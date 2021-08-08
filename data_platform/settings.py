@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users'
+    'datasets',
 ]
 
 MIDDLEWARE = [
@@ -119,6 +119,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/users/login'
+# Media tags
 
-LOGIN_REDIRECT_URL = '/users/login'  # to be changed
+MEDIA_ROOT = './media/'
+MEDIA_URL = './media/'

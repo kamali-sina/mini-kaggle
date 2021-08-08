@@ -1,0 +1,7 @@
+<h1>Upload a new file</h1>
+<form enctype="multipart/form-data" action="{% url 'datasets:upload' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_ul }}
+    <input type="submit" value="Submit">
+</form>
+<p><a href="{% url 'datasets:index' %}">datasets page</a></p>

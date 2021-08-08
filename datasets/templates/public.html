@@ -1,0 +1,10 @@
+{% if public_datasets_list %}
+<h1>Public datasets:</h1>
+<ul>
+    {% for dataset in public_datasets_list %}
+    <li><a href="/datasets/{{ dataset.id }}/">{{ dataset.id }}: {{ dataset.description }}</a> | author: {{ request.user.username }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No public datasets available.</p>
+{% endif %}

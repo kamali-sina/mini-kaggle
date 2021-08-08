@@ -1,0 +1,16 @@
+<h3>Welcome {{ request.user.username }}!</h3>
+
+{% if private_datasets_list %}
+<h2>Your private datasets:</h2>
+<ul>
+    {% for dataset in private_datasets_list %}
+    <li><a href="/datasets/{{ dataset.id }}/">{{ dataset.id }}: {{ dataset.description }}</a> | author: {{ request.user.username }}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No private datasets available.</p>
+{% endif %}
+<li><a href="/datasets/public">Public datasets</a></li>
+
+<li><a href="{% url 'datasets:upload' %}">upload a new file?</a></li>
