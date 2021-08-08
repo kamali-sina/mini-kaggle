@@ -1,0 +1,12 @@
+{% if datasets_list %}
+<h1>Your datasets:</h1>
+<ul>
+    {% for dataset in datasets_list %}
+    <li><a href="/datasets/{{ dataset.id }}/">{{ dataset.title }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+    <h1>No datasets are available.</h1>
+{% endif %}
+
+<p><a href="{% url 'datasets:upload' %}">upload a new file?</a></p>
