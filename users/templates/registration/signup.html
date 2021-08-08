@@ -1,0 +1,18 @@
+{% load static %}
+
+<form id='form' action="{% url 'users:signup' %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h1>Signup</h1></legend>
+        <ul>
+            {% for field in form %}
+            <li>
+                {{ field.errors }}
+                {{ field.label_tag }} {{ field }}
+            </li>
+            {% endfor %}
+        </ul>
+    </fieldset>
+    <input type="submit" value="Signup">
+</form>
+<a href="{% url 'login' %}">Have an account? login here.</a>
