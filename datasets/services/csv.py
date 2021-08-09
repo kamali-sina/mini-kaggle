@@ -5,7 +5,10 @@ from django.conf import settings
 DEFAULT_ROW_NO = 10
 
 
-def read_csv_dataset(filename):
+def read_csv_dataset(filename, row_number=None):
+    if row_number == None:
+        row_number = DEFAULT_ROW_NO
+
     with open(f'{settings.MEDIA_ROOT}/{filename}', 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
 
@@ -13,7 +16,7 @@ def read_csv_dataset(filename):
 
         rows = []
         for row in csv_reader:
-            if csv_reader.line_num > DEFAULT_ROW_NO:
+            if csv_reader.line_num > row_number:
                 break
             rows.append(row)
 
