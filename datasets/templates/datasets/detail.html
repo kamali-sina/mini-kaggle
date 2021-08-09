@@ -1,0 +1,6 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{%static 'datasets/styles/detail.css' %}">
+{% include "datasets/dataset_info.html" %}
+{% include "datasets/dataset_content.html" %}
+<p><a href="{% url 'datasets:index' %}">datasets page</a></p>
+

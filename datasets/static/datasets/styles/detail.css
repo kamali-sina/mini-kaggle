@@ -1,0 +1,30 @@
+.container{
+  padding-top: 5vh;
+  display: flex;
+  justify-content: center;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  min-width: 50%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.header {
+  background-color: #dddddd;
+}
+
+.about{
+  background-color: aliceblue;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  font-family: arial, sans-serif;
+  padding: 30px;
+}
