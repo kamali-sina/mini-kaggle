@@ -8,8 +8,9 @@ from django.views import generic
 from .forms import CreateDatasetForm
 
 
-class CreatorOnlyMixin(AccessMixin):
-    """Verify that the current user is the creator."""
+class PublicOrCreatorMixin(AccessMixin):
+    """Verify that the current user is the creator.
+        Also see if the requested dataset is public or not."""
 
     def dispatch(self, request, *args, **kwargs):
         dataset_id = kwargs.get("pk", None)
@@ -19,27 +20,33 @@ class CreatorOnlyMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-# Create your views here.
-
 class DatasetIndexView(LoginRequiredMixin, generic.ListView):
-    template_name = "index.html"
-    context_object_name = "private_datasets_list"
+    template_name = "datasets.html"
+    context_object_name = "datasets_list"
 
     def get_queryset(self):
-        queryset = Dataset.objects.filter(is_public=False, creator=self.request.user)
-        return queryset
+        return Dataset.objects.filter(is_public=False, creator=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = "private"
+        return context
 
 
-class PublicView(LoginRequiredMixin, generic.ListView):
-    template_name = "public.html"
-    context_object_name = "public_datasets_list"
+class PublicView(generic.ListView):
+    template_name = "datasets.html"
+    context_object_name = "datasets_list"
 
     def get_queryset(self):
-        queryset = Dataset.objects.filter(is_public=True)
-        return queryset
+        return Dataset.objects.filter(is_public=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = "public"
+        return context
 
 
-class DatasetDetailView(LoginRequiredMixin, CreatorOnlyMixin, generic.DetailView):
+class DatasetDetailView(LoginRequiredMixin, PublicOrCreatorMixin, generic.DetailView):
     model = Dataset
     template_name = "detail.html"
 
