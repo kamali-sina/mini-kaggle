@@ -1,4 +1,9 @@
 <h1>{{ dataset.title }}</h1>
 <h2>Created by: {{ request.user.username }}</h2>
+{% if dataset.is_public %}
+<h3>Public dataset</h3>
+{% else %}
+<h3>Private dataset</h3>
+{% endif %}
 <p>Description: {{ dataset.description }}</p>
 <p><a href="{% url 'datasets:index' %}">datasets page</a></p>
