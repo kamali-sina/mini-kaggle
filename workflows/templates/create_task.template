@@ -1,0 +1,10 @@
+<style>li{
+   font-size: 17px;
+   list-style: none;
+   margin: 15px auto;}
+</style>
+<form action="{% url 'workflows:create_task' %}" method="post">
+   {% csrf_token %}
+   {{ form.as_ul }}
+   <input type="submit" value="CreateTask">
+</form>
