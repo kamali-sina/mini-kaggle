@@ -1,27 +1,17 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import Dataset
+from .services.csv import read_csv_dataset
 from django.views import generic
 from .forms import CreateDatasetForm
 
 
-class PublicOrCreatorMixin(AccessMixin):
-    """Verify that the current user is the creator.
-        Also see if the requested dataset is public or not."""
-
-    def dispatch(self, request, *args, **kwargs):
-        dataset_id = kwargs.get("pk", None)
-        dataset = Dataset.objects.get(id=dataset_id)
-        if dataset.creator.id != request.user.id and not dataset.is_public:
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
-
-
 class DatasetIndexView(LoginRequiredMixin, generic.ListView):
-    template_name = "datasets.html"
+    template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
 
     def get_queryset(self):
@@ -34,7 +24,7 @@ class DatasetIndexView(LoginRequiredMixin, generic.ListView):
 
 
 class PublicView(generic.ListView):
-    template_name = "datasets.html"
+    template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
 
     def get_queryset(self):
@@ -44,11 +34,6 @@ class PublicView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['tag'] = "public"
         return context
-
-
-class DatasetDetailView(LoginRequiredMixin, PublicOrCreatorMixin, generic.DetailView):
-    model = Dataset
-    template_name = "detail.html"
 
 
 @login_required
@@ -65,4 +50,32 @@ def dataset_add_dataset(request):
         return HttpResponseRedirect(reverse("datasets:detail", args=(dataset.id,)))
     elif request.method == "GET":
         form = CreateDatasetForm()
-        return render(request, "upload.html", {"form": form})
+        return render(request, "datasets/upload.html", {"form": form})
+
+
+def has_permission(permission_func):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            if permission_func(*args, **kwargs):
+                return func(*args, **kwargs)
+            else:
+                raise PermissionDenied
+
+        return wrapper
+
+    return decorator
+
+
+def has_dataset_detail_perm(request, pk):
+    # check for dataset public/private access once u add the feature
+    dataset = get_object_or_404(Dataset, pk=pk)
+    return dataset.creator.id == request.user.id
+
+
+@login_required
+@has_permission(has_dataset_detail_perm)
+def dataset_detail_view(request, pk):
+    dataset = get_object_or_404(Dataset, pk=pk)
+    context = {'csv': read_csv_dataset(str(dataset.file)),
+               'dataset': dataset}
+    return render(request, 'datasets/detail.html', context)

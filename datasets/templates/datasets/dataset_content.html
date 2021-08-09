@@ -1,0 +1,17 @@
+<div class="container">
+    <table>
+        <tr class="header">
+            {% for h in csv.header %}
+            <th>{{ h }}</th>
+            {% endfor %}
+        </tr>
+
+        {% for row in csv.rows %}
+        <tr>
+            {% for item in row %}
+            <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
