@@ -123,4 +123,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = './media/'
 
 LOGIN_URL = '/users/login'
-LOGIN_REDIRECT_URL = '/users/login'  # to be changed
+LOGIN_REDIRECT_URL = '/datasets/'
