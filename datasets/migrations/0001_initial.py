@@ -28,10 +28,16 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("date_created", models.DateTimeField(auto_now_add=True)),
-                ("description", models.CharField(max_length=200, null=True)),
+                ("title", models.CharField(default="No Title", max_length=100)),
+                (
+                    "description",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
                 (
                     "file",
-                    models.FileField(upload_to=datasets.models.user_directory_path),
+                    models.FileField(
+                        upload_to=datasets.models.user_dataset_directory_path
+                    ),
                 ),
                 (
                     "creator",

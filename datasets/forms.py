@@ -13,15 +13,10 @@ class CreateDatasetForm(forms.ModelForm):
         ],
     )
 
-    description = forms.CharField(
-         max_length=200,
-         required=False,
-    )
-
     is_public = forms.BooleanField(
         required=False
     )
 
     class Meta:
-        fields = ["description", "file", "is_public"]
+        fields = ["file", "title", "description"]
         model = Dataset

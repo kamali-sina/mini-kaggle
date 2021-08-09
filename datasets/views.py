@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
 from django.urls import reverse
 from .models import Dataset
 from django.views import generic
@@ -22,7 +21,7 @@ class CreatorOnlyMixin(AccessMixin):
 
 # Create your views here.
 
-class IndexView(LoginRequiredMixin, generic.ListView):
+class DatasetIndexView(LoginRequiredMixin, generic.ListView):
     template_name = "index.html"
     context_object_name = "private_datasets_list"
 
@@ -40,21 +39,23 @@ class PublicView(LoginRequiredMixin, generic.ListView):
         return queryset
 
 
-class DetailView(LoginRequiredMixin, CreatorOnlyMixin, generic.DetailView):
+class DatasetDetailView(LoginRequiredMixin, CreatorOnlyMixin, generic.DetailView):
     model = Dataset
     template_name = "detail.html"
 
 
 @login_required
-def uploadData(request):
+def dataset_add_dataset(request):
     if request.method == "POST":
-        form = CreateDatasetForm(request.POST, request.FILES)  # there is no instance yet!
-        if form.is_valid():
-            file = form.save(commit=False)
-            file.creator = request.user
-            file.save()
-            return HttpResponseRedirect(reverse("datasets:detail", args=(file.id,)))
-        return HttpResponse("Invalid format!", status=405)
+        form = CreateDatasetForm(
+            request.POST, request.FILES
+        )
+        if not form.is_valid():
+            return HttpResponse("Invalid format!", status=400)
+        dataset = form.save(commit=False)  # the file should be there now anyway
+        dataset.creator = request.user
+        dataset.save()
+        return HttpResponseRedirect(reverse("datasets:detail", args=(dataset.id,)))
     elif request.method == "GET":
         form = CreateDatasetForm()
         return render(request, "upload.html", {"form": form})
