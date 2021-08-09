@@ -16,6 +16,7 @@ class Dataset(models.Model):
     title = models.CharField(max_length=100, null=False, default="No Title")
     description = models.CharField(max_length=200, blank=True, null=True)
     file = models.FileField(upload_to=user_dataset_directory_path)
+    is_public = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
         return str(self.title)

@@ -14,5 +14,5 @@ class CreateDatasetForm(forms.ModelForm):
     )
 
     class Meta:
-        fields = ["file", "title", "description"]
+        fields = ["file", "title", "description", 'is_public']
         model = Dataset
