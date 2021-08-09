@@ -2,12 +2,11 @@
 <h1>Public datasets:</h1>
 <ul>
     {% for dataset in public_datasets_list %}
-    <li><a href="/datasets/{{ dataset.id }}/">{{ dataset.id }}: {{ dataset.description }}</a> | author: {{ request.user.username }}</li>
+    <li><a href="/datasets/{{ dataset.id }}/">{{ dataset.title }}</a></li>
     {% endfor %}
 </ul>
 {% else %}
-<p>No public datasets available.</p>
+    <p>No public datasets available.</p>
 {% endif %}
-<li><a href="/datasets/">Private datasets</a></li>
 
 <li><a href="{% url 'datasets:upload' %}">upload a new file?</a></li>
