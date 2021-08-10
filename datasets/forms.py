@@ -16,3 +16,6 @@ class CreateDatasetForm(forms.ModelForm):
     class Meta:
         fields = ["file", "title", "description", 'is_public']
         model = Dataset
+        widgets = {
+            "description": forms.Textarea(),
+        }
