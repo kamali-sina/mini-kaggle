@@ -1,3 +1,13 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}{% endblock %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+
+
 {% if next %}
     {% if user.is_authenticated %}
         <p>Your account doesn't have access to this page. To proceed,
@@ -32,3 +42,9 @@
 </form>
 
 <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+
+
+{% endblock %}
+
+
+

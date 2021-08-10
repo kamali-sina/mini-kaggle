@@ -1,11 +1,25 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
 <style>li{
    font-size: 17px;
    list-style: none;
    margin: 15px auto;}
 </style>
+{% endblock %}
+
+{% block title %}Tasks{% endblock %}
+
+{% block body %}
+
+
 <a href="{% url 'workflows:create_task' %}">add new task</a></br>
 <ul>
    {% for task in tasks %}
        <li><a href="{{ task.pk }}/">{{task.name}} ({{task.status}})</a></li>
    {% endfor %}
 </ul>
+
+
+{% endblock %}

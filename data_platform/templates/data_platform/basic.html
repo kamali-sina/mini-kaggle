@@ -1,0 +1,38 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    {% block head %}
+    <!--style, link and other head tags go here-->
+    {% endblock %}
+    <style>
+        body {
+            font-family: Garamond, sans-serif;
+            overflow-x: hidden;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        html {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'data_platform/styles/basic.css' %}">
+    <meta charset="utf-8">
+    <meta name="author" content="SummerCamp_Bakend_Team3">
+    <meta name="keywords" content="dataset, workflow, task, data">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}<!--page title goes here-->{% endblock %}</title>
+</head>
+
+<body>
+    {% include 'data_platform/nav_bar.html' %}
+    {% block body %}
+    <!--body goes here-->
+    {% endblock %}
+</body>
+
+</html>

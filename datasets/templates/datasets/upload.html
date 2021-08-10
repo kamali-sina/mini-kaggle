@@ -1,3 +1,13 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}{% endblock %}
+
+{% block title %}Upload Dataset{% endblock %}
+
+{% block body %}
+
+
 <h1>Upload a new file</h1>
 <form enctype="multipart/form-data" action="{% url 'datasets:upload' %}" method="post">
     {% csrf_token %}
@@ -5,3 +15,6 @@
     <input type="submit" value="Submit">
 </form>
 <p><a href="{% url 'datasets:index' %}">datasets page</a></p>
+
+
+{% endblock %}

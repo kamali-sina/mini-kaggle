@@ -1,0 +1,26 @@
+.nav_bar_container{
+  display: flex;
+  padding: 10px 30px 10px 50px;
+  box-shadow: 0px 0px 10px grey;
+}
+
+.filler{
+  flex-grow: 1;
+}
+
+.nav_item_container{
+  display: flex;
+  align-items: center;
+}
+
+.menu-item{
+  text-decoration: none;
+  color: black;
+  margin-right: 20px;
+  font-size: large;
+  font-weight: bold;
+}
+
+.menu-item:hover {
+  color: rgb(16,84,113);
+}

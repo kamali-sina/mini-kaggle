@@ -1,6 +1,18 @@
+{% extends 'data_platform/basic.html' %}
 {% load static %}
+
+{% block head %}
 <link rel="stylesheet" type="text/css" href="{%static 'datasets/styles/detail.css' %}">
+{% endblock %}
+
+{% block title %}Dataset Details{% endblock %}
+
+{% block body %}
+
+
 {% include "datasets/dataset_info.html" %}
 {% include "datasets/dataset_content.html" %}
 <p><a href="{% url 'datasets:index' %}">datasets page</a></p>
 
+
+{% endblock %}

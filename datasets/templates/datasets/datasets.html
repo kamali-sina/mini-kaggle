@@ -1,3 +1,13 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}{% endblock %}
+
+{% block title %}Datasets{% endblock %}
+
+{% block body %}
+
+
 {% if  datasets_list  %}
 <h1>{{ tag }} datasets:</h1>
 <ul>
@@ -6,7 +16,10 @@
     {% endfor %}
 </ul>
 {% else %}
-    <h2>No {{ tag }} datasets available.</h2>
+<h2>No {{ tag }} datasets available.</h2>
 {% endif %}
 
 <li><a href="{% url 'datasets:upload' %}">upload a new file?</a></li>
+
+
+{% endblock %}
