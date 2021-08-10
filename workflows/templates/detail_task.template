@@ -1,8 +1,19 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
 <style>li{
    font-size: 17px;
    list-style: none;
    margin: 15px auto;}
 </style>
+{% endblock %}
+
+{% block title %}Task Details{% endblock %}
+
+{% block body %}
+
+
 <ul>
    <li>name: {{task.name}}</li>
    <li>task.docker_image: {{task.docker_image}}</li>
@@ -13,3 +24,6 @@
       </form>
    </li>
 </ul>
+
+
+{% endblock %}

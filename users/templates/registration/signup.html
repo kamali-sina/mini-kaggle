@@ -1,4 +1,12 @@
+{% extends 'data_platform/basic.html' %}
 {% load static %}
+
+{% block head %}{% endblock %}
+
+{% block title %}Signup{% endblock %}
+
+{% block body %}
+
 
 <form id='form' action="{% url 'users:signup' %}" method="post">
     {% csrf_token %}
@@ -16,3 +24,8 @@
     <input type="submit" value="Signup">
 </form>
 <a href="{% url 'login' %}">Have an account? login here.</a>
+
+
+{% endblock %}
+
+
