@@ -71,9 +71,8 @@ def has_permission(permission_func):
 
 
 def has_dataset_detail_perm(request, pk):
-    # check for dataset public/private access once u add the feature
     dataset = get_object_or_404(Dataset, pk=pk)
-    return dataset.creator.id == request.user.id
+    return dataset.creator.id == request.user.id or dataset.is_public
 
 
 @login_required
