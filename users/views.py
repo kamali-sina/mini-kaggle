@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.shortcuts import render
 
 from django.views.generic import CreateView
 
@@ -12,3 +13,8 @@ class Signup(CreateView):
     form_class = UserForm
     template_name = 'registration/signup.html'
     success_url = settings.LOGIN_URL
+
+
+def dashboard(request):
+    return render(request, "dashboard.html")
+
