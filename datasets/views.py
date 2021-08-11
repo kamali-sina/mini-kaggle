@@ -9,8 +9,11 @@ from .services.csv import read_csv_dataset
 from django.views import generic
 from .forms import CreateDatasetForm
 
+NUMBER_OF_OBJECTS_PER_PAGE = 10
+
 
 class DatasetIndexView(LoginRequiredMixin, generic.ListView):
+    paginate_by = NUMBER_OF_OBJECTS_PER_PAGE
     template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
 
@@ -24,6 +27,7 @@ class DatasetIndexView(LoginRequiredMixin, generic.ListView):
 
 
 class PublicView(generic.ListView):
+    paginate_by = NUMBER_OF_OBJECTS_PER_PAGE
     template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
 
