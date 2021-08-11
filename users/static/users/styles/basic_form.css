@@ -1,0 +1,87 @@
+.form_container {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    font-family: arial, sans-serif;
+}
+
+.long_form {
+    margin-top: 10%;
+    width: 30%;
+    height: 50%;
+    background-color: aliceblue;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-bottom: 15px;
+}
+
+.small_form {
+    margin-top: 5%;
+    width: 30%;
+    height: 70%;
+    background-color: aliceblue;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-bottom: 15px;
+}
+
+.table {
+    height: 50%;
+}
+
+input[type=text] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type=email] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+input[type=submit] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: medium;
+}
+
+input[type=file] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: medium;
+}
+
+label {
+    margin-right: 10px;
+}
+
+.filler {
+    height: 100%;
+}
+
+.title {
+    padding-top: 10px;
+    padding-bottom: 30px;
+}

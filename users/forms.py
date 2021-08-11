@@ -10,7 +10,7 @@ class UserForm(forms.ModelForm):
         widget=forms.PasswordInput(),
         validators=[
             MinLengthValidator(limit_value=8, message='password should be at least 8 character'),
-            RegexValidator(regex="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]*$",
+            RegexValidator(regex=r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]*$",
                            message='password should contain at least one letter and one number')
         ]
     )
