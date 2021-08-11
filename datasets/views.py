@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.urls import reverse
 from .models import Dataset
 from .services.csv import read_csv_dataset
@@ -79,3 +79,12 @@ def dataset_detail_view(request, pk):
     context = {'csv': read_csv_dataset(str(dataset.file)),
                'dataset': dataset}
     return render(request, 'datasets/detail.html', context)
+
+
+@login_required
+@has_permission(has_dataset_detail_perm)
+def dataset_download_view(request, pk):
+    dataset = get_object_or_404(Dataset, pk=pk)
+    file = open(dataset.file.path, 'rb')
+    response = FileResponse(file)
+    return response

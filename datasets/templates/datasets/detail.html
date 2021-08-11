@@ -12,6 +12,7 @@
 
 {% include "datasets/dataset_info.html" %}
 {% include "datasets/dataset_content.html" %}
+<p><a href="{% url 'datasets:download' pk=dataset.id %}">download dataset</a></p>
 <p><a href="{% url 'datasets:index' %}">datasets page</a></p>
 
 
