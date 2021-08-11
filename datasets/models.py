@@ -14,7 +14,7 @@ class Dataset(models.Model):
     creator = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True, null=False)
     title = models.CharField(max_length=100, null=False, default="No Title")
-    description = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     file = models.FileField(upload_to=user_dataset_directory_path)
     is_public = models.BooleanField(default=False, blank=True)
 
