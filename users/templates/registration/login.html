@@ -1,7 +1,9 @@
 {% extends 'data_platform/basic.html' %}
 {% load static %}
 
-{% block head %}{% endblock %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+{% endblock %}
 
 {% block title %}Login{% endblock %}
 
@@ -9,37 +11,40 @@
 
 
 {% if next %}
-    {% if user.is_authenticated %}
-        <p>Your account doesn't have access to this page. To proceed,
-            please login with an account that has access.</p>
-    {% else %}
-        <p>Please login to see this page.</p>
-    {% endif %}
+{% if user.is_authenticated %}
+<p>Your account doesn't have access to this page. To proceed,
+    please login with an account that has access.</p>
+{% else %}
+<p>Please login to see this page.</p>
+{% endif %}
 {% endif %}
 
-<form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <fieldset>
-        <legend><h1>Login</h1></legend>
-        <table>
-            <tr>
-                <td>{{ form.username.label_tag }}</td>
-                <td>{{ form.username }}</td>
-            </tr>
-            <tr>
-                <td>{{ form.password.label_tag }}</td>
-                <td>{{ form.password }}</td>
-            </tr>
-        </table>
-        {% if form.errors %}
+<div class="form_container">
+    <form method="post" action="{% url 'login' %}" class="small_form">
+        <h1 class="title">Login</h1>
+        {% csrf_token %}
+        <div class="filler">
+            <table>
+                <tr>
+                    <td>{{ form.username.label_tag }}</td>
+                    <td>{{ form.username }}</td>
+                </tr>
+                <tr>
+                    <td>{{ form.password.label_tag }}</td>
+                    <td>{{ form.password }}</td>
+                </tr>
+            </table>
+            {% if form.errors %}
             <p>Your username and password didn't match. Please try again.</p>
-        {% endif %}
-    </fieldset>
-    <input type="submit" value="login">
-    <input type="hidden" name="next" value="{{ next }}">
-    <p>Don't have an account?
-        <a href="{% url 'users:signup' %}">Sign up</a></p>
-</form>
+            {% endif %}
+            <input type="submit" value="Login">
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <p>Don't have an account?
+            <a href="{% url 'users:signup' %}">Sign up</a></p>
+    </form>
+</div>
+
 
 <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
 
