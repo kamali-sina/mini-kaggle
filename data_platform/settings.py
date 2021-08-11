@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'workflows',
     'datasets',
-    'users'
+    'users',
+    'django_celery_results'
 ]
 
 MIDDLEWARE = [
@@ -129,3 +130,6 @@ MEDIA_ROOT = './media/'
 
 LOGIN_URL = '/users/login'
 LOGIN_REDIRECT_URL = '/datasets/'
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'django-db'
