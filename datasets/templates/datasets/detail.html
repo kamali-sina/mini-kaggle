@@ -3,6 +3,7 @@
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{%static 'datasets/styles/detail.css' %}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 {% endblock %}
 
 {% block title %}Dataset Details{% endblock %}
@@ -12,8 +13,18 @@
 
 {% include "datasets/dataset_info.html" %}
 {% include "datasets/dataset_content.html" %}
-<p><a href="{% url 'datasets:download' pk=dataset.id %}">download dataset</a></p>
-<p><a href="{% url 'datasets:index' %}">datasets page</a></p>
+
+<a href="{% url 'datasets:download' pk=dataset.id %}" class="download">
+    <i class="material-icons">download</i>
+    Download
+</a>
+
+<div class="tag_container">
+    Tags:
+    {% for tag in dataset.tags.all %}
+    <a class="tag">{{ tag.text }}</a>
+    {% endfor %}
+</div>
 
 
 {% endblock %}
