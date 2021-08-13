@@ -21,24 +21,8 @@
 
 <div class="form_container">
     <form method="post" action="{% url 'login' %}" class="small_form">
-        <h1 class="title">Login</h1>
         {% csrf_token %}
-        <div class="filler">
-            <table>
-                <tr>
-                    <td>{{ form.username.label_tag }}</td>
-                    <td>{{ form.username }}</td>
-                </tr>
-                <tr>
-                    <td>{{ form.password.label_tag }}</td>
-                    <td>{{ form.password }}</td>
-                </tr>
-            </table>
-            {% if form.errors %}
-            <p>Your username and password didn't match. Please try again.</p>
-            {% endif %}
-            <input type="submit" value="Login">
-        </div>
+        {% include 'registration/basic_form.html' with form=form title='Login' submit_value='Login'%}
         <input type="hidden" name="next" value="{{ next }}">
         <p>Don't have an account?
             <a href="{% url 'users:signup' %}">Sign up</a></p>

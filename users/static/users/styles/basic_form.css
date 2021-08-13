@@ -6,9 +6,9 @@
 }
 
 .long_form {
-    margin-top: 10%;
+    margin-top: 5%;
     width: 30%;
-    height: 50%;
+    height: 70%;
     background-color: aliceblue;
     display: flex;
     align-items: center;
@@ -19,12 +19,12 @@
 .small_form {
     margin-top: 5%;
     width: 30%;
-    height: 70%;
+    height: 50%;
     background-color: aliceblue;
     display: flex;
     align-items: center;
     flex-direction: column;
-    padding-bottom: 15px;
+    padding-bottom: 30px;
 }
 
 .table {

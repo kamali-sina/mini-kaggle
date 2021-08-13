@@ -13,24 +13,8 @@
 
 <div class="form_container">
     <form id='form' action="{% url 'users:signup' %}" method="post" class="long_form">
-        <h1 class="title">Signup</h1>
         {% csrf_token %}
-        <div class="filler">
-            <table>{% for field in form %}
-                <tr>
-                    <td>{{ field.label_tag }}</td>
-                    <td>{{ field }}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        {{ field.errors }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-
-            <input type="submit" value="Signup">
-        </div>
+        {% include 'registration/basic_form.html' with form=form title='Signup' submit_value='Signup'%}
         <a href="{% url 'login' %}">Have an account? login here.</a>
     </form>
 </div>
