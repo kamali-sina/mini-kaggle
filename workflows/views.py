@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib.auth.models import User
 
-
 class CreatorOnlyMixin(AccessMixin):
     """Verify that the current user is the creator."""
 
@@ -47,6 +46,8 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
 
 
 class TaskListView(LoginRequiredMixin, ListView):
+    ITEMS_PER_PAGE = 10
+    paginate_by = ITEMS_PER_PAGE
     model = Task
     template_name = 'list_task.template'
     context_object_name = 'tasks'

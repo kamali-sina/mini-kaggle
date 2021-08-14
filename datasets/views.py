@@ -14,9 +14,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import QueryDict
 from django.contrib.auth.models import User
 
-NUMBER_OF_OBJECTS_PER_PAGE = 10
-
-
 def has_permission(permission_func):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -36,7 +33,8 @@ def has_dataset_owner_perm(request, pk):
 
 
 class DatasetIndexView(LoginRequiredMixin, generic.ListView):
-    paginate_by = NUMBER_OF_OBJECTS_PER_PAGE
+    ITEMS_PER_PAGE = 10
+    paginate_by = ITEMS_PER_PAGE
     template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
 
@@ -50,7 +48,8 @@ class DatasetIndexView(LoginRequiredMixin, generic.ListView):
 
 
 class PublicView(generic.ListView):
-    paginate_by = NUMBER_OF_OBJECTS_PER_PAGE
+    ITEMS_PER_PAGE = 10
+    paginate_by = ITEMS_PER_PAGE
     template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
 
