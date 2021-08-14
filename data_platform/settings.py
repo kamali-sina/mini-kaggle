@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'workflows',
     'datasets',
     'users',
-    'django_celery_results'
+    'django_celery_results',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,14 @@ LOGIN_REDIRECT_URL = '/datasets/'
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'django-db'
+
+# Email settings
+# https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-EMAIL_BACKEND
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'dataplatformteam3@gmail.com'
+EMAIL_HOST_PASSWORD = 'divar1234'
+EMAIL_USE_TLS = True
+
