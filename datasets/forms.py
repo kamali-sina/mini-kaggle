@@ -1,6 +1,11 @@
+import datetime
+import re
+
 from django import forms
 from .models import Dataset
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, RegexValidator
+from datasets.services.tag_addition import get_unique_tags_validator_for_dataset, add_new_or_existing_tag, \
+    tag_input_regex, tag_input_format_msg
 
 
 class CreateDatasetForm(forms.ModelForm):
@@ -12,6 +17,10 @@ class CreateDatasetForm(forms.ModelForm):
             FileExtensionValidator(allowed_extensions=["csv"]),
         ],
     )
+    adding_tags = forms.CharField(label='Add as many space separated tags as you want',
+                                  required=False,
+                                  max_length=300,
+                                  validators=[RegexValidator(regex=tag_input_regex, message=tag_input_format_msg)])
 
     class Meta:
         fields = ["file", "title", "description", 'is_public']
@@ -19,3 +28,65 @@ class CreateDatasetForm(forms.ModelForm):
         widgets = {
             "description": forms.Textarea(),
         }
+
+    def clean_adding_tags(self):
+        return [] if not self.cleaned_data['adding_tags'] else set(re.split(r'\s+', self.cleaned_data['adding_tags']))
+
+    def save(self, creator, commit=True, pk=0):
+        dataset = super(CreateDatasetForm, self).save(commit=False)
+        dataset.creator = creator
+        if pk:
+            dataset.id = pk
+            dataset.date_created = datetime.datetime.now()
+        if commit:
+            dataset.save()
+            self.save_tags(dataset)
+        return dataset
+
+    def save_tags(self, dataset):
+        for tag_text in self.cleaned_data['adding_tags']:
+            add_new_or_existing_tag(tag_text, dataset)
+
+
+class EditDatasetInfoForm(forms.ModelForm):
+    class Meta:
+        model = Dataset
+        fields = ['title', 'description']
+
+
+class DeleteTagForm(forms.Form):
+    deleting_tags = forms.ModelMultipleChoiceField(queryset=None,
+                                                   required=False,
+                                                   label='Select tags to delete',
+                                                   widget=forms.CheckboxSelectMultiple)
+
+    def __init__(self, *args, **kwargs):
+        self.dataset = kwargs.pop('dataset')
+        super(DeleteTagForm, self).__init__(*args, **kwargs)
+        dataset = Dataset.objects.get(id=self.dataset.id)
+        self.fields['deleting_tags'].queryset = dataset.tags
+
+    def submit(self):
+        if self.is_valid():
+            self.dataset.tags.remove(*self.cleaned_data['deleting_tags'])
+
+
+class AddTagForm(forms.Form):
+    adding_tags = forms.CharField(label='Add as many space separated tags as you want',
+                                  required=False,
+                                  max_length=300,
+                                  validators=[
+                                      RegexValidator(regex=tag_input_regex, message=tag_input_format_msg)])
+
+    def __init__(self, *args, **kwargs):
+        self.dataset = kwargs.pop('dataset')
+        super(AddTagForm, self).__init__(*args, **kwargs)
+        self.fields['adding_tags'].validators.append(get_unique_tags_validator_for_dataset(self.dataset))
+
+    def clean_adding_tags(self):
+        return [] if not self.cleaned_data['adding_tags'] else set(re.split(r'\s+', self.cleaned_data['adding_tags']))
+
+    def submit(self):
+        if self.is_valid():
+            for tag_text in self.cleaned_data['adding_tags']:
+                add_new_or_existing_tag(tag_text, self.dataset)
