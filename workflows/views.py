@@ -1,11 +1,11 @@
 from django.http import HttpResponseRedirect
-
 from .models import Task, PythonTask
 from .forms import TaskForm, PythonTaskForm
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 class CreatorOnlyMixin(AccessMixin):
@@ -35,7 +35,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
         candidate = form.save(commit=False)
         candidate.creator = self.request.user
         candidate.save()
-
+        messages.success(self.request, 'Your task has been created :)')
         success_url = reverse("workflows:detail_task", args=(candidate.pk,))
         return HttpResponseRedirect(success_url)
 
@@ -49,7 +49,7 @@ class PythonTaskCreateView(LoginRequiredMixin, CreateView):
         python_task = form.save(commit=False)
         python_task.creator = self.request.user
         python_task.save()
-
+        messages.success(self.request, 'Your task has been created :)')
         success_url = reverse("workflows:detail_task", args=(python_task.pk,))
         return HttpResponseRedirect(success_url)
 

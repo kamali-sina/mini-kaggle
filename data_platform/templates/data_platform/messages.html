@@ -1,0 +1,9 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'data_platform/styles/messages.css' %}">
+
+{% for message in messages %}
+<div class="ui {{ message.tags }} message">
+  <h1 class="message">{{ message }}</h1>
+</div>
+{% endfor %}
