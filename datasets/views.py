@@ -65,19 +65,15 @@ class PublicView(generic.ListView):
         return context
 
 
-@login_required
-def dataset_add_dataset(request):
-    if request.method == "POST":
-        form = CreateDatasetForm(
-            request.POST, request.FILES
-        )
-        if not form.is_valid():
-            return HttpResponse("Invalid format!", status=400)
-        dataset = form.save(request.user)  # the file should be there now anyway
-        return HttpResponseRedirect(reverse("datasets:detail", args=(dataset.id,)))
-    elif request.method == "GET":
-        form = CreateDatasetForm()
-        return render(request, "datasets/upload.html", {"form": form})
+class DatasetCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Dataset
+    form_class = CreateDatasetForm
+    template_name = 'datasets/upload.html'
+
+    def form_valid(self, form):
+        candidate = form.save(self.request.user)
+        success_url = reverse("datasets:detail", args=(candidate.pk,))
+        return HttpResponseRedirect(success_url)
 
 
 @login_required
