@@ -10,9 +10,12 @@ from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, DeleteTagForm
 from datasets.services.form_handler import create_dataset_edition_forms_on_get, create_dataset_edition_forms_on_post, \
     submit_dataset_edition_forms
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 
 from django.http import QueryDict
 from django.contrib.auth.models import User
+
 
 def has_permission(permission_func):
     def decorator(func):
@@ -143,3 +146,10 @@ def edit_dataset_view(request, pk):
         create_dataset_edition_forms_on_post(context, request.POST, dataset)
         submit_dataset_edition_forms(context)
     return render(request, 'datasets/edit.html', context=context)
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(has_permission(has_dataset_owner_perm), name='dispatch')
+class DatasetDeleteView(generic.DeleteView):
+    model = Dataset
+    success_url = reverse_lazy('datasets:index')

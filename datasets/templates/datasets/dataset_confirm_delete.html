@@ -1,0 +1,21 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/delete.css' %}">
+{% endblock %}
+
+{% block title %}Delete Dataset{% endblock %}
+
+{% block body %}
+
+
+<div class="delete_form_container">
+    <p>Are you sure you want to delete "{{ object }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <input type="submit" value="Confirm" class="delete_button">
+    </form>
+</div>
+
+{% endblock %}
