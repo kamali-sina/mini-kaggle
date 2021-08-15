@@ -20,7 +20,7 @@
 {% endif %}
 
 <div class="form_container">
-    <form method="post" action="{% url 'login' %}" class="small_form">
+    <form method="post" action="{% url 'users:login' %}" class="small_form">
         {% csrf_token %}
         {% include 'registration/basic_form.html' with form=form title='Login' submit_value='Login'%}
         <input type="hidden" name="next" value="{{ next }}">
@@ -30,7 +30,7 @@
 </div>
 
 
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+<p><a href="{% url 'users:password_reset' %}">Lost password?</a></p>
 
 
 {% endblock %}
