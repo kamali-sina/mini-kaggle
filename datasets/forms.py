@@ -9,14 +9,6 @@ from datasets.services.tag_addition import get_unique_tags_validator_for_dataset
 
 
 class CreateDatasetForm(forms.ModelForm):
-    file = forms.FileField(
-        label="Filepath:",
-        help_text="Only csv files",
-        widget=forms.FileInput(),
-        validators=[
-            FileExtensionValidator(allowed_extensions=["csv"]),
-        ],
-    )
     adding_tags = forms.CharField(label='Add as many space separated tags as you want',
                                   required=False,
                                   max_length=300,
