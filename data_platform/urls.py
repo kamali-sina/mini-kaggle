@@ -25,4 +25,5 @@ urlpatterns = [
     path('users/', include('users.urls')),
 
     path('datasets/', include('datasets.urls')),
+    path('notifications/', include('notifications.urls')),
 ]
