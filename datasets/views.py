@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 
 from django.http import QueryDict
 from django.contrib.auth.models import User
-
+from django.contrib import messages
 
 def has_permission(permission_func):
     def decorator(func):
@@ -75,6 +75,7 @@ class DatasetCreateView(LoginRequiredMixin, generic.CreateView):
     def form_valid(self, form):
         candidate = form.save(self.request.user)
         success_url = reverse("datasets:detail", args=(candidate.pk,))
+        messages.success(self.request, 'Your dataset has been created :)')
         return HttpResponseRedirect(success_url)
 
 
