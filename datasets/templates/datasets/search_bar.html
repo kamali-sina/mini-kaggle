@@ -1,0 +1,11 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/search_bar.css' %}">
+
+<div class="search_box">
+    <form action="{% url 'datasets:index' %}" method="post" class="search_form">
+        {% csrf_token %}
+        <label for="search_box">Looking for something else?</label>
+        <input type="text" name="search_box" id="search_box">
+        <input type="submit" name="search" value="Search">
+    </form>
+</div>

@@ -1,0 +1,20 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/filter_bar.css' %}">
+
+<div class="filter_box">
+    <h3>Select tags to apply filter:</h3>
+    {%if request.session.active_tags or request.session.inactive_tags %}
+    <form action="{% url 'datasets:index' %}" method="post" class="tags_container">
+        {% csrf_token %}
+        {% for a_tag in request.session.active_tags %}
+        <input type="submit" name="inactivated_tag" value="{{ a_tag }}" class="active_tag tag">
+        {% endfor %}
+        {% for i_tag in request.session.inactive_tags %}
+        <input type="submit" name="activated_tag" value="{{ i_tag }}" class="inactive_tag tag">
+        {% endfor %}
+    </form>
+    {% else %}
+    <small>You dont have any tags yet.</small>
+    {% endif %}
+</div>
