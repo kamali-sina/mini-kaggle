@@ -2,19 +2,20 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 
-
 # Create your models here.
 from django.core.exceptions import ValidationError
 
-MAX_DATASETS_FILE_SIZE = 5 * 1024 * 1024 # 5MB
+MAX_DATASETS_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
 
 def validate_file_size(file):
-    filesize= file.size
+    filesize = file.size
     if filesize > MAX_DATASETS_FILE_SIZE:
-        max_filesize_in_mb = MAX_DATASETS_FILE_SIZE/(1024 * 1024)
+        max_filesize_in_mb = MAX_DATASETS_FILE_SIZE / (1024 * 1024)
         raise ValidationError(f"The maximum file size that can be uploaded is {max_filesize_in_mb}MB")
     else:
         return file
+
 
 def user_dataset_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/datasets/<filename>
@@ -35,9 +36,9 @@ class Dataset(models.Model):
     title = models.CharField(max_length=100, null=False, default="No Title")
     description = models.TextField(blank=True, null=True)
     file = models.FileField(
-        upload_to=user_dataset_directory_path, 
+        upload_to=user_dataset_directory_path,
         validators=[
-            validate_file_size, 
+            validate_file_size,
             FileExtensionValidator(allowed_extensions=["csv"])
         ]
     )

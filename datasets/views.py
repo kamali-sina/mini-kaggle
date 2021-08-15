@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
@@ -149,3 +151,10 @@ def edit_dataset_view(request, pk):
 class DatasetDeleteView(generic.DeleteView):
     model = Dataset
     success_url = reverse_lazy('datasets:index')
+
+    def delete(self, request, *args, **kwargs):
+        object = self.get_object()
+        if object.file:
+            if os.path.isfile(object.file.path):
+                os.remove(object.file.path)
+        return super(DatasetDeleteView, self).delete(self, request, *args, **kwargs)
