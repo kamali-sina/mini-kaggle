@@ -1,0 +1,19 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %} {% endblock %}
+
+{% block title %}Create Task{% endblock %}
+
+{% block body %}
+
+
+<form enctype="multipart/form-data" action="{% url 'workflows:create_python_task' %}" method="post">
+   {% csrf_token %}
+   {{ form.as_ul }}
+   <input type="submit" value="CreateTask">
+</form>
+
+
+{% endblock %}
+

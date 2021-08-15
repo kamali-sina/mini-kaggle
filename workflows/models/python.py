@@ -1,5 +1,7 @@
+from django.core import validators
 from django.db import models
 from .task import Task
+
 
 def user_python_file_directory_path(instance, filename):
     # file will be uploaded to MEDIAROOT/user<id>/datasets/<filename>
@@ -7,4 +9,8 @@ def user_python_file_directory_path(instance, filename):
 
 
 class PythonTask(Task):
-    python_file = models.FileField(upload_to=user_python_file_directory_path)
+    python_file = models.FileField(
+        upload_to=user_python_file_directory_path,
+        validators=[
+            validators.FileExtensionValidator(allowed_extensions=["py"]),
+        ])

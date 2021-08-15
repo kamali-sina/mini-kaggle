@@ -1,11 +1,12 @@
 from django.http import HttpResponseRedirect
 
-from .models import Task
-from .forms import TaskForm
+from .models import Task, PythonTask
+from .forms import TaskForm, PythonTaskForm
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib.auth.models import User
+
 
 class CreatorOnlyMixin(AccessMixin):
     """Verify that the current user is the creator."""
@@ -36,6 +37,20 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
         candidate.save()
 
         success_url = reverse("workflows:detail_task", args=(candidate.pk,))
+        return HttpResponseRedirect(success_url)
+
+
+class PythonTaskCreateView(LoginRequiredMixin, CreateView):
+    model = PythonTask
+    form_class = PythonTaskForm
+    template_name = 'create_python_task.html'
+
+    def form_valid(self, form):
+        python_task = form.save(commit=False)
+        python_task.creator = self.request.user
+        python_task.save()
+
+        success_url = reverse("workflows:detail_task", args=(python_task.pk,))
         return HttpResponseRedirect(success_url)
 
 
