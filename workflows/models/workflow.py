@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Workflow(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=255)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
