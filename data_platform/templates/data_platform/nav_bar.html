@@ -11,12 +11,12 @@
         <nav id="navbar">
             <a href="{% url 'datasets:public' %}" class="menu-item">Explore datasets</a>
             {% if not request.user.is_authenticated %}
-                <a href="{% url 'login' %}" class="menu-item">Login</a>
+                <a href="{% url 'users:login' %}" class="menu-item">Login</a>
                 <a href="{% url 'users:signup' %}" class="menu-item">Sign up</a>
             {% else %}
                 <a href="{% url 'datasets:index' %}" class="menu-item">Your datasets</a>
                 <a href="{% url 'workflows:list_task' %}" class="menu-item">Your workflows</a>
-                <a href="{% url 'logout' %}" class="menu-item">Sign out</a>
+                <a href="{% url 'users:logout' %}" class="menu-item">Sign out</a>
                 <span style="font-style: italic">Signed in as: {{ request.user.username }}</span>
             {% endif %}
         </nav>

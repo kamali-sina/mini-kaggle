@@ -15,7 +15,7 @@
     <form id='form' action="{% url 'users:signup' %}" method="post" class="long_form">
         {% csrf_token %}
         {% include 'registration/basic_form.html' with form=form title='Signup' submit_value='Signup'%}
-        <a href="{% url 'login' %}">Have an account? login here.</a>
+        <a href="{% url 'users:login' %}">Have an account? login here.</a>
     </form>
 </div>
 

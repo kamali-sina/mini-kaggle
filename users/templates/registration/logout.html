@@ -1,0 +1,20 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}{% endblock %}
+
+{% block title %}Logout{% endblock %}
+
+{% block body %}
+
+
+<div style="margin: 50px">
+    <h3>{{ title }}</h3>
+    <h5>Thanks for spending some quality time with the Web site today.</h5>
+    <div class="filler"></div>
+    <a href="{% url 'users:login' %}">Log in again.</a>
+</div>
+
+
+{% endblock %}
+
