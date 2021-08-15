@@ -7,24 +7,24 @@
 
 .long_form {
     margin-top: 5%;
-    width: 30%;
+    width: auto;
     height: 70%;
     background-color: aliceblue;
     display: flex;
     align-items: center;
     flex-direction: column;
-    padding-bottom: 15px;
+    padding: 15px 10% 15px 10%;
 }
 
 .small_form {
     margin-top: 5%;
-    width: 30%;
+    width: auto;
     height: 50%;
     background-color: aliceblue;
     display: flex;
     align-items: center;
     flex-direction: column;
-    padding-bottom: 30px;
+    padding: 30px 10% 100px 10%;
 }
 
 .table {
