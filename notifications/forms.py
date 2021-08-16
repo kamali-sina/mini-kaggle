@@ -31,7 +31,7 @@ class CreateEmailNotificationSourceForm(forms.ModelForm):
 
     class Meta:
         model = EmailNotificationSource
-        fields = ["recipients"]
+        fields = ["title", "recipients"]
 
     def clean_recipients(self):
         return list(set(re.split(r'\s+', self.cleaned_data['recipients'])))

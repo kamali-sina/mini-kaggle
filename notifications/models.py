@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 
 class NotificationSource(models.Model):
+    title = models.CharField(max_length=200, default='Untitled')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
