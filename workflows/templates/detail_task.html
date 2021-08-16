@@ -1,0 +1,63 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    #task-excution{
+        width: 50px; height: 25px;margin: 4px;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}Task Details{% endblock %}
+
+{% block body %}
+
+
+    <ul>
+        <li><a href="{% url 'workflows:list_task' %}">back to list</a></li>
+        <hr>
+        <li>name: {{ task.name }}</li>
+        {% for key,value in special_fields.items %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+
+        <li>type: {{ task.get_task_type_display }}</li>
+        <li>status: {{ task.status }}</li>
+        <li>creator:
+            {% if task.creator.get_full_name %}
+                {{ task.creator.get_full_name }}
+            {% else %}
+                {{ task.creator.username }}
+            {% endif %}
+        </li>
+        <div style="display: flex;">
+            <form method="post" style="
+    margin: 10px;" action="delete/">{% csrf_token %}
+                <input style="background: #e74c3c;color: white;border: 2px solid #FFF;font-size: 16px;padding: 4px;"
+                       type="submit" value="Delete">
+            </form>
+            <form method="post" style="
+    margin: 10px;" action="run/">{% csrf_token %}
+                <input style="background: #27ae60;color: white;border: 2px solid #FFF;font-size: 16px;padding: 4px;"
+                       type="submit" value="Run task">
+            </form>
+
+        </div>
+
+        <hr>
+        {% if task.executions %}
+            <h3>executions:</h3>
+            {% for execution in task.executions %}
+                <div id="task-excution" style="background: {{ execution.status_color }};">{{ execution.status }}</div>
+            {% endfor %}
+        {% endif %}
+    </ul>
+
+
+
+{% endblock %}
