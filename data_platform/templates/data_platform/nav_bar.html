@@ -3,9 +3,11 @@
 <link rel="stylesheet" type="text/css" href="{% static 'data_platform/styles/nav_bar.css' %}">
 
 <div class="nav_bar_container">
-    <h1>Data
-        <spin style="color: rgb(16,84,113);">Platform</spin>
-    </h1>
+    <a href="{% url 'dashboard' %}">
+        <h1>Data
+            <span style="color: rgb(16,84,113);">Platform</span>
+        </h1>
+    </a>
     <div class="filler"></div>
     <div class="nav_item_container">
         <nav id="navbar">
