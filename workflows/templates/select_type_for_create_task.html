@@ -1,0 +1,22 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}Create Task{% endblock %}
+
+{% block body %}
+
+    {% for task_type,task_url in task_types.items %}
+        <li><a href="{{ task_url }}">{{ task_type }}</a></li>
+    {% endfor %}
+
+{% endblock %}
+

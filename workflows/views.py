@@ -29,7 +29,7 @@ class TaskDeleteView(LoginRequiredMixin, CreatorOnlyMixin, DeleteView):
 class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
     form_class = TaskForm
-    template_name = 'create_task.template'
+    template_name = 'create_task.html'
 
     def form_valid(self, form):
         candidate = form.save(commit=False)
@@ -56,7 +56,7 @@ class PythonTaskCreateView(LoginRequiredMixin, CreateView):
 
 class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
     model = Task
-    template_name = 'detail_task.template'
+    template_name = 'detail_task.html'
     context_object_name = 'task'
 
 
@@ -64,7 +64,7 @@ class TaskListView(LoginRequiredMixin, ListView):
     ITEMS_PER_PAGE = 10
     paginate_by = ITEMS_PER_PAGE
     model = Task
-    template_name = 'list_task.template'
+    template_name = 'list_task.html'
     context_object_name = 'tasks'
 
     def get_queryset(self):
