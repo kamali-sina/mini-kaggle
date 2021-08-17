@@ -1,11 +1,14 @@
 import os
+import operator
+import re
+from functools import reduce
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.urls import reverse
-from datasets.models import Dataset
+from datasets.models import Dataset, Tag
 from datasets.services.csv import read_csv_dataset
 from django.views import generic
 from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, DeleteTagForm, AddTagForm
@@ -18,6 +21,9 @@ from django.utils.decorators import method_decorator
 from django.http import QueryDict
 from django.contrib.auth.models import User
 from django.contrib import messages
+
+from django.db.models import Q
+
 
 def has_permission(permission_func):
     def decorator(func):
@@ -37,14 +43,38 @@ def has_dataset_owner_perm(request, pk):
     return dataset.creator.id == request.user.id
 
 
-class DatasetIndexView(LoginRequiredMixin, generic.ListView):
+class FilterListView(generic.ListView):
+    def post(self, request):
+        return super(FilterListView, self).get(request)
+
+    def get_queryset(self):
+        return Dataset.objects.filter(self.get_filter_query()).distinct()
+
+    def get_filter_query(self):
+        query_list = [Q(tags__text__icontains=tag) for tag in self.get_applying_tags()]
+        return reduce(operator.or_, query_list, Q())
+
+    def get_applying_tags(self):
+        active_tags = self.request.GET.getlist('tag')
+        search_tags = re.split(r'\s+',
+                               self.request.POST.get('search_box', '')) if 'search_box' in self.request.POST else []
+        return active_tags + search_tags
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['inactive_tags'] = self.request.user.tags.exclude(text__in=self.request.GET.getlist('tag'))
+        context['searched'] = self.request.POST.get('search_box', '')
+        return context
+
+
+class DatasetIndexView(LoginRequiredMixin, FilterListView):
     ITEMS_PER_PAGE = 10
     paginate_by = ITEMS_PER_PAGE
     template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
 
     def get_queryset(self):
-        return Dataset.objects.filter(is_public=False, creator=self.request.user)
+        return super().get_queryset().filter(is_public=False, creator=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,14 +82,14 @@ class DatasetIndexView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class PublicView(generic.ListView):
+class PublicView(FilterListView):
     ITEMS_PER_PAGE = 10
     paginate_by = ITEMS_PER_PAGE
     template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
 
     def get_queryset(self):
-        return Dataset.objects.filter(is_public=True)
+        return super().get_queryset().filter(is_public=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
