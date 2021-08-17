@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import User
@@ -12,6 +14,8 @@ class Task(models.Model):
 
     notification_source = models.ForeignKey(NotificationSource, on_delete=models.SET_NULL, null=True)
     alert_on_failure = models.BooleanField(default=False)
+
+    timeout = models.DurationField(null=True, blank=True)
 
     def __str__(self):
         return self.name

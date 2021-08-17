@@ -13,6 +13,7 @@ class TaskForm(ModelForm):
         self.creator = kwargs.pop('user')
         super(TaskForm, self).__init__(*args, **kwargs)
         self.fields['notification_source'].queryset = self.creator.notification_sources
+        self.fields['timeout'].help_text = 'leave empty, for no time limit'
 
     def clean(self):
         cleaned_data = super().clean()
@@ -24,7 +25,7 @@ class TaskForm(ModelForm):
 
     class Meta:
         model = Task
-        fields = ['name', 'notification_source', 'alert_on_failure']
+        fields = ['name', 'timeout', 'notification_source', 'alert_on_failure']
 
 
 class PythonTaskForm(ModelForm):
