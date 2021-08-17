@@ -13,7 +13,7 @@ class NotificationSource(models.Model):
         EMAIL = 'EM', _("Email")
 
     title = models.CharField(max_length=200, default='Untitled')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notification_sources')
     type = models.CharField(max_length=5, choices=NotificationSourceType.choices, default=NotificationSourceType.EMAIL)
 
     def cast(self):
