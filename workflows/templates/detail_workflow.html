@@ -1,0 +1,59 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}Workflow Details{% endblock %}
+
+{% block body %}
+    <ul>
+        <hr>
+        <li>Name: {{ workflow.name }}</li>
+        {% for key,value in special_fields.items %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+
+        <li>Creator:
+            {% if workflow.creator.get_full_name %}
+                {{ workflow.creator.get_full_name }}
+            {% else %}
+                {{ workflow.creator.username }}
+            {% endif %}
+        </li>
+        <div>
+            <h3><br>Tasks:</h3>
+            {% if workflow.task_set.all %}
+                {% for task in workflow.task_set.all %}
+                    <li><a href="/workflows/task/{{ task.id }}">{{ task.name }}</a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>No tasks registered to the workflow</li>
+            {% endif %}
+            <a href="{% url 'workflows:create_task' %}">add new task</a>
+        </div>
+        <br>
+        <div style="display: flex;">
+            <form method="post" style="
+    margin: 10px;" action="delete/">
+                {% csrf_token %}
+                <input style="background: #e74c3c;color: white;border: 2px solid #FFF;font-size: 16px;padding: 4px;"
+                       type="submit" value="Delete Workflow">
+            </form>
+            <form method="post" style="
+    margin: 10px;" action="run/">
+                {% csrf_token %}
+                <input style="background: #27ae60;color: white;border: 2px solid #FFF;font-size: 16px;padding: 4px;"
+                       type="submit" value="Run Workflow">
+            </form>
+        </div>
+        </hr>
+    </ul>
+{% endblock %}

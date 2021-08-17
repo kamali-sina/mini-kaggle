@@ -1,0 +1,50 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}Workflows{% endblock %}
+
+{% block body %}
+    {% if  workflows %}
+        <h2>Workflows:<br></h2>
+        {% for workflow in workflows %}
+            <li><a href="{{ workflow.pk }}/">{{ workflow.name }}</a></li>
+        {% endfor %}
+
+        <br>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% else %}
+        <h2>No workflows available.</h2>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'workflows:create_workflow' %}">Add new workflow</a>
+    <br>
+
+
+{% endblock %}

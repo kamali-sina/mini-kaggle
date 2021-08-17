@@ -1,0 +1,23 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}Create Workflow{% endblock %}
+
+{% block body %}
+
+    <form enctype="multipart/form-data" action="" method="post">
+        {% csrf_token %}
+        {{ form.as_ul }}
+        <input type="submit" value="Create Workflow">
+    </form>
+
+{% endblock %}
