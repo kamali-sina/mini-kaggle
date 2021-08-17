@@ -37,11 +37,12 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        candidate = form.save(commit=False)
-        candidate.creator = self.request.user
-        candidate.save()
+        task = form.save(commit=False)
+        task.creator = self.request.user
+        task.save()
+        form.save_m2m()
         messages.success(self.request, 'Your task has been created :)')
-        success_url = reverse("workflows:detail_task", args=(candidate.pk,))
+        success_url = reverse("workflows:detail_task", args=(task.pk,))
         return HttpResponseRedirect(success_url)
 
 
