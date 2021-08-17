@@ -11,7 +11,7 @@
 
 
 <div class="form_container">
-    <form enctype="multipart/form-data" action="{% url 'datasets:upload' %}" method="post" class="small_form">
+    <form enctype="multipart/form-data" action="{% url 'datasets:upload' %}" method="post" class="long_form">
         {% csrf_token %}
         {% include 'registration/basic_form.html' with form=form title='Upload a new file' submit_value='Submit'%}
     </form>
