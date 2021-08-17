@@ -51,6 +51,11 @@ class PythonTaskCreateView(LoginRequiredMixin, CreateView):
     form_class = PythonTaskForm
     template_name = 'create_python_task.html'
 
+    def get_form_kwargs(self):
+        kwargs = super(PythonTaskCreateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         python_task = form.save(commit=False)
         python_task.creator = self.request.user
