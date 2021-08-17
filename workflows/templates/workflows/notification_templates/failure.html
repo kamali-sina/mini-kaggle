@@ -1,1 +1,3 @@
-Task {{ task.name }} failed!
+Task "{{ task.name }}" failed at {{ datetime }} due to following errors:
+
+{{ error | safe }}
