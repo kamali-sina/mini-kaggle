@@ -11,7 +11,7 @@ from datasets.models import Dataset
 class Task(models.Model):
     name = models.CharField(max_length=255)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    workflow = models.ForeignKey(Workflow, null=True, blank=True, on_delete=models.CASCADE)
+    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
     accessible_datasets = models.ManyToManyField(Dataset)
 
     notification_source = models.ForeignKey(NotificationSource, on_delete=models.SET_NULL, null=True)

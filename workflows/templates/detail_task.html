@@ -19,9 +19,9 @@
 
 
     <ul>
-        <li><a href="{% url 'workflows:list_task' %}">back to list</a></li>
+        <li><a href="/workflows/workflow/{{ task.workflow.id }}">Back to list</a></li>
         <hr>
-        <li>name: {{ task.name }}</li>
+        <li>Name: {{ task.name }}</li>
         {% for key,value in special_fields.items %}
             <li>{{ key }}: {{ value }}</li>
         {% endfor %}

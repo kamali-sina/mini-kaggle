@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from workflows.models import Task, PythonTask
+from workflows.models import Task, PythonTask, Workflow
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -16,6 +16,8 @@ class TaskForm(ModelForm):
         self.creator = kwargs.pop('user')
         super(TaskForm, self).__init__(*args, **kwargs)
         self.fields['notification_source'].queryset = self.creator.notification_sources
+        self.fields['workflow'] = forms.ModelChoiceField(
+            queryset=Workflow.objects.filter(creator=self.creator))
         self.fields['accessible_datasets'].queryset = self.creator.datasets
         self.fields['timeout'].help_text = 'leave empty, for no time limit'
 
@@ -29,11 +31,17 @@ class TaskForm(ModelForm):
 
     class Meta:
         model = Task
-        fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure']
+        fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'workflow']
 
 
 class PythonTaskForm(TaskForm):
     class Meta:
         model = PythonTask
         fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'python_file',
-                  'docker_image']
+          'docker_image']
+
+
+class WorkflowForm(ModelForm):
+    class Meta:
+        model = Workflow
+        fields = ['name']

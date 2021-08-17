@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('notifications', '0001_initial'),
-        ('workflows', '0009_alter_task_workflow'),
+        ('workflows', '0009_alter_task_workflow')
     ]
 
     operations = [
