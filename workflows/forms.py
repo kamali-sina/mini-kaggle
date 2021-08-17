@@ -32,7 +32,8 @@ class TaskForm(ModelForm):
         fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure']
 
 
-class PythonTaskForm(ModelForm):
+class PythonTaskForm(TaskForm):
     class Meta:
         model = PythonTask
-        fields = ["name", "python_file"]
+        fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'python_file',
+                  'docker_image']

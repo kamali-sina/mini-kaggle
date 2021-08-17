@@ -1,6 +1,7 @@
 from django.core import validators
 from django.db import models
 from .task import Task
+import os
 
 
 def user_python_file_directory_path(instance, filename):
@@ -14,3 +15,8 @@ class PythonTask(Task):
         validators=[
             validators.FileExtensionValidator(allowed_extensions=["py"]),
         ])
+
+    docker_image = models.CharField(
+        max_length=255,
+        default="python:3.8-alpine"
+    )
