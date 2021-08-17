@@ -1,6 +1,7 @@
 <h1 class="title">{{ title }}</h1>
 
 <div class="filler">
+    {{ form.non_field_errors }}
     <table>
         {% for field in form %}
         <tr>
