@@ -15,6 +15,12 @@ class UserForm(forms.ModelForm):
         ]
     )
 
+    def clean(self):
+        email = self.cleaned_data.get("email")
+        email_is_registered = User.objects.filter(email=email).exists()
+        if email_is_registered:
+            raise forms.ValidationError('This email is already registered!')
+
     class Meta:
         fields = ['username', 'first_name', 'last_name', 'email']
         model = User
