@@ -5,6 +5,9 @@ from django.core.exceptions import ValidationError
 
 
 class TaskForm(ModelForm):
+    accessible_datasets = forms.ModelMultipleChoiceField(queryset=None,
+                                                         required=False,
+                                                         label='Select the datasets this task will make use of')
     notification_source = forms.ModelChoiceField(queryset=None,
                                                  required=False,
                                                  label='Select a notification source for this task')
@@ -13,6 +16,7 @@ class TaskForm(ModelForm):
         self.creator = kwargs.pop('user')
         super(TaskForm, self).__init__(*args, **kwargs)
         self.fields['notification_source'].queryset = self.creator.notification_sources
+        self.fields['accessible_datasets'].queryset = self.creator.datasets
         self.fields['timeout'].help_text = 'leave empty, for no time limit'
 
     def clean(self):
@@ -25,7 +29,7 @@ class TaskForm(ModelForm):
 
     class Meta:
         model = Task
-        fields = ['name', 'timeout', 'notification_source', 'alert_on_failure']
+        fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure']
 
 
 class PythonTaskForm(ModelForm):
