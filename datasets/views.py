@@ -67,33 +67,22 @@ class FilterListView(generic.ListView):
         return context
 
 
-class DatasetIndexView(LoginRequiredMixin, FilterListView):
+class DatasetListView(LoginRequiredMixin, FilterListView):
     ITEMS_PER_PAGE = 10
     paginate_by = ITEMS_PER_PAGE
     template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
+    visibility = 'private'
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_public=False, creator=self.request.user)
+        if self.visibility == 'public':
+            return super().get_queryset().filter(is_public=True)
+        else:
+            return super().get_queryset().filter(is_public=False, creator=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tag'] = "private"
-        return context
-
-
-class PublicView(FilterListView):
-    ITEMS_PER_PAGE = 10
-    paginate_by = ITEMS_PER_PAGE
-    template_name = "datasets/datasets.html"
-    context_object_name = "datasets_list"
-
-    def get_queryset(self):
-        return super().get_queryset().filter(is_public=True)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tag'] = "public"
+        context['visibility'] = self.visibility
         return context
 
 

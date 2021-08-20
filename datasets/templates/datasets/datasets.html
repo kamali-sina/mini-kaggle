@@ -13,7 +13,7 @@
 {% include 'datasets/filter_bar.html' %}
 
 {% if  datasets_list  %}
-<h1>{{ tag }} datasets:</h1>
+<h1>{{ visibility }} datasets:</h1>
 <ul>
     {% for dataset in datasets_list %}
     <li><a href="/datasets/{{ dataset.id }}/">{{ dataset.title }}</a></li>
@@ -42,7 +42,7 @@
 </div>
 
 {% else %}
-<h2>No {{ tag }} datasets available.</h2>
+<h2>No {{ visibility }} datasets available.</h2>
 {% endif %}
 
 <br>
