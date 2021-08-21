@@ -64,7 +64,11 @@ class FilterListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['inactive_tags'] = self.request.user.tags.exclude(text__in=self.request.GET.getlist('tag'))
+        if self.request.user.is_authenticated:
+            context['inactive_tags'] = self.request.user.tags.exclude(text__in=self.request.GET.getlist('tag'))
+        else:
+            context['inactive_tags'] = Tag.objects.filter(datasets__is_public=True).exclude(
+                text__in=self.request.GET.getlist('tag')).distinct()
         context['searched'] = self.request.POST.get('search_box', '')
         return context
 
