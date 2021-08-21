@@ -24,9 +24,3 @@ def remove_tag_param(request, tag):
 @register.simple_tag
 def get_tag_params(request):
     return request.GET.getlist('tag')
-
-
-@register.simple_tag
-def append_params(request):
-    query_dict = request.GET.copy()
-    return "&" + query_dict.urlencode() if query_dict else ''

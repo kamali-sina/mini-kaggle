@@ -1,6 +1,6 @@
 {% extends 'data_platform/basic.html' %}
 {% load static %}
-{% load filter_query_params %}
+{% load query_params %}
 
 {% block head %}{% endblock %}
 
@@ -26,8 +26,8 @@
 <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
-            <a href="?page=1{% append_params request %}">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}{% append_params request %}">previous</a>
+            <a href="{% append_param request 'page' 1 %}">&laquo; first</a>
+            <a href="{% append_param request 'page' page_obj.previous_page_number %}">previous</a>
         {% endif %}
 
         <span class="current">
@@ -35,8 +35,8 @@
         </span>
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% append_params request %}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}{% append_params request %}">last &raquo;</a>
+            <a href="{% append_param request 'page' page_obj.next_page_number %}">next</a>
+            <a href="{% append_param request 'page' page_obj.paginator.num_pages %}">last &raquo;</a>
         {% endif %}
     </span>
 </div>
