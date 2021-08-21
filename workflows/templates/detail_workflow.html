@@ -31,7 +31,7 @@
             <h3><br>Tasks:</h3>
             {% if workflow.task_set.all %}
                 {% for task in workflow.task_set.all %}
-                    <li><a href="/workflows/task/{{ task.id }}">{{ task.name }}</a>
+                    <li><a href="{% url 'workflows:detail_task' task.id %}">{{ task.name }}</a>
                     </li>
                 {% endfor %}
             {% else %}
