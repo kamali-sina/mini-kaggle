@@ -18,6 +18,9 @@
     <i class="material-icons">download</i>
     Download
 </a>
+<a href="{% url 'datasets:delete' pk=dataset.id %}" class="ui negative button">
+    Delete
+</a>
 
 <div class="tag_container">
     Tags:
