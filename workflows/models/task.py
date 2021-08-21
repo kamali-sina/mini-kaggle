@@ -1,14 +1,15 @@
-import datetime
-
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import User
 from workflows.models.workflow import Workflow
-from notifications.models import NotificationSource
-from datasets.models import Dataset
 
 
 class Task(models.Model):
+    class TaskTypeChoices(models.TextChoices):
+        NONE = "N", _("None")
+        DOCKER = "DC", _("Docker")
+        PYTHON = "PY", _("Python")
+
     name = models.CharField(max_length=255)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
@@ -18,6 +19,7 @@ class Task(models.Model):
     alert_on_failure = models.BooleanField(default=False)
 
     timeout = models.DurationField(null=True, blank=True)
+    task_type = models.CharField(max_length=2, choices=TaskTypeChoices.choices, default=TaskTypeChoices.NONE)
 
     def __str__(self):
         return self.name
