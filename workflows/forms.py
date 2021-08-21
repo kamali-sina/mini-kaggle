@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from workflows.models import Task, PythonTask, Workflow
+from workflows.models import Task, PythonTask, Workflow, DockerTask
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -38,7 +38,13 @@ class PythonTaskForm(TaskForm):
     class Meta:
         model = PythonTask
         fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'python_file',
-          'docker_image']
+                  'docker_image', 'workflow']
+
+
+class DockerTaskForm(TaskForm):
+    class Meta:
+        model = DockerTask
+        fields = ["name", "docker_image", 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'workflow']
 
 
 class WorkflowForm(ModelForm):

@@ -2,6 +2,8 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import User
 from workflows.models.workflow import Workflow
+from datasets.models import Dataset
+from notifications.models import NotificationSource
 
 
 class Task(models.Model):
