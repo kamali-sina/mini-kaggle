@@ -11,7 +11,6 @@ workflows_urls = [
 tasks_urls = [
     path('tasks/<int:pk>/', views.TaskDetailView.as_view(), name='detail_task'),
     path('tasks/<int:pk>/delete/', views.TaskDeleteView.as_view(), name='delete_task'),
-    path('tasks/create/python', views.PythonTaskCreateView.as_view(), name='create_python_task'),
 ]
 
 urlpatterns = [

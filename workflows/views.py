@@ -1,10 +1,9 @@
 from django.http import HttpResponseRedirect
-from .models import Task, PythonTask
-from .forms import TaskForm, PythonTaskForm
+from workflows.models import Task, PythonTask, DockerTask, Workflow, TaskExecution
+from workflows.forms import TaskForm, PythonTaskForm, WorkflowForm, DockerTaskForm
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.contrib.auth.models import User
 from django.contrib import messages
 from .services.runner import get_service_runner
 from django.shortcuts import render
@@ -63,11 +62,20 @@ class WorkflowCreateView(LoginRequiredMixin, CreateView):
 
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
+    model = Task
+    form_class = TaskForm
     template_name = "create_task.html"
+
     task_types_data = {
         "docker": {"model": DockerTask, "task_type": Task.TaskTypeChoices.DOCKER, "form_class": DockerTaskForm},
         "python": {"model": PythonTask, "task_type": Task.TaskTypeChoices.PYTHON, "form_class": PythonTaskForm},
     }
+
+    def get_form_kwargs(self):
+        kwargs = super(TaskCreateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get(self, request, *args, **kwargs):
         task_type = self.request.GET.get("type")
@@ -97,22 +105,9 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
         task.creator = self.request.user
         task.task_type = self.task_type
         task.save()
+        form.save_m2m()
         messages.success(self.request, 'Your task has been created :)')
         success_url = reverse("workflows:detail_task", args=(task.pk,))
-        return HttpResponseRedirect(success_url)
-
-
-class PythonTaskCreateView(LoginRequiredMixin, CreateView):
-    model = PythonTask
-    form_class = PythonTaskForm
-    template_name = 'create_python_task.html'
-
-    def form_valid(self, form):
-        python_task = form.save(commit=False)
-        python_task.creator = self.request.user
-        python_task.save()
-        messages.success(self.request, 'Your task has been created :)')
-        success_url = reverse("workflows:detail_task", args=(python_task.pk,))
         return HttpResponseRedirect(success_url)
 
 
@@ -174,3 +169,9 @@ def run_task_view(request, pk):
 
     success_url = reverse("workflows:detail_task", args=(task.pk,))
     return HttpResponseRedirect(success_url)
+
+
+class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
+    model = Workflow
+    template_name = 'detail_workflow.html'
+    context_object_name = 'workflow'
