@@ -12,7 +12,6 @@ class DockerTaskService(TaskService):
                                            status=TaskExecution.StatusChoices.RUNNING)
 
     def _task_execution_status(self, task_execution):
-
         StatusChoices = TaskExecution.StatusChoices
 
         client = docker.from_env()
