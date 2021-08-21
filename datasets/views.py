@@ -52,13 +52,15 @@ class FilterListView(generic.ListView):
 
     def get_filter_query(self):
         query_list = [Q(tags__text__icontains=tag) for tag in self.get_applying_tags()]
+        query_list = query_list + [Q(title__icontains=search_word) for search_word in self.get_search_words()]
         return reduce(operator.or_, query_list, Q())
 
     def get_applying_tags(self):
-        active_tags = self.request.GET.getlist('tag')
-        search_tags = re.split(r'\s+',
-                               self.request.POST.get('search_box', '')) if 'search_box' in self.request.POST else []
-        return active_tags + search_tags
+        return self.request.GET.getlist('tag')
+
+    def get_search_words(self):
+        return re.split(r'\s+',
+                        self.request.POST.get('search_box', '')) if 'search_box' in self.request.POST else []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
