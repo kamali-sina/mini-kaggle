@@ -1,5 +1,3 @@
-BUILD_DIR=build
-
 all:
 	@echo "usage: make <options> \nuse 'make help' to find out more."
 
@@ -8,7 +6,7 @@ help:
 	@echo "\tinstall: install all required packages for the project"
 
 test: 
-	find . -type f -name "*.py" | xargs pylint --rcfile=.pylintrc --output-format=text --exit-zero 
+	find . -type f -name "*.py" | xargs pylint --exit-zero
 	python3 manage.py makemigrations --check
 
 install:

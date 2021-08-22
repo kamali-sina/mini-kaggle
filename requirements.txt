@@ -17,3 +17,5 @@ sqlparse==0.4.1
 vine==5.0.0
 wcwidth==0.2.5
 docker==5.0.0
+pylint==2.10.2
+pylint-django=2.4.4
