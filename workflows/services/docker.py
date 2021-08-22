@@ -13,7 +13,7 @@ from django.conf import settings
 
 class DockerTaskService(TaskService):
     accessible_datasets_path = '/datasets/'
-    extract_datasets_path = '/results/'
+    container_extract_datasets_path = '/results/'
 
     def run_task(self, task):
         client = docker.from_env()
@@ -64,7 +64,7 @@ class DockerTaskService(TaskService):
         container = client.containers.get(task_execution.dockertaskexecution.container_id)
         f = BytesIO()
         try:
-            bits, stat = container.get_archive(self.extract_datasets_path)
+            bits, stat = container.get_archive(self.container_extract_datasets_path)
         except:
             # There is no data to be extracted
             return
@@ -72,11 +72,12 @@ class DockerTaskService(TaskService):
             f.write(chunk)
         f.seek(0)
         tar = tarfile.open(fileobj=f)
-        tar.extractall()
+        task_execution_id = str(task_execution.id)
+        extract_path = f"./task_{task_execution_id}"
+        tar.extractall(path=extract_path)
         tar.close()
         f.close()
-        task_execution_id = str(task_execution.id)
-        extracted_files_dir = f"./task_{task_execution_id}" + self.extract_datasets_path
+        extracted_files_dir = extract_path + self.container_extract_datasets_path
         for file in os.listdir(extracted_files_dir):
             if (not is_file_valid(file)):
                 print(f'{file} is not a supported type')
