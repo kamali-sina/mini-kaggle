@@ -13,8 +13,7 @@ def validate_file_size(file):
     if filesize > MAX_DATASETS_FILE_SIZE:
         max_filesize_in_mb = MAX_DATASETS_FILE_SIZE / (1024 * 1024)
         raise ValidationError(f"The maximum file size that can be uploaded is {max_filesize_in_mb}MB")
-    else:
-        return file
+    return file
 
 
 def user_dataset_directory_path(instance, filename):
@@ -27,7 +26,7 @@ class Tag(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tags')
 
     def __str__(self):
-        return self.text
+        return str(self.text)
 
 
 class Dataset(models.Model):

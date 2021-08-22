@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
-from workflows.models import Task, DockerTask, PythonTask, TaskExecution
+from workflows.models import Task, TaskExecution
 from .task_data import get_task_data
 
 
 def task_status_color(status):
     if status == "Failed":
         return "#c0392b"
-    elif status == "Success":
+    if status == "Success":
         return "#27ae60"
-    else:
-        return "#bdc3c7"
+    return "#bdc3c7"
 
 
+# pylint: disable=no-self-use
 class TaskService(ABC):
     @abstractmethod
     def run_task(self, task):
@@ -42,8 +42,7 @@ class TaskService(ABC):
         task_executions = TaskExecution.objects.filter(task=task)
         if task_executions.count() == 0:
             return "None"
-        else:
-            return self.task_execution_status(task_executions.last())
+        return self.task_execution_status(task_executions.last())
 
     @abstractmethod
     def _task_execution_status(self, task_execution):
@@ -59,5 +58,4 @@ class TaskService(ABC):
 
         if task_execution.status == task_execution.StatusChoices.RUNNING:
             return self._task_execution_status(task_execution)
-        else:
-            return task_execution.get_status_display()
+        return task_execution.get_status_display()

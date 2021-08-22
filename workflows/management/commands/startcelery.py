@@ -9,7 +9,7 @@ now you are ready to runserver!
 
 import subprocess
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

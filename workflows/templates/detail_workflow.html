@@ -16,9 +16,6 @@
     <ul>
         <hr>
         <li>Name: {{ workflow.name }}</li>
-        {% for key,value in special_fields.items %}
-            <li>{{ key }}: {{ value }}</li>
-        {% endfor %}
 
         <li>Creator:
             {% if workflow.creator.get_full_name %}

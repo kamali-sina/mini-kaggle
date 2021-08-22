@@ -28,8 +28,8 @@ def get_task_data(task):
     if task.__class__ != Task:
         task = task.task_ptr
 
-    for model, data in tasks_data.items():
+    for data in tasks_data.values():
         if hasattr(task, data["task_related_name"]):
-            return tasks_data[model]
+            return data
 
     raise Exception("Service not found!")
