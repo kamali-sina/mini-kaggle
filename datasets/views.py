@@ -18,7 +18,7 @@ from django.contrib import messages
 from django.db.models import Q
 
 from datasets.models import Dataset, Tag
-from datasets.services.csv import read_csv_dataset
+from datasets.services.read_csv import read_csv_dataset
 from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, AddTagForm
 from datasets.services.form_handler import create_dataset_edition_forms_on_get, create_dataset_edition_forms_on_post, \
     submit_dataset_edition_forms

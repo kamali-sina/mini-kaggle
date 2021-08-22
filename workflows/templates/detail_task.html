@@ -38,6 +38,13 @@
             {{ task.creator.username }}
             {% endif %}
         </li>
+        <li><strong>Accessible datasets: </strong>
+            <ul>
+                {% for dataset_path in accessible_datasets %}
+                <li>{{ dataset_path }}<li>
+                {% endfor %}
+            </ul>
+        </li>
         <div style="display: flex;">
             <form method="post" style="
     margin: 10px;" action="delete/">{% csrf_token %}

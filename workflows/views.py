@@ -7,8 +7,9 @@ from django.contrib import messages
 from django.shortcuts import render
 from workflows.models import Task, PythonTask, DockerTask, Workflow, TaskExecution
 from workflows.forms import TaskForm, PythonTaskForm, WorkflowForm, DockerTaskForm
-from .services.task import task_status_color
-from .services.runner import get_service_runner
+from workflows.services.task import task_status_color
+from workflows.services.runner import get_service_runner
+from workflows.services.docker import DockerTaskService
 
 
 class CreatorOnlyMixin(AccessMixin):
@@ -128,6 +129,7 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         task.executions = task_executions
 
         context["display_fields"] = task_runner.get_display_fields(task)
+        context["accessible_datasets"] = DockerTaskService.get_accessible_datasets_mount_info(task)
         return context
 
 
