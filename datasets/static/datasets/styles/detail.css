@@ -1,25 +1,3 @@
-.container{
-  padding-top: 5vh;
-  display: flex;
-  justify-content: center;
-}
-
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  min-width: 50%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-.header {
-  background-color: #dddddd;
-}
-
 .about{
   background-color: aliceblue;
   display: flex;
@@ -29,37 +7,3 @@ td, th {
   padding: 30px;
 }
 
-.tag_container {
-    margin-top: 20px;
-    display: flex;
-    padding: 20px;
-    align-items: center;
-    font-style: italic;
-    font-size: small;
-}
-
-.tag {
-    padding: 10px;
-    background-color: #e6e6e6;
-    border-radius: 6px;
-    margin-left: 10px;
-}
-
-.download {
-    margin-left: 20px;
-    padding: 10px;
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    color: black;
-    background-color: #e6e6e6;
-    border-radius: 5px;
-}
-
-.download:hover{
-    color: rgb(16,84,113);
-}
-
-i{
-    margin-right: 5px;
-}

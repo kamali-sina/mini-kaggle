@@ -11,11 +11,11 @@
 {% block body %}
 
 
-<div class="form_container">
-    <form id='form' action="{% url 'users:signup' %}" method="post" class="long_form">
+<div class="ui center aligned page grid segment">
+    <form id='form' action="{% url 'users:signup' %}" method="post" class="ui form">
         {% csrf_token %}
         {% include 'registration/basic_form.html' with form=form title='Signup' submit_value='Signup'%}
-        <a href="{% url 'users:login' %}">Have an account? login here.</a>
+        <p>Have an account?  <a href="{% url 'users:login' %}">Login here.</a></p>
     </form>
 </div>
 

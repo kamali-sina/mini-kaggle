@@ -1,11 +1,15 @@
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/search_bar.css' %}">
 
-<div class="search_box">
-    <form action="{% url 'datasets:index' %}?{{ request.GET.urlencode }}" method="post" class="search_form">
-        {% csrf_token %}
-        <label for="search_box">Looking for something else?</label>
-        <input type="text" name="search_box" id="search_box" value="{{ searched }}">
-        <input type="submit" name="search" value="Search">
-    </form>
-</div>
+<form action="{% url 'datasets:index' %}?{{ request.GET.urlencode }}" method="post">
+    {% csrf_token %}
+    <div class="ui menu">
+        <div class="ui category search item">
+            <div class="ui transparent icon input">
+                <input class="prompt" type="text" placeholder="Search ..." name="search_box">
+                <i class="search link icon"></i>
+            </div>
+            <div class="results"></div>
+        </div>
+    </div>
+</form>
+

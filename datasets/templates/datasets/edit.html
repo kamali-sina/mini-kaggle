@@ -1,60 +1,23 @@
+{% extends 'data_platform/basic.html' %}
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/edit.css' %}">
 
-<div class="form_container">
-    <form action="{% url 'datasets:edit' pk %}" method="post">
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+{% endblock %}
+
+{% block title %}Edit Dataset{% endblock %}
+
+{% block body %}
+
+
+<div class="ui center aligned page grid segment">
+    <form action="{% url 'datasets:edit' pk %}" method="post" class="ui form">
         {% csrf_token %}
-
-        <div class="sub_form">
-            <h1 class="title">Edit Dataset Info</h1>
-            <table>
-                {% for field in dataset_info_edition_form %}
-                <tr>
-                    <td>{{ field.label_tag }}</td>
-                    <td>{{ field }}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        {{ field.errors }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        <div class="sub_form">
-            <h1 class="title">Delete Tags</h1>
-            <table>
-                {% for field in tag_deletion_form %}
-                <tr>
-                    <td>{{ field.label_tag }}</td>
-                    <td>{{ field }}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        {{ field.errors }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        <div class="sub_form">
-            <h1 class="title">Add Tags</h1>
-            <table>
-                {% for field in tag_addition_form %}
-                <tr>
-                    <td>{{ field.label_tag }}</td>
-                    <td>{{ field }}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        {{ field.errors }}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <input type="submit" value="Apply Changes">
+        {% include 'registration/basic_form.html' with form=dataset_info_edition_form title='Edit Dataset Info'%}
+        {% include 'registration/basic_form.html' with form=tag_deletion_form title='Delete Tags'%}
+        {% include 'registration/basic_form.html' with form=tag_addition_form title='Add Tags' submit_value='Apply Changes'%}
     </form>
 </div>
+
+
+{% endblock %}
