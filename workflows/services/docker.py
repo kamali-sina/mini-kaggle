@@ -1,12 +1,20 @@
 import os
 import docker
+from io import BytesIO
+import tarfile
 
+from requests.sessions import extract_cookies_to_jar
+
+from datasets.models import Dataset
+from django.contrib.auth.models import User
 from workflows.models import DockerTaskExecution, TaskExecution
 from workflows.services.task import TaskService
+from django.conf import settings
 
 
 class DockerTaskService(TaskService):
     accessible_datasets_path = '/datasets/'
+    extract_datasets_path = '/results/'
 
     def run_task(self, task):
         client = docker.from_env()
@@ -42,3 +50,31 @@ class DockerTaskService(TaskService):
             task_execution.save()
 
         return status.name
+
+    def _add_file_to_datasets(self, file_path, filename, task_execution):
+        user = task_execution.task.creator
+        task_name = task_execution.task.name
+        path_in_media = "datasets/" + user.username + "/"
+        os.makedirs(settings.MEDIA_ROOT + path_in_media, exist_ok=True)
+        os.replace(file_path, settings.MEDIA_ROOT + path_in_media + filename)
+        Dataset.objects.create(creator=user, file=path_in_media + filename, title=f"created_by_{task_name}")
+
+    def _exctract_data_from_container(self, task_execution):
+        client = docker.from_env()
+        container = client.containers.get(task_execution.dockertaskexecution.container_id)
+        f = BytesIO()
+        bits, stat = container.get_archive(self.extract_datasets_path)
+        for chunk in bits:
+            f.write(chunk)
+        f.seek(0)
+        tar = tarfile.open(fileobj=f)
+        tar.extractall()
+        tar.close()
+        f.close()
+        extracted_files_dir = "." + self.extract_datasets_path
+        for file in os.listdir(extracted_files_dir):
+            if (not file.endswith('.csv')):
+                print(f'{file} is not a supported type')
+            file_path = os.path.abspath(extracted_files_dir + file)
+            self._add_file_to_datasets(file_path, file, task_execution)
+        os.rmdir(extracted_files_dir)
