@@ -1,3 +1,4 @@
+import os
 import docker
 
 from workflows.models import DockerTaskExecution, TaskExecution
@@ -5,11 +6,25 @@ from workflows.services.task import TaskService
 
 
 class DockerTaskService(TaskService):
+    accessible_datasets_path = '/datasets/'
+
     def run_task(self, task):
         client = docker.from_env()
-        container = client.containers.run(task.dockertask.docker_image, detach=True)
+        container = client.containers.run(task.dockertask.docker_image,
+                                          volumes=DockerTaskService.get_accessible_datasets_mount_dict(task),
+                                          detach=True)
         DockerTaskExecution.objects.create(task=task, container_id=container.id,
                                            status=TaskExecution.StatusChoices.RUNNING)
+
+    @staticmethod
+    def get_accessible_datasets_mount_dict(task):
+        volumes = {}
+        for dataset in task.accessible_datasets.all():
+            volumes.update({dataset.file.path: {
+                'bind': f'{DockerTaskService.accessible_datasets_path}{dataset.title}{os.path.splitext(dataset.file.name)[1]}',
+                'mode': 'ro'}})
+        return volumes
+
     # pylint: disable=no-member
     def _task_execution_status(self, task_execution):
         client = docker.from_env()
