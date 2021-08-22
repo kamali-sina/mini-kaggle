@@ -5,7 +5,7 @@ import tarfile
 
 from requests.sessions import extract_cookies_to_jar
 
-from datasets.models import Dataset
+from datasets.models import Dataset, is_file_valid
 from workflows.models import DockerTaskExecution, TaskExecution
 from workflows.services.task import TaskService
 from django.conf import settings
@@ -75,9 +75,10 @@ class DockerTaskService(TaskService):
         tar.extractall()
         tar.close()
         f.close()
-        extracted_files_dir = "." + self.extract_datasets_path
+        task_execution_id = str(task_execution.id)
+        extracted_files_dir = f"./task_{task_execution_id}" + self.extract_datasets_path
         for file in os.listdir(extracted_files_dir):
-            if (not file.endswith('.csv')):
+            if (not is_file_valid(file)):
                 print(f'{file} is not a supported type')
             file_path = os.path.abspath(extracted_files_dir + file)
             self._add_file_to_datasets(file_path, file, task_execution)
