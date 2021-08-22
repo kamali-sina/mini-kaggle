@@ -2,6 +2,7 @@ import os
 import docker
 from io import BytesIO
 import tarfile
+import shutil
 
 from requests.sessions import extract_cookies_to_jar
 
@@ -83,4 +84,4 @@ class DockerTaskService(TaskService):
                 print(f'{file} is not a supported type')
             file_path = os.path.abspath(extracted_files_dir + file)
             self._add_file_to_datasets(file_path, file, task_execution)
-        os.rmdir(extract_path)
+        shutil.rmtree(extract_path, ignore_errors=True)
