@@ -63,7 +63,11 @@ class DockerTaskService(TaskService):
         client = docker.from_env()
         container = client.containers.get(task_execution.dockertaskexecution.container_id)
         f = BytesIO()
-        bits, stat = container.get_archive(self.extract_datasets_path)
+        try:
+            bits, stat = container.get_archive(self.extract_datasets_path)
+        except:
+            # There is no data to be extracted
+            return
         for chunk in bits:
             f.write(chunk)
         f.seek(0)
