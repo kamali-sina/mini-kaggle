@@ -10,8 +10,8 @@
 {% block body %}
 
 
-<div class="form_container">
-    <form enctype="multipart/form-data" action="{% url 'datasets:upload' %}" method="post" class="long_form">
+<div class="ui center aligned page grid segment">
+    <form enctype="multipart/form-data" action="{% url 'datasets:upload' %}" method="post" class="ui form">
         {% csrf_token %}
         {% include 'registration/basic_form.html' with form=form title='Upload a new file' submit_value='Submit'%}
     </form>

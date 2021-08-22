@@ -2,15 +2,18 @@
 {% load static %}
 
 {% block head %}
-    <style>li {
-        font-size: 17px;
-        list-style: none;
-        margin: 15px auto;
-    }
-    #task-excution{
-        width: 50px; height: 25px;margin: 4px;
-    }
-    </style>
+<style>li {
+    font-size: 17px;
+    list-style: none;
+    margin: 15px auto;
+}
+
+#task-excution {
+    width: 50px;
+    height: 25px;
+    margin: 4px;
+}
+</style>
 {% endblock %}
 
 {% block title %}Task Details{% endblock %}
@@ -18,46 +21,43 @@
 {% block body %}
 
 
+<div class="ui segment">
     <ul>
         <li><a href="/workflows/workflow/{{ task.workflow.id }}">Back to list</a></li>
-        <hr>
-        <li>Name: {{ task.name }}</li>
+        <li><strong>Name: </strong>{{ task.name }}</li>
         {% for key,value in special_fields.items %}
-            <li>{{ key }}: {{ value }}</li>
+        <li><strong>{{ key }}: </strong>{{ value }}</li>
         {% endfor %}
 
-        <li>type: {{ task.get_task_type_display }}</li>
-        <li>status: {{ task.status }}</li>
-        <li>creator:
+        <li><strong>Type: </strong>{{ task.get_task_type_display }}</li>
+        <li><strong>Status: </strong>{{ task.status }}</li>
+        <li><strong>Creator: </strong>
             {% if task.creator.get_full_name %}
-                {{ task.creator.get_full_name }}
+            {{ task.creator.get_full_name }}
             {% else %}
-                {{ task.creator.username }}
+            {{ task.creator.username }}
             {% endif %}
         </li>
         <div style="display: flex;">
             <form method="post" style="
     margin: 10px;" action="delete/">{% csrf_token %}
-                <input style="background: #e74c3c;color: white;border: 2px solid #FFF;font-size: 16px;padding: 4px;"
-                       type="submit" value="Delete">
+                <input type="submit" value="Delete" class="negative ui button">
             </form>
             <form method="post" style="
     margin: 10px;" action="run/">{% csrf_token %}
-                <input style="background: #27ae60;color: white;border: 2px solid #FFF;font-size: 16px;padding: 4px;"
-                       type="submit" value="Run task">
+                <input type="submit" value="Run task" class="ui button">
             </form>
 
         </div>
 
-        <hr>
         {% if task.executions %}
-            <h3>executions:</h3>
-            {% for execution in task.executions %}
-                <div id="task-excution" style="background: {{ execution.status_color }};">{{ execution.status }}</div>
-            {% endfor %}
+        <h3>executions:</h3>
+        {% for execution in task.executions %}
+        <div id="task-excution" style="background: {{ execution.status_color }};">{{ execution.status }}</div>
+        {% endfor %}
         {% endif %}
     </ul>
-
+</div>
 
 
 {% endblock %}

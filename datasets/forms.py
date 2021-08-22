@@ -17,7 +17,7 @@ class CreateDatasetForm(forms.ModelForm):
                                   validators=[RegexValidator(regex=tag_input_regex, message=tag_input_format_msg)])
 
     class Meta:
-        fields = ["file", "title", "description", 'is_public']
+        fields = ["title", "file", "description", 'is_public']
         model = Dataset
         widgets = {
             "description": forms.Textarea(),

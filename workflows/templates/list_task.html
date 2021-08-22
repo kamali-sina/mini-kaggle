@@ -2,28 +2,35 @@
 {% load static %}
 
 {% block head %}
-    <style>li {
-        font-size: 17px;
-        list-style: none;
-        margin: 15px auto;
-    }
-    </style>
+<style>li {
+    font-size: 17px;
+    list-style: none;
+    margin: 15px auto;
+}
+
+</style>
 {% endblock %}
 
 {% block title %}Tasks{% endblock %}
 
 {% block body %}
-    {% if  tasks %}
+{% if  tasks %}
 
-        {% for task in tasks %}
-            <li><a href="{{ task.pk }}/">{{ task.name }}</a>
-                <span>(Type: {{ task.get_task_type_display }}  ~  Status: {{ task.status }})</span></li>
-        {% endfor %}
+<div class="ui relaxed divided list">
+    {% for task in tasks %}
+    <div class="item">
+        <i class="large tasks middle aligned icon"></i>
+        <div class="content">
+            <a class="header" href="{{ task.pk }}/">{{ task.name }}</a>
+            <div class="description">(Type: {{ task.get_task_type_display }} ~ Status: {{ task.status }})</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
+<br>
 
-        <br>
-
-        <div class="pagination">
+<div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
             <a href="?page=1">&laquo; first</a>
@@ -39,15 +46,15 @@
             <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
-        </div>
-    {% else %}
-        <h2>No tasks available.</h2>
-    {% endif %}
+</div>
+{% else %}
+<h2>No tasks available.</h2>
+{% endif %}
 
-    <br>
+<br>
 
-    <a href="{% url 'workflows:create_task' %}">add new task</a>
-    <br>
+<a href="{% url 'workflows:create_task' %}">add new task</a>
+<br>
 
 
 {% endblock %}

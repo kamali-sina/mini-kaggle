@@ -14,18 +14,18 @@
 {% include "datasets/dataset_info.html" %}
 {% include "datasets/dataset_content.html" %}
 
-<a href="{% url 'datasets:download' pk=dataset.id %}" class="download">
-    <i class="material-icons">download</i>
+<a href="{% url 'datasets:download' pk=dataset.id %}" class="ui labeled icon button">
+    <i class="download icon"></i>
     Download
 </a>
 <a href="{% url 'datasets:delete' pk=dataset.id %}" class="ui negative button">
     Delete
 </a>
 
-<div class="tag_container">
+<div style="font-style: italic; margin-top: 20px;">
     Tags:
     {% for tag in dataset.tags.all %}
-    <a class="tag">{{ tag.text }}</a>
+    <a class="ui medium label">{{ tag.text }}</a>
     {% endfor %}
 </div>
 

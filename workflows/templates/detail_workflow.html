@@ -2,37 +2,46 @@
 {% load static %}
 
 {% block head %}
-    <style>li {
-        font-size: 17px;
-        list-style: none;
-        margin: 15px auto;
-    }
-    </style>
+<style>li {
+    font-size: 17px;
+    list-style: none;
+    margin: 15px auto;
+}
+</style>
 {% endblock %}
 
 {% block title %}Workflow Details{% endblock %}
 
 {% block body %}
-    <ul>
-        <hr>
-        <li>Name: {{ workflow.name }}</li>
 
-        <li>Creator:
+
+<div class="ui segment">
+    <ul>
+        <li><strong>Name: </strong>{{ workflow.name }}</li>
+
+        <li><strong>Creator: </strong>
             {% if workflow.creator.get_full_name %}
-                {{ workflow.creator.get_full_name }}
+            {{ workflow.creator.get_full_name }}
             {% else %}
-                {{ workflow.creator.username }}
+            {{ workflow.creator.username }}
             {% endif %}
         </li>
         <div>
-            <h3><br>Tasks:</h3>
+            <br>
+            <h3>Tasks:</h3>
             {% if workflow.task_set.all %}
+            <div class="ui relaxed divided list">
                 {% for task in workflow.task_set.all %}
-                    <li><a href="{% url 'workflows:detail_task' task.id %}">{{ task.name }}</a>
-                    </li>
+                <div class="item">
+                    <i class="large tasks middle aligned icon"></i>
+                    <div class="content">
+                        <a class="header" href="{% url 'workflows:detail_task' task.id %}">{{ task.name }}</a>
+                    </div>
+                </div>
                 {% endfor %}
+            </div>
             {% else %}
-                <li>No tasks registered to the workflow</li>
+            <li>No tasks registered to the workflow</li>
             {% endif %}
             <a href="{% url 'workflows:create_task' %}">add new task</a>
         </div>
@@ -41,16 +50,16 @@
             <form method="post" style="
     margin: 10px;" action="delete/">
                 {% csrf_token %}
-                <input style="background: #e74c3c;color: white;border: 2px solid #FFF;font-size: 16px;padding: 4px;"
-                       type="submit" value="Delete Workflow">
+                <input type="submit" value="Delete Workflow" class="negative ui button">
             </form>
             <form method="post" style="
     margin: 10px;" action="run/">
                 {% csrf_token %}
-                <input style="background: #27ae60;color: white;border: 2px solid #FFF;font-size: 16px;padding: 4px;"
-                       type="submit" value="Run Workflow">
+                <input type="submit" value="Run Workflow" class="ui button">
             </form>
         </div>
-        </hr>
     </ul>
+</div>
+
+
 {% endblock %}

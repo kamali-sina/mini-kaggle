@@ -13,12 +13,21 @@
 {% include 'datasets/filter_bar.html' %}
 
 {% if  datasets_list  %}
+
 <h1>{{ visibility }} datasets:</h1>
-<ul>
+
+<div class="ui relaxed divided list">
     {% for dataset in datasets_list %}
-    <li><a href="/datasets/{{ dataset.id }}/">{{ dataset.title }}</a></li>
+    <div class="item">
+        <i class="large database middle aligned icon"></i>
+        <div class="content">
+            <a class="header" href="/datasets/{{ dataset.id }}/">{{ dataset.title }}</a>
+            <div class="description">Created at {{ dataset.date_created }}</div>
+        </div>
+    </div>
     {% endfor %}
-</ul>
+</div>
+
 
 <br>
 
@@ -47,7 +56,7 @@
 
 <br>
 
-<li><a href="{% url 'datasets:upload' %}">upload a new file?</a></li>
+<a href="{% url 'datasets:upload' %}">upload a new file?</a>
 
 
 {% endblock %}

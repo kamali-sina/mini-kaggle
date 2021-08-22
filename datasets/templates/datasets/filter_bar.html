@@ -1,20 +1,22 @@
 {% load static %}
 {% load filter_query_params %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/filter_bar.css' %}">
 
 {% get_tag_params request as active_tags %}
 
-<div class="filter_box">
+<div class="ui segment">
     <h3>Select tags to apply filter:</h3>
+    {% if inactive_tags or active_tags %}
     <form action="{% url 'datasets:index' %}" method="post" class="tags_container">
         {% csrf_token %}
         {% for a_tag in active_tags %}
-        <a href="{% remove_tag_param request a_tag %}" class="active_tag tag">{{ a_tag }}</a>
+        <a href="{% remove_tag_param request a_tag %}" class="ui medium blue label">{{ a_tag }}</a>
         {% endfor %}
         {% for i_tag in inactive_tags %}
-        <a href="{% add_tag_param request i_tag %}" class="inactive_tag tag">{{ i_tag }}</a>
+        <a href="{% add_tag_param request i_tag %}" class="ui medium label">{{ i_tag }}</a>
         {% endfor %}
     </form>
+    {% else %}
     <small>You dont have any tags yet.</small>
+    {% endif %}
 </div>

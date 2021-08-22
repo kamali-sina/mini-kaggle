@@ -1,11 +1,13 @@
-<div class="container">
-    <table>
-        <tr class="header">
+<div style="width:100%; display: flex; justify-content: center; padding: 60px 60px 0px 60px;">
+    <table class="ui celled teal table" style="max-width: 70%;">
+        <thead>
+        <tr>
             {% for h in csv.header %}
             <th>{{ h }}</th>
             {% endfor %}
         </tr>
-
+        </thead>
+        <tbody>
         {% for row in csv.rows %}
         <tr>
             {% for item in row %}
@@ -13,5 +15,6 @@
             {% endfor %}
         </tr>
         {% endfor %}
+        </tbody>
     </table>
 </div>

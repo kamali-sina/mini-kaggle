@@ -25,18 +25,20 @@
     <meta name="author" content="SummerCamp_Bakend_Team3">
     <meta name="keywords" content="dataset, workflow, task, data">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" >
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="{% static 'data_platform/styles/semantic.css' %}">
+    <script src="{% static 'data_platform/scripts/jquery.js' %}"></script>
+    <script src="{% static 'data_platform/scripts/semantic.js' %}"></script>
     <title>{% block title %}<!--page title goes here-->{% endblock %}</title>
 </head>
 
 <body>
-    {% include 'data_platform/nav_bar.html' %}
+{% include 'data_platform/nav_bar.html' %}
+<div style="padding: 30px;" class="ui container">
     {% include "data_platform/messages.html" %}
     {% block body %}
     <!--body goes here-->
     {% endblock %}
+</div>
 </body>
 
 </html>
