@@ -23,7 +23,7 @@
 
 <div class="ui segment">
     <ul>
-        <li><a href="/workflows/workflow/{{ task.workflow.id }}">Back to list</a></li>
+        <li><a href="{% url 'workflows:detail_workflow' task.workflow.id %}">Back to list</a></li>
         <li><strong>Name: </strong>{{ task.name }}</li>
         {% for key,value in special_fields.items %}
         <li><strong>{{ key }}: </strong>{{ value }}</li>
