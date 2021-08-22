@@ -17,7 +17,8 @@ class PythonTaskService(DockerTaskService):
         client = docker.from_env()
         container = client.containers.run(task.pythontask.docker_image, detach=True,
                                           volumes={
-                                              file_path: {"bind": "/run_file.py", "mode": "ro"}
+                                              file_path: {"bind": "/run_file.py", "mode": "ro"},
+                                              **DockerTaskService.get_accessible_datasets_mount_dict(task)
                                           },
                                           command="python3 /run_file.py")
         DockerTaskExecution.objects.create(task=task, container_id=container.id,
