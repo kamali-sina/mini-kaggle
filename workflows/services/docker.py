@@ -6,7 +6,6 @@ import tarfile
 from requests.sessions import extract_cookies_to_jar
 
 from datasets.models import Dataset
-from django.contrib.auth.models import User
 from workflows.models import DockerTaskExecution, TaskExecution
 from workflows.services.task import TaskService
 from django.conf import settings
@@ -45,6 +44,7 @@ class DockerTaskService(TaskService):
                 status = TaskExecution.StatusChoices.FAILED
             else:
                 status = TaskExecution.StatusChoices.SUCCESS
+                self._exctract_data_from_execution(task_execution)
 
             task_execution.status = status
             task_execution.save()
@@ -59,7 +59,7 @@ class DockerTaskService(TaskService):
         os.replace(file_path, settings.MEDIA_ROOT + path_in_media + filename)
         Dataset.objects.create(creator=user, file=path_in_media + filename, title=f"created_by_{task_name}")
 
-    def _exctract_data_from_container(self, task_execution):
+    def _exctract_data_from_execution(self, task_execution):
         client = docker.from_env()
         container = client.containers.get(task_execution.dockertaskexecution.container_id)
         f = BytesIO()
