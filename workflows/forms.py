@@ -1,7 +1,7 @@
 from django.forms import ModelForm
-from workflows.models import Task, PythonTask, Workflow, DockerTask
 from django import forms
 from django.core.exceptions import ValidationError
+from workflows.models import Task, PythonTask, Workflow, DockerTask
 
 
 class TaskForm(ModelForm):
@@ -14,7 +14,7 @@ class TaskForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.creator = kwargs.pop('user')
-        super(TaskForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['notification_source'].queryset = self.creator.notification_sources
         self.fields['workflow'] = forms.ModelChoiceField(
             queryset=Workflow.objects.filter(creator=self.creator))

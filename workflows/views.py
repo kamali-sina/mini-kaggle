@@ -1,14 +1,14 @@
 from django.http import HttpResponseRedirect
-from workflows.models import Task, PythonTask, DockerTask, Workflow, TaskExecution
-from workflows.forms import TaskForm, PythonTaskForm, WorkflowForm, DockerTaskForm
+
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
-from .services.runner import get_service_runner
 from django.shortcuts import render
-
+from workflows.models import Task, PythonTask, DockerTask, Workflow, TaskExecution
+from workflows.forms import TaskForm, PythonTaskForm, WorkflowForm, DockerTaskForm
 from .services.task import task_status_color
+from .services.runner import get_service_runner
 
 
 class CreatorOnlyMixin(AccessMixin):
@@ -72,7 +72,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
     }
 
     def get_form_kwargs(self):
-        kwargs = super(TaskCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -81,11 +81,10 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
         if not task_type:
             context = {
                 "task_types": {task_type: reverse("workflows:create_task") + f"?type={task_type}"
-                               for task_type in self.task_types_data.keys()}
+                               for task_type in self.task_types_data}
             }
             return render(request, "select_type_for_create_task.html", context)
-        else:
-            return super().get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_form_class(self):
         task_type = self.request.GET.get("type")
@@ -94,15 +93,15 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
 
         task_type_data = self.task_types_data[task_type]
         self.model = task_type_data["model"]
-        self.task_type = task_type_data["task_type"]
         self.form_class = task_type_data["form_class"]
 
         return self.form_class
 
     def form_valid(self, form):
+        task_type = self.request.GET.get("type")
         task = form.save(commit=False)
         task.creator = self.request.user
-        task.task_type = self.task_type
+        task.task_type = self.task_types_data[task_type]["task_type"]
         task.save()
         form.save_m2m()
         messages.success(self.request, 'Your task has been created :)')
@@ -116,7 +115,7 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
     context_object_name = 'task'
 
     def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         task = context["task"]
         task_runner = get_service_runner(task)
         task.get_task_type_display = task_runner.get_task_type(task)

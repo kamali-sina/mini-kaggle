@@ -3,26 +3,25 @@ import operator
 import re
 from functools import reduce
 
+from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.urls import reverse
-from datasets.models import Dataset, Tag
-from datasets.services.csv import read_csv_dataset
-from django.views import generic
-from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, DeleteTagForm, AddTagForm
-from datasets.services.form_handler import create_dataset_edition_forms_on_get, create_dataset_edition_forms_on_post, \
-    submit_dataset_edition_forms
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-
 from django.http import QueryDict
 from django.contrib.auth.models import User
 from django.contrib import messages
-
 from django.db.models import Q
+
+from datasets.models import Dataset, Tag
+from datasets.services.csv import read_csv_dataset
+from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, AddTagForm
+from datasets.services.form_handler import create_dataset_edition_forms_on_get, create_dataset_edition_forms_on_post, \
+    submit_dataset_edition_forms
 
 
 def has_permission(permission_func):
@@ -30,8 +29,7 @@ def has_permission(permission_func):
         def wrapper(*args, **kwargs):
             if permission_func(*args, **kwargs):
                 return func(*args, **kwargs)
-            else:
-                raise PermissionDenied
+            raise PermissionDenied
 
         return wrapper
 
@@ -45,7 +43,7 @@ def has_dataset_owner_perm(request, pk):
 
 class FilterListView(generic.ListView):
     def post(self, request):
-        return super(FilterListView, self).get(request)
+        return super().get(request)
 
     def get_queryset(self):
         return Dataset.objects.filter(self.get_filter_query()).distinct()
@@ -83,8 +81,7 @@ class DatasetListView(LoginRequiredMixin, FilterListView):
     def get_queryset(self):
         if self.visibility == 'public':
             return super().get_queryset().filter(is_public=True)
-        else:
-            return super().get_queryset().filter(is_public=False, creator=self.request.user)
+        return super().get_queryset().filter(is_public=False, creator=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,7 +114,8 @@ def dataset_detail_view(request, pk):
     if request.method == 'PATCH':
         return handle_dataset_patch_method(request, pk)
     if request.method == 'DELETE':
-        return handle_dataset_delete_method(request, pk)
+        return handle_dataset_delete_method(pk)
+    return HttpResponse("Bad request!", status=400)
 
 
 def handle_dataset_post_method(request, pk):
@@ -136,7 +134,7 @@ def handle_dataset_patch_method(request, pk):
     info_form = EditDatasetInfoForm(data, instance=dataset)
     add_tag_form = AddTagForm(data, dataset=dataset)
     if not info_form.is_valid() or not add_tag_form.is_valid():
-        return HttpResponse(f"Invalid format!", status=400)
+        return HttpResponse("Invalid format!", status=400)
 
     info_form.save()
     add_tag_form.submit()
@@ -144,7 +142,7 @@ def handle_dataset_patch_method(request, pk):
     return HttpResponse(f"Dataset {pk} edited successfully", status=200)
 
 
-def handle_dataset_delete_method(request, pk):
+def handle_dataset_delete_method(pk):
     dataset = get_object_or_404(Dataset, pk=pk)
     dataset.delete()
     return HttpResponse(f"Dataset {pk} deleted successfully", status=200)
@@ -154,9 +152,9 @@ def handle_dataset_delete_method(request, pk):
 @has_permission(has_dataset_owner_perm)
 def dataset_download_view(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
-    file = open(dataset.file.path, 'rb')
-    response = FileResponse(file)
-    return response
+    with open(dataset.file.path, 'rb') as file:
+        response = FileResponse(file)
+        return response
 
 
 @login_required
@@ -179,8 +177,8 @@ class DatasetDeleteView(generic.DeleteView):
     success_url = reverse_lazy('datasets:index')
 
     def delete(self, request, *args, **kwargs):
-        object = self.get_object()
-        if object.file:
-            if os.path.isfile(object.file.path):
-                os.remove(object.file.path)
-        return super(DatasetDeleteView, self).delete(self, request, *args, **kwargs)
+        dataset = self.get_object()
+        if dataset.file:
+            if os.path.isfile(dataset.file.path):
+                os.remove(dataset.file.path)
+        return super().delete(self, request, *args, **kwargs)

@@ -1,4 +1,3 @@
-from workflows.models import DockerTask, PythonTask, Task, TaskExecution
 from workflows.services.docker import DockerTaskService
 from workflows.services.python import PythonTaskService
 from .task_data import get_task_data
@@ -10,5 +9,6 @@ def get_service_runner(task):
 
     if task_type == "Docker":
         return DockerTaskService()
-    elif task_type == "Python":
+    if task_type == "Python":
         return PythonTaskService()
+    raise Exception("Invalid task type!")

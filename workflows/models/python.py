@@ -1,7 +1,6 @@
 from django.core import validators
 from django.db import models
 from .task import Task
-import os
 
 
 def user_python_file_directory_path(instance, filename):

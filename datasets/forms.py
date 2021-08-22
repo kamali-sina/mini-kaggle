@@ -2,10 +2,12 @@ import datetime
 import re
 
 from django import forms
-from .models import Dataset
-from django.core.validators import FileExtensionValidator, RegexValidator
+from django.core.validators import RegexValidator
+
 from datasets.services.tag_addition import get_unique_tags_validator_for_dataset, add_new_or_existing_tag, \
     tag_input_regex, tag_input_format_msg
+
+from .models import Dataset
 
 
 class CreateDatasetForm(forms.ModelForm):
@@ -25,7 +27,7 @@ class CreateDatasetForm(forms.ModelForm):
         return [] if not self.cleaned_data['adding_tags'] else set(re.split(r'\s+', self.cleaned_data['adding_tags']))
 
     def save(self, creator, commit=True, pk=0):
-        dataset = super(CreateDatasetForm, self).save(commit=False)
+        dataset = super().save(commit=False)
         dataset.creator = creator
         if pk:
             dataset.id = pk
@@ -54,7 +56,7 @@ class DeleteTagForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.dataset = kwargs.pop('dataset')
-        super(DeleteTagForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         dataset = Dataset.objects.get(id=self.dataset.id)
         self.fields['deleting_tags'].queryset = dataset.tags
 
@@ -72,7 +74,7 @@ class AddTagForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.dataset = kwargs.pop('dataset')
-        super(AddTagForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['adding_tags'].validators.append(get_unique_tags_validator_for_dataset(self.dataset))
 
     def clean_adding_tags(self):

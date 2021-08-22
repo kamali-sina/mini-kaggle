@@ -1,5 +1,3 @@
-from enum import Enum
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
@@ -20,7 +18,7 @@ class NotificationSource(models.Model):
         return getattr(self, NOTIFICATION_CHILD_REGISTRY[self.type])
 
     def __str__(self):
-        return self.title
+        return str(self.title)
 
 
 class EmailNotificationSource(NotificationSource):

@@ -4,7 +4,6 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView
 from django.contrib import messages
-# Create your views here.
 from .forms import UserForm
 
 
@@ -22,4 +21,3 @@ class Signup(CreateView):
 
 def dashboard(request):
     return render(request, "dashboard.html")
-
