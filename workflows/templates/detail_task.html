@@ -30,7 +30,6 @@
         {% endfor %}
 
         <li><strong>Type: </strong>{{ task.get_task_type_display }}</li>
-        <li><strong>Status: </strong>{{ task.status }}</li>
         <li><strong>Creator: </strong>
             {% if task.creator.get_full_name %}
             {{ task.creator.get_full_name }}

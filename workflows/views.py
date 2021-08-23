@@ -120,7 +120,6 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         task = context["task"]
         task_runner = get_service_runner(task)
         task.get_task_type_display = task_runner.get_task_type(task)
-        task.status = task_runner.task_status(task)
 
         task_executions = TaskExecution.objects.filter(task=task)
         for task_execution in task_executions:
@@ -155,7 +154,6 @@ class TaskListView(LoginRequiredMixin, ListView):
         tasks = Task.objects.filter(creator=self.request.user)
         for task in tasks:
             task_runner = get_service_runner(task)
-            task.status = task_runner.task_status(task)
             task.get_task_type_display = task_runner.get_task_type(task)
 
         return tasks
