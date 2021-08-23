@@ -1,0 +1,29 @@
+image: m.docker-registry.ir/python:3.8-alpine
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - apk update && apk add make
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+
+stages:
+  - Test
+
+migrations:
+  stage: Test
+  script:
+  - make test-migrations
+
+pylint:
+  stage: Test
+  script:
+    - make test-pylint
