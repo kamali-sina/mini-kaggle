@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'django_celery_results',
     'notifications',
+    'notebooks',
 ]
 
 MIDDLEWARE = [
