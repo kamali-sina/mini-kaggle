@@ -17,7 +17,15 @@ tasks_urls = [
     path('tasks/<int:pk>/delete/', views.TaskDeleteView.as_view(), name='delete_task'),
 ]
 
+secret_urls = [
+    path('secrets/', views.SecretListView.as_view(), name='list_secret'),
+    path('secrets/create/', views.SecretCreateView.as_view(), name='create_secret'),
+    path('secrets/<int:pk>/', views.SecretDetailView.as_view(), name='detail_secret'),
+    path('secrets/<int:pk>/delete/', views.SecretDeleteView.as_view(), name='delete_secret'),
+]
+
 urlpatterns = [
     *tasks_urls,
+    *secret_urls,
     *workflows_urls,
 ]
