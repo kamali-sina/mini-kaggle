@@ -8,7 +8,7 @@
     margin: 15px auto;
 }
 
-#task-excution {
+#task-execution {
     width: 50px;
     height: 25px;
     margin: 4px;
@@ -59,7 +59,7 @@
         {% if task.executions %}
         <h3>executions:</h3>
         {% for execution in task.executions %}
-        <div id="task-excution" style="background: {{ execution.status_color }};">{{ execution.status }}</div>
+        <div id="task-execution" style="background: {{ execution.status_color }};">{{ execution.status }}</div>
         {% endfor %}
         {% endif %}
     </ul>

@@ -1,6 +1,8 @@
 from django.forms import ModelForm
 from django import forms
 from django.core.exceptions import ValidationError
+
+from workflows.models import Secret
 from workflows.models import Task, PythonTask, Workflow, DockerTask
 
 
@@ -20,6 +22,7 @@ class TaskForm(ModelForm):
             queryset=Workflow.objects.filter(creator=self.creator))
         self.fields['accessible_datasets'].queryset = self.creator.datasets
         self.fields['timeout'].help_text = 'leave empty, for no time limit'
+        self.fields['secret_variables'].label = 'Add secret variable to task execution'
 
     def clean(self):
         cleaned_data = super().clean()
@@ -31,23 +34,28 @@ class TaskForm(ModelForm):
 
     class Meta:
         model = Task
-        fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'workflow']
+        fields = ['name', 'timeout', 'secret_variables', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'workflow']
 
 
 class PythonTaskForm(TaskForm):
     class Meta:
         model = PythonTask
-        fields = ['name', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'python_file',
+        fields = ['name', 'timeout', 'secret_variables', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'python_file',
                   'docker_image', 'workflow']
 
 
 class DockerTaskForm(TaskForm):
     class Meta:
         model = DockerTask
-        fields = ["name", "docker_image", 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'workflow']
+        fields = ["name", "docker_image", 'secret_variables', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'workflow']
 
 
 class WorkflowForm(ModelForm):
     class Meta:
         model = Workflow
         fields = ['name']
+
+class SecretForm(ModelForm):
+    class Meta:
+        model = Secret
+        fields = ['name',"value"]

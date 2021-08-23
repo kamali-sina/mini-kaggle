@@ -8,11 +8,18 @@ from workflows.services.task import TaskService
 class DockerTaskService(TaskService):
     accessible_datasets_path = '/datasets/'
 
+    @staticmethod
+    def get_environment(task):
+        return {secret.name: secret.value
+                for secret in task.secret_variables.all()}
+
     def run_task(self, task):
         client = docker.from_env()
         container = client.containers.run(task.dockertask.docker_image,
                                           volumes=DockerTaskService.get_accessible_datasets_mount_dict(task),
-                                          detach=True)
+                                          detach=True,
+                                          environment=self.get_environment(task)
+                                          )
         DockerTaskExecution.objects.create(task=task, container_id=container.id,
                                            status=TaskExecution.StatusChoices.RUNNING)
 
