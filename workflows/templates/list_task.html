@@ -22,7 +22,7 @@
         <i class="large tasks middle aligned icon"></i>
         <div class="content">
             <a class="header" href="{{ task.pk }}/">{{ task.name }}</a>
-            <div class="description">(Type: {{ task.get_task_type_display }} ~ Status: {{ task.status }})</div>
+            <div class="description">(Type: {{ task.get_task_type_display }})</div>
         </div>
     </div>
     {% endfor %}
