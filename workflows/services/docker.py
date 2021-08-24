@@ -1,8 +1,15 @@
 import os
+from enum import Enum
 import docker
 
+from django.core.exceptions import ValidationError
 from workflows.models import DockerTaskExecution, TaskExecution
 from workflows.services.task import TaskService
+
+
+class MarkTaskExecutionStatusOptions(Enum):
+    FAILED = 0
+    SUCCESS = 1
 
 
 class DockerTaskService(TaskService):
@@ -23,25 +30,22 @@ class DockerTaskService(TaskService):
         DockerTaskExecution.objects.create(task=task, container_id=container.id,
                                            status=TaskExecution.StatusChoices.RUNNING)
 
-    @staticmethod
-    def get_accessible_datasets_mount_dict(task):
-        volumes = {}
-        for dataset in task.accessible_datasets.all():
-            volumes.update({dataset.file.path: {
-                'bind': DockerTaskService._get_dataset_mount_path(dataset),
-                'mode': 'ro'}})
-        return volumes
-
-    @staticmethod
-    def get_accessible_datasets_mount_info(task):
-        info = []
-        for dataset in task.accessible_datasets.all():
-            info.append(DockerTaskService._get_dataset_mount_path(dataset))
-        return info
-
-    @staticmethod
-    def _get_dataset_mount_path(dataset):
-        return f'{DockerTaskService.accessible_datasets_path}{dataset.title}{os.path.splitext(dataset.file.name)[1]}'
+    def stop_task_execution(
+            self,
+            task_execution_id: str,
+            mark_task_execution_status_as: MarkTaskExecutionStatusOptions,
+    ):
+        client = docker.from_env()
+        docker_task_execution = DockerTaskExecution.objects.get(id=task_execution_id)
+        container = client.containers.get(container_id=docker_task_execution.container_id)
+        if mark_task_execution_status_as == MarkTaskExecutionStatusOptions.FAILED:
+            docker_task_execution.status = TaskExecution.StatusChoices.FAILED
+        elif mark_task_execution_status_as == MarkTaskExecutionStatusOptions.SUCCESS:
+            docker_task_execution.status = TaskExecution.StatusChoices.SUCCESS
+        else:
+            raise ValidationError("invalid mark status choice")
+        container.stop()
+        docker_task_execution.save()
 
     # pylint: disable=no-member
     def _task_execution_status(self, task_execution):
@@ -60,3 +64,23 @@ class DockerTaskService(TaskService):
             task_execution.save()
 
         return status.name
+
+    @staticmethod
+    def get_accessible_datasets_mount_info(task):
+        info = []
+        for dataset in task.accessible_datasets.all():
+            info.append(DockerTaskService._get_dataset_mount_path(dataset))
+        return info
+
+    @staticmethod
+    def _get_dataset_mount_path(dataset):
+        return f'{DockerTaskService.accessible_datasets_path}{dataset.title}{os.path.splitext(dataset.file.name)[1]}'
+
+    @staticmethod
+    def get_accessible_datasets_mount_dict(task):
+        volumes = {}
+        for dataset in task.accessible_datasets.all():
+            volumes.update({dataset.file.path: {
+                'bind': f'{DockerTaskService.accessible_datasets_path}{dataset.title}{os.path.splitext(dataset.file.name)[1]}',
+                'mode': 'ro'}})
+        return volumes

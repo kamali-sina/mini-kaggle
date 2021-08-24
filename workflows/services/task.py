@@ -15,7 +15,11 @@ def task_status_color(status):
 class TaskService(ABC):
     @abstractmethod
     def run_task(self, task):
-        pass
+        raise NotImplementedError
+
+    @abstractmethod
+    def stop_task_execution(self, task_execution_id, mark_task_execution_status_as):
+        raise NotImplementedError
 
     def get_display_fields(self, task):
         task_map = get_task_data(task)

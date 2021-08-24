@@ -2,18 +2,19 @@
 {% load static %}
 
 {% block head %}
-<style>li {
-    font-size: 17px;
-    list-style: none;
-    margin: 15px auto;
-}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
 
-#task-execution {
-    width: 50px;
-    height: 25px;
-    margin: 4px;
-}
-</style>
+
+    #task-execution {
+        width: 50px;
+        height: 25px;
+        margin: 4px;
+    }
+    </style>
 {% endblock %}
 
 {% block title %}Task Details{% endblock %}
@@ -21,49 +22,65 @@
 {% block body %}
 
 
-<div class="ui segment">
-    <ul>
-        <li><a href="{% url 'workflows:detail_workflow' task.workflow.id %}">Back to list</a></li>
-        <li><strong>Name: </strong>{{ task.name }}</li>
-        {% for key,value in special_fields.items %}
-        <li><strong>{{ key }}: </strong>{{ value }}</li>
-        {% endfor %}
+    <div class="ui segment">
+        <ul>
+            <li><a href="{% url 'workflows:detail_workflow' task.workflow.id %}">Back to list</a></li>
+            <li><strong>Name: </strong>{{ task.name }}</li>
+            {% for key,value in special_fields.items %}
+                <li><strong>{{ key }}: </strong>{{ value }}</li>
+            {% endfor %}
 
-        <li><strong>Type: </strong>{{ task.get_task_type_display }}</li>
-        <li><strong>Creator: </strong>
-            {% if task.creator.get_full_name %}
-            {{ task.creator.get_full_name }}
-            {% else %}
-            {{ task.creator.username }}
-            {% endif %}
-        </li>
-        <li><strong>Accessible datasets: </strong>
-            <ul>
-                {% for dataset_path in accessible_datasets %}
-                <li>{{ dataset_path }}<li>
-                {% endfor %}
-            </ul>
-        </li>
-        <div style="display: flex;">
-            <form method="post" style="
+            <li><strong>Type: </strong>{{ task.get_task_type_display }}</li>
+            <li><strong>Creator: </strong>
+                {% if task.creator.get_full_name %}
+                    {{ task.creator.get_full_name }}
+                {% else %}
+                    {{ task.creator.username }}
+                {% endif %}
+            </li>
+            <li><strong>Accessible datasets: </strong>
+                <ul>
+                    {% for dataset_path in accessible_datasets %}
+                        <li>{{ dataset_path }}
+                        <li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <div style="display: flex;">
+                <form method="post" style="
     margin: 10px;" action="delete/">{% csrf_token %}
-                <input type="submit" value="Delete" class="negative ui button">
-            </form>
-            <form method="post" style="
+                    <input type="submit" value="Delete" class="negative ui button">
+                </form>
+                <form method="post" style="
     margin: 10px;" action="run/">{% csrf_token %}
-                <input type="submit" value="Run task" class="ui button">
-            </form>
+                    <input type="submit" value="Run task" class="ui button">
+                </form>
+            </div>
 
-        </div>
+            {% if task.executions %}
+                <h3>executions:</h3>
+                {% for execution in task.executions %}
+                    <div class="ui grid" id="task-excution" style="display: inline;">
+                        <div class="ui button" style="display: flex;">
+                            <h3 class="ui left floated 4 wide column"
+                                style="background: {{ execution.status_color }};">{{ execution.status }}</h3>
+                            {% for mark_option in mark_options %}
+                                <form method="post"
+                                      style="margin: 10px;"
+                                      action="{% url 'workflows:stop_task_execution' pk=task.id exec_pk=execution.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="mark_option" value="{{ mark_option.value }}"/>
+                                    <input type="submit" value="Mark {{ mark_option.text }}"
+                                           class="ui right floated {{ mark_option.color }} button">
+                                </form>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
 
-        {% if task.executions %}
-        <h3>executions:</h3>
-        {% for execution in task.executions %}
-        <div id="task-execution" style="background: {{ execution.status_color }};">{{ execution.status }}</div>
-        {% endfor %}
-        {% endif %}
-    </ul>
-</div>
 
 
 {% endblock %}

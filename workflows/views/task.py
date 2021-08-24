@@ -4,11 +4,13 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from workflows.models import Task, PythonTask, DockerTask, TaskExecution
 from workflows.forms import TaskForm, PythonTaskForm, DockerTaskForm
 from workflows.services.task import task_status_color
 from workflows.services.runner import get_service_runner
+from workflows.services.docker import DockerTaskService, MarkTaskExecutionStatusOptions
+
 
 class CreatorOnlyMixin(AccessMixin):
     """Verify that the current user is the creator."""
@@ -40,6 +42,21 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         task.executions = task_executions
 
         context["display_fields"] = task_runner.get_display_fields(task)
+        context["accessible_datasets"] = DockerTaskService.get_accessible_datasets_mount_info(task)
+
+        context["mark_options"] = [
+            {
+                "value": MarkTaskExecutionStatusOptions.FAILED.value,
+                "text": "failed",
+                "color": "red",
+            },
+            {
+                "value": MarkTaskExecutionStatusOptions.SUCCESS.value,
+                "text": "success",
+                "color": "green",
+            }
+        ]
+
         return context
 
 
@@ -116,10 +133,22 @@ class TaskListView(LoginRequiredMixin, ListView):
 
 
 def run_task_view(request, pk):
-    task = Task.objects.get(pk=pk)
+    task = get_object_or_404(Task, pk=pk)
 
     task_runner = get_service_runner(task)
     task_runner.run_task(task)
+
+    success_url = reverse("workflows:detail_task", args=(task.pk,))
+    return HttpResponseRedirect(success_url)
+
+
+def stop_task_execution_view(request, pk, exec_pk):
+    task = get_object_or_404(Task, pk=pk)
+    task_runner = get_service_runner(task)
+    task_runner.stop_task_execution(
+        task_execution_id=exec_pk,
+        mark_task_execution_status_as=MarkTaskExecutionStatusOptions(int(request.POST["mark_option"])),
+    )
 
     success_url = reverse("workflows:detail_task", args=(task.pk,))
     return HttpResponseRedirect(success_url)

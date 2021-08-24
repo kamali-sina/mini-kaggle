@@ -15,6 +15,9 @@ tasks_urls = [
     path('tasks/create/', views.TaskCreateView.as_view(), name='create_task'),
     path('tasks/<int:pk>/', views.TaskDetailView.as_view(), name='detail_task'),
     path('tasks/<int:pk>/delete/', views.TaskDeleteView.as_view(), name='delete_task'),
+    path('tasks/<int:pk>/executions/<int:exec_pk>/mark/', views.task.stop_task_execution_view,
+         name='stop_task_execution'),
+    path('tasks/<int:pk>/run/', views.task.run_task_view, name='run'),
 ]
 
 secret_urls = [
