@@ -1,15 +1,14 @@
 import os
-import docker
 from io import BytesIO
 import tarfile
 import shutil
+import docker
+from docker.errors import APIError
 
-from requests.sessions import extract_cookies_to_jar
-
+from django.conf import settings
 from datasets.models import Dataset, is_file_valid
 from workflows.models import DockerTaskExecution, TaskExecution
 from workflows.services.task import TaskService
-from django.conf import settings
 
 def add_file_to_datasets(file_path, filename, task_execution):
     user = task_execution.task.creator
@@ -80,28 +79,27 @@ class DockerTaskService(TaskService):
     def _recieve_data_from_container(self, task_execution, extract_path):
         client = docker.from_env()
         container = client.containers.get(task_execution.dockertaskexecution.container_id)
-        f = BytesIO()
+        file_stream = BytesIO()
         try:
-            bits, stat = container.get_archive(self.container_extract_datasets_path)
-        except:
+            bits, _ = container.get_archive(self.container_extract_datasets_path)
+        except APIError:
             return False
         for chunk in bits:
-            f.write(chunk)
-        f.seek(0)
-        tar = tarfile.open(fileobj=f)
-        tar.extractall(path=extract_path)
-        tar.close()
-        f.close()
+            file_stream.write(chunk)
+        file_stream.seek(0)
+        with tarfile.open(fileobj=file_stream) as tar_file:
+            tar_file.extractall(path=extract_path)
+        file_stream.close()
         return True
 
     def exctract_data_from_execution(self, task_execution):
         extract_path = f"./task_{task_execution.id}"
-        if (not self._recieve_data_from_container(task_execution, extract_path)):
+        if not self._recieve_data_from_container(task_execution, extract_path):
             # There is no data to be extracted
             return
         extracted_files_dir = extract_path + self.container_extract_datasets_path
         for file in os.listdir(extracted_files_dir):
-            if (not is_file_valid(file)):
+            if not is_file_valid(file):
                 print(f'{file} is not a supported type')
             file_path = os.path.abspath(extracted_files_dir + file)
             add_file_to_datasets(file_path, file, task_execution)

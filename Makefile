@@ -8,7 +8,7 @@ help:
 test: test-migrations test-pylint
 
 test-migrations: 
-	python manage.py makemigrations --check --dry-run
+	python3 manage.py makemigrations --check --dry-run
 
 test-pylint:
 	find . -type f -name "*.py" | grep -vE "migrations|^./venv|^./cache" | xargs pylint
