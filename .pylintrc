@@ -20,7 +20,7 @@ fail-on=
 fail-under=10.0
 
 # Files or directories to be skipped. They should be base names, not paths.
-ignore=CVS
+ignore=CVS,
 
 # Add files or directories matching the regex patterns to the ignore-list. The
 # regex matches against paths.
@@ -45,7 +45,8 @@ limit-inference-results=100
 
 # List of plugins (as comma separated values of python module names) to load,
 # usually to register additional checkers.
-load-plugins=pylint_django 
+load-plugins=pylint_django,
+
 django-settings-module=data_platform.settings
 
 # Pickle collected data for later comparisons.
@@ -80,6 +81,7 @@ disable=print-statement,
         unpacking-in-except,
         old-raise-syntax,
         backtick,
+        duplicate-code,
         long-suffix,
         old-ne-operator,
         old-octal-literal,
@@ -163,6 +165,7 @@ disable=print-statement,
         too-few-public-methods,
         arguments-differ,
         imported-auth-user,
+        import-outside-toplevel,
 
 
 # Enable the message, report, category or checker with the given id(s). You can

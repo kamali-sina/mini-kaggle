@@ -8,7 +8,7 @@
     margin: 15px auto;
 }
 
-#task-excution {
+#task-execution {
     width: 50px;
     height: 25px;
     margin: 4px;
@@ -23,20 +23,26 @@
 
 <div class="ui segment">
     <ul>
-        <li><a href="/workflows/workflow/{{ task.workflow.id }}">Back to list</a></li>
+        <li><a href="{% url 'workflows:detail_workflow' task.workflow.id %}">Back to list</a></li>
         <li><strong>Name: </strong>{{ task.name }}</li>
         {% for key,value in special_fields.items %}
         <li><strong>{{ key }}: </strong>{{ value }}</li>
         {% endfor %}
 
         <li><strong>Type: </strong>{{ task.get_task_type_display }}</li>
-        <li><strong>Status: </strong>{{ task.status }}</li>
         <li><strong>Creator: </strong>
             {% if task.creator.get_full_name %}
             {{ task.creator.get_full_name }}
             {% else %}
             {{ task.creator.username }}
             {% endif %}
+        </li>
+        <li><strong>Accessible datasets: </strong>
+            <ul>
+                {% for dataset_path in accessible_datasets %}
+                <li>{{ dataset_path }}<li>
+                {% endfor %}
+            </ul>
         </li>
         <div style="display: flex;">
             <form method="post" style="
@@ -53,7 +59,7 @@
         {% if task.executions %}
         <h3>executions:</h3>
         {% for execution in task.executions %}
-        <div id="task-excution" style="background: {{ execution.status_color }};">{{ execution.status }}</div>
+        <div id="task-execution" style="background: {{ execution.status_color }};">{{ execution.status }}</div>
         {% endfor %}
         {% endif %}
     </ul>

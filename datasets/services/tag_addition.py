@@ -1,18 +1,19 @@
 import re
 
-from datasets.models import Tag
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-tag_input_regex = r'^(?:[\w_0-9\.-]+)(?:\s*[\w_0-9\.-]+\s*)*$'
-tag_input_format_msg = 'Tags should be space separated. Only letters, _ - and . are allowed.'
+from datasets.models import Tag
+
+TAG_INPUT_REGEX = r'^(?:[\w_0-9\.-]+)(?:\s*[\w_0-9\.-]+\s*)*$'
+TAG_INPUT_FORMAT_MESSAGE = 'Tags should be space separated. Only letters, _ - and . are allowed.'
 
 
 def add_new_or_existing_tag(tag_text, dataset):
     try:
         tag = dataset.creator.tags.get(text=tag_text)
         dataset.tags.add(tag)
-    except:
+    except Tag.DoesNotExist:
         tag = Tag.objects.create(creator=dataset.creator, text=tag_text)
         dataset.tags.add(tag)
 

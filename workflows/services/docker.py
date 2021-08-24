@@ -23,11 +23,18 @@ class DockerTaskService(TaskService):
     accessible_datasets_path = '/datasets/'
     container_extract_datasets_path = '/results/'
 
+    @staticmethod
+    def get_environment(task):
+        return {secret.name: secret.value
+                for secret in task.secret_variables.all()}
+
     def run_task(self, task):
         client = docker.from_env()
         container = client.containers.run(task.dockertask.docker_image,
                                           volumes=DockerTaskService.get_accessible_datasets_mount_dict(task),
-                                          detach=True)
+                                          detach=True,
+                                          environment=self.get_environment(task)
+                                          )
         DockerTaskExecution.objects.create(task=task, container_id=container.id,
                                            status=TaskExecution.StatusChoices.RUNNING)
 
@@ -36,9 +43,20 @@ class DockerTaskService(TaskService):
         volumes = {}
         for dataset in task.accessible_datasets.all():
             volumes.update({dataset.file.path: {
-                'bind': f'{DockerTaskService.accessible_datasets_path}{dataset.title}{os.path.splitext(dataset.file.name)[1]}',
+                'bind': DockerTaskService._get_dataset_mount_path(dataset),
                 'mode': 'ro'}})
         return volumes
+
+    @staticmethod
+    def get_accessible_datasets_mount_info(task):
+        info = []
+        for dataset in task.accessible_datasets.all():
+            info.append(DockerTaskService._get_dataset_mount_path(dataset))
+        return info
+
+    @staticmethod
+    def _get_dataset_mount_path(dataset):
+        return f'{DockerTaskService.accessible_datasets_path}{dataset.title}{os.path.splitext(dataset.file.name)[1]}'
 
     # pylint: disable=no-member
     def _task_execution_status(self, task_execution):

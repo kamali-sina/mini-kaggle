@@ -16,9 +16,10 @@ from django.http import QueryDict
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Q
+from django.db.models import Count
 
 from datasets.models import Dataset, Tag
-from datasets.services.csv import read_csv_dataset
+from datasets.services.read_csv import read_csv_dataset
 from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, AddTagForm
 from datasets.services.form_handler import create_dataset_edition_forms_on_get, create_dataset_edition_forms_on_post, \
     submit_dataset_edition_forms
@@ -41,51 +42,53 @@ def has_dataset_owner_perm(request, pk):
     return dataset.creator.id == request.user.id
 
 
-class FilterListView(generic.ListView):
-    def post(self, request):
-        return super().get(request)
-
-    def get_queryset(self):
-        return Dataset.objects.filter(self.get_filter_query()).distinct()
-
-    def get_filter_query(self):
-        query_list = [Q(tags__text__icontains=tag) for tag in self.get_applying_tags()]
-        query_list = query_list + [Q(title__icontains=search_word) for search_word in self.get_search_words()]
-        return reduce(operator.or_, query_list, Q())
-
-    def get_applying_tags(self):
-        return self.request.GET.getlist('tag')
-
-    def get_search_words(self):
-        return re.split(r'\s+',
-                        self.request.POST.get('search_box', '')) if 'search_box' in self.request.POST else []
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['inactive_tags'] = self.request.user.tags.exclude(text__in=self.request.GET.getlist('tag'))
-        else:
-            context['inactive_tags'] = Tag.objects.filter(datasets__is_public=True).exclude(
-                text__in=self.request.GET.getlist('tag')).distinct()
-        context['searched'] = self.request.POST.get('search_box', '')
-        return context
-
-
-class DatasetListView(LoginRequiredMixin, FilterListView):
+class DatasetListView(LoginRequiredMixin, generic.ListView):
+    """datasets list view in which datasets can be filtered by their tags and searched by their titles"""
     ITEMS_PER_PAGE = 10
     paginate_by = ITEMS_PER_PAGE
     template_name = "datasets/datasets.html"
     context_object_name = "datasets_list"
     visibility = 'private'
 
+    def post(self, request):
+        return super().get(request)
+
     def get_queryset(self):
-        if self.visibility == 'public':
-            return super().get_queryset().filter(is_public=True)
-        return super().get_queryset().filter(is_public=False, creator=self.request.user)
+        if not self.get_applying_tags():
+            return Dataset.objects.filter(
+                self.get_title_search_words_query(), self.get_visibility_query(), self.get_creator_query())
+        return Dataset.objects.filter(
+            self.get_title_search_words_query(), self.get_visibility_query(), self.get_creator_query()).filter(
+            tags__text__in=self.get_applying_tags()).distinct().annotate(
+            matching_tags_no=Count('tags')).filter(
+            matching_tags_no=len(self.get_applying_tags()))
+
+    def get_visibility_query(self):
+        return Q(is_public=True) if self.visibility == 'public' else Q(is_public=False)
+
+    def get_creator_query(self):
+        return Q() if self.visibility == 'public' else Q(creator=self.request.user)
+
+    def get_applying_tags(self):
+        return self.request.GET.getlist('tag')
+
+    def get_title_search_words_query(self):
+        query_list = [Q(title__icontains=search_word) for search_word in self.get_title_search_words()]
+        return reduce(operator.or_, query_list, Q())
+
+    def get_title_search_words(self):
+        return re.split(r'\s+',
+                        self.request.POST.get('search_box', '')) if 'search_box' in self.request.POST else []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['visibility'] = self.visibility
+        if self.request.user.is_authenticated:
+            context['inactive_tags'] = self.request.user.tags.exclude(text__in=self.request.GET.getlist('tag'))
+        else:
+            context['inactive_tags'] = Tag.objects.filter(datasets__is_public=True).exclude(
+                text__in=self.request.GET.getlist('tag')).distinct()
+        context['searched'] = self.request.POST.get('search_box', '')
         return context
 
 

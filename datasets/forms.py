@@ -5,7 +5,7 @@ from django import forms
 from django.core.validators import RegexValidator
 
 from datasets.services.tag_addition import get_unique_tags_validator_for_dataset, add_new_or_existing_tag, \
-    tag_input_regex, tag_input_format_msg
+    TAG_INPUT_REGEX, TAG_INPUT_FORMAT_MESSAGE
 
 from .models import Dataset
 
@@ -14,7 +14,7 @@ class CreateDatasetForm(forms.ModelForm):
     adding_tags = forms.CharField(label='Add as many space separated tags as you want',
                                   required=False,
                                   max_length=300,
-                                  validators=[RegexValidator(regex=tag_input_regex, message=tag_input_format_msg)])
+                                  validators=[RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)])
 
     class Meta:
         fields = ["title", "file", "description", 'is_public']
@@ -70,7 +70,7 @@ class AddTagForm(forms.Form):
                                   required=False,
                                   max_length=300,
                                   validators=[
-                                      RegexValidator(regex=tag_input_regex, message=tag_input_format_msg)])
+                                      RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)])
 
     def __init__(self, *args, **kwargs):
         self.dataset = kwargs.pop('dataset')
