@@ -7,9 +7,9 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 from workflows.models import Task, PythonTask, DockerTask, TaskExecution
 from workflows.forms import TaskForm, PythonTaskForm, DockerTaskForm
-from workflows.services.task import task_status_color
+from workflows.services.docker import task_status_color, get_display_fields, get_task_type, DockerTaskService, \
+    MarkTaskExecutionStatusOptions
 from workflows.services.runner import get_service_runner
-from workflows.services.docker import DockerTaskService, MarkTaskExecutionStatusOptions
 
 
 class CreatorOnlyMixin(AccessMixin):
@@ -32,7 +32,7 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         context = super().get_context_data(**kwargs)
         task = context["task"]
         task_runner = get_service_runner(task)
-        task.get_task_type_display = task_runner.get_task_type(task)
+        task.get_task_type_display = get_task_type(task)
         task.status = task_runner.task_status(task)
 
         task_executions = TaskExecution.objects.filter(task=task)
@@ -41,7 +41,7 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
             task_execution.status_color = task_status_color(task_execution.status)
         task.executions = task_executions
 
-        context["display_fields"] = task_runner.get_display_fields(task)
+        context["display_fields"] = get_display_fields(task)
         context["accessible_datasets"] = DockerTaskService.get_accessible_datasets_mount_info(task)
 
         context["mark_options"] = [
@@ -127,7 +127,7 @@ class TaskListView(LoginRequiredMixin, ListView):
         for task in tasks:
             task_runner = get_service_runner(task)
             task.status = task_runner.task_status(task)
-            task.get_task_type_display = task_runner.get_task_type(task)
+            task.get_task_type_display = get_task_type(task)
 
         return tasks
 
