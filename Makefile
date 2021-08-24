@@ -11,7 +11,7 @@ test-migrations:
 	python3 manage.py makemigrations --check --dry-run
 
 test-pylint:
-	find . -type f -name "*.py" | grep -vE "migrations|^./venv|^./cache" | xargs pylint
+	find . -type f -name "*.py" | grep -vE "migrations|^./venv|^./cache|^./lib|^./media" | xargs pylint
 
 install:
 	pip install -r requirements.txt
