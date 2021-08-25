@@ -1,7 +1,31 @@
 import datetime
+import logging
+
+from django.db import transaction
+
 from celery import shared_task
 from notifications.services.send_notifications import send_notification
-from workflows.models.task import Task
+from workflows.models import Task, WorkflowSchedule
+from workflows.services.workflow_schedule import run_scheduled_workflow
+from data_platform.celery import app
+
+
+@app.on_after_finalize.connect
+def setup_workflows_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(10, run_scheduled_workflows.s(), name='run scheduled workflows')
+
+
+# pylint: disable=broad-except
+@app.task
+@transaction.atomic
+def run_scheduled_workflows():
+    workflow_schedules = WorkflowSchedule.objects.select_for_update().filter(paused=False)
+    for workflow_schedule in workflow_schedules:
+        try:
+            run_scheduled_workflow(workflow_schedule)
+        except Exception as exc:
+            logging.exception(exc)
+            print("Problem running workflow with id: " + str(workflow_schedule.workflow.id) + " at the scheduled time.")
 
 
 # pylint: disable=unused-argument
