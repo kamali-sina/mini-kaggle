@@ -1,9 +1,11 @@
+from datetime import timedelta
+from datetime import datetime
 from django.forms import ModelForm
 from django import forms
 from django.core.exceptions import ValidationError
 
 from workflows.models import Secret
-from workflows.models import Task, PythonTask, Workflow, DockerTask
+from workflows.models import Task, PythonTask, Workflow, DockerTask, WorkflowSchedule
 
 
 class TaskForm(ModelForm):
@@ -34,20 +36,23 @@ class TaskForm(ModelForm):
 
     class Meta:
         model = Task
-        fields = ['name', 'timeout', 'secret_variables', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'workflow']
+        fields = ['name', 'timeout', 'secret_variables', 'accessible_datasets', 'notification_source',
+                  'alert_on_failure', 'workflow']
 
 
 class PythonTaskForm(TaskForm):
     class Meta:
         model = PythonTask
-        fields = ['name', 'timeout', 'secret_variables', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'python_file',
+        fields = ['name', 'timeout', 'secret_variables', 'accessible_datasets', 'notification_source',
+                  'alert_on_failure', 'python_file',
                   'docker_image', 'workflow']
 
 
 class DockerTaskForm(TaskForm):
     class Meta:
         model = DockerTask
-        fields = ["name", "docker_image", 'secret_variables', 'timeout', 'accessible_datasets', 'notification_source', 'alert_on_failure', 'workflow']
+        fields = ["name", "docker_image", 'secret_variables', 'timeout', 'accessible_datasets', 'notification_source',
+                  'alert_on_failure', 'workflow']
 
 
 class WorkflowForm(ModelForm):
@@ -55,7 +60,19 @@ class WorkflowForm(ModelForm):
         model = Workflow
         fields = ['name']
 
+
 class SecretForm(ModelForm):
     class Meta:
         model = Secret
-        fields = ['name',"value"]
+        fields = ['name', "value"]
+
+
+class WorkflowScheduleForm(ModelForm):
+    class Meta:
+        model = WorkflowSchedule
+        fields = ['start_time', 'schedule_interval']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start_time'].widget.attrs['placeholder'] = datetime.now()
+        self.fields['schedule_interval'].widget.attrs['placeholder'] = timedelta()

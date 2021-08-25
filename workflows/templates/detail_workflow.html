@@ -7,6 +7,8 @@
     list-style: none;
     margin: 15px auto;
 }
+
+
 </style>
 {% endblock %}
 
@@ -47,15 +49,17 @@
         </div>
         <br>
         <div style="display: flex;">
-            <form method="post" style="
-    margin: 10px;" action="delete/">
+            <form method="post" style="margin: 10px;" action="delete/">
                 {% csrf_token %}
                 <input type="submit" value="Delete Workflow" class="negative ui button">
             </form>
-            <form method="post" style="
-    margin: 10px;" action="run/">
+            <form method="post" style="margin: 10px;" action="run/">
                 {% csrf_token %}
                 <input type="submit" value="Run Workflow" class="ui button">
+            </form>
+            <form style="margin: 10px;" action="{% url 'workflows:schedule_workflow' workflow.id %}">
+                {% csrf_token %}
+                <input type="submit" value="Schedule" class="ui button">
             </form>
         </div>
     </ul>

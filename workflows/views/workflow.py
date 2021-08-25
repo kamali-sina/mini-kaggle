@@ -1,10 +1,11 @@
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, DeleteView, DetailView, ListView
+from django.views.generic import View, CreateView, DeleteView, DetailView, ListView, UpdateView, FormView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
-from workflows.models import Workflow
-from workflows.forms import WorkflowForm
+from django.shortcuts import get_object_or_404
+from workflows.models import Workflow, WorkflowSchedule
+from workflows.forms import WorkflowForm, WorkflowScheduleForm
 
 
 class WorkflowCreatorOnlyMixin(AccessMixin):
@@ -54,3 +55,39 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
     model = Workflow
     template_name = 'detail_workflow.html'
     context_object_name = 'workflow'
+
+
+class WorkflowScheduleRedirectView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        workflow = get_object_or_404(Workflow, pk=self.kwargs['pk'])
+        if hasattr(workflow, 'schedule'):
+            return WorkflowScheduleUpdateView.as_view()(request, *args, **kwargs)
+        return WorkflowScheduleCreateView.as_view()(request, *args, **kwargs)
+
+
+class WorkflowScheduleFormView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, FormView):
+    model = WorkflowSchedule
+    form_class = WorkflowScheduleForm
+
+    def get_success_url(self):
+        return reverse("workflows:detail_workflow", args=(self.kwargs['pk'],))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pk'] = self.kwargs['pk']
+        return context
+
+
+class WorkflowScheduleCreateView(WorkflowScheduleFormView, CreateView):
+    def form_valid(self, form):
+        workflow = get_object_or_404(Workflow, pk=self.kwargs['pk'])
+        workflow_schedule = form.save(commit=False)
+        workflow_schedule.workflow = workflow
+        workflow_schedule.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class WorkflowScheduleUpdateView(WorkflowScheduleFormView, UpdateView):
+    def get_object(self, queryset=None):
+        workflow = get_object_or_404(Workflow, pk=self.kwargs['pk'])
+        return workflow.schedule
