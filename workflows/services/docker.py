@@ -52,7 +52,9 @@ def exctract_dataset_from_execution(task_execution):
         return
     extracted_files_dir = extract_path + DockerTaskService.container_extract_datasets_path
     if not check_validity_of_datasets(extracted_files_dir):
-        raise ValidationError
+        raise ValidationError(f"Not all files in the \
+                            {DockerTaskService.container_extract_datasets_path} folder \
+                            were valid! No datasets are saved.")
     for file in os.listdir(extracted_files_dir):
         file_path = os.path.abspath(extracted_files_dir + file)
         add_file_to_datasets(file_path, file, task_execution)
