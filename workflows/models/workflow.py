@@ -27,4 +27,4 @@ class WorkflowSchedule(models.Model):
 
     next_run_time = models.DateTimeField(blank=True, null=True)
 
-    paused = models.BooleanField(default=False)
+    paused = models.BooleanField(default=False, db_index=True)
