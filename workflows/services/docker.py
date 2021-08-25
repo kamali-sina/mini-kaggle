@@ -4,7 +4,6 @@ from enum import Enum
 import tarfile
 import shutil
 import docker
-from docker.errors import APIError
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -26,7 +25,7 @@ def add_file_to_datasets(file_path, filename, task_execution):
     Dataset.objects.create(creator=user, file=path_in_media + filename, title=dataset_title)
 
 
-def ـrecieve_dataset_from_container(task_execution, extract_path):
+def recieve_dataset_from_container(task_execution, extract_path):
     client = docker.from_env()
     container = client.containers.get(task_execution.dockertaskexecution.container_id)
     file_stream = BytesIO()
@@ -40,19 +39,19 @@ def ـrecieve_dataset_from_container(task_execution, extract_path):
     return True
 
 
-def _check_validity_of_datasets(extracted_files_dir):
+def check_validity_of_datasets(extracted_files_dir):
     for file in os.listdir(extracted_files_dir):
         if not is_file_valid(file):
             return False
-    return True 
+    return True
 
 def exctract_dataset_from_execution(task_execution):
     extract_path = f"./task_{task_execution.id}"
-    if not ـrecieve_dataset_from_container(task_execution, extract_path):
+    if not recieve_dataset_from_container(task_execution, extract_path):
         # There is no data to be extracted
         return
     extracted_files_dir = extract_path + DockerTaskService.container_extract_datasets_path
-    if (not _check_validity_of_datasets(extracted_files_dir)):
+    if not check_validity_of_datasets(extracted_files_dir):
         raise ValidationError
     for file in os.listdir(extracted_files_dir):
         file_path = os.path.abspath(extracted_files_dir + file)
