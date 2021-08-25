@@ -5,6 +5,8 @@ from django.core.validators import FileExtensionValidator
 # Create your models here.
 from django.core.exceptions import ValidationError
 
+DATASETS_MEDIA_PATH = 'datasets/%s/'
+
 MAX_DATASETS_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 ALLOWED_FILE_EXTENTIONS = ["csv"]

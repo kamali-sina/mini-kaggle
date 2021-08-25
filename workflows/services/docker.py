@@ -8,17 +8,56 @@ from docker.errors import APIError
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from datasets.models import Dataset, is_file_valid
+from datasets.models import Dataset, is_file_valid, DATASETS_MEDIA_PATH
 from workflows.models import Task, DockerTaskExecution, TaskExecution
 from .task_data import get_task_data
+
+
+CREATED_DATASETS_NAME_ABSTRACT = 'created_by_%s'
+
 
 def add_file_to_datasets(file_path, filename, task_execution):
     user = task_execution.task.creator
     task_name = task_execution.task.name
-    path_in_media = "datasets/" + user.username + "/"
+    dataset_title  = CREATED_DATASETS_NAME_ABSTRACT%task_name
+    path_in_media = DATASETS_MEDIA_PATH%str(user.username)
     os.makedirs(settings.MEDIA_ROOT + path_in_media, exist_ok=True)
     os.replace(file_path, settings.MEDIA_ROOT + path_in_media + filename)
-    Dataset.objects.create(creator=user, file=path_in_media + filename, title=f"created_by_{task_name}")
+    Dataset.objects.create(creator=user, file=path_in_media + filename, title=dataset_title)
+
+
+def ـrecieve_dataset_from_container(task_execution, extract_path):
+    client = docker.from_env()
+    container = client.containers.get(task_execution.dockertaskexecution.container_id)
+    file_stream = BytesIO()
+    bits, _ = container.get_archive(DockerTaskService.container_extract_datasets_path)
+    for chunk in bits:
+        file_stream.write(chunk)
+    file_stream.seek(0)
+    with tarfile.open(fileobj=file_stream) as tar_file:
+        tar_file.extractall(path=extract_path)
+    file_stream.close()
+    return True
+
+
+def _check_validity_of_datasets(extracted_files_dir):
+    for file in os.listdir(extracted_files_dir):
+        if not is_file_valid(file):
+            return False
+    return True 
+
+def exctract_dataset_from_execution(task_execution):
+    extract_path = f"./task_{task_execution.id}"
+    if not ـrecieve_dataset_from_container(task_execution, extract_path):
+        # There is no data to be extracted
+        return
+    extracted_files_dir = extract_path + DockerTaskService.container_extract_datasets_path
+    if (not _check_validity_of_datasets(extracted_files_dir)):
+        raise ValidationError
+    for file in os.listdir(extracted_files_dir):
+        file_path = os.path.abspath(extracted_files_dir + file)
+        add_file_to_datasets(file_path, file, task_execution)
+    shutil.rmtree(extract_path, ignore_errors=True)
 
 
 def task_status_color(status):
@@ -113,44 +152,12 @@ class DockerTaskService():
                 status = TaskExecution.StatusChoices.FAILED
             else:
                 status = TaskExecution.StatusChoices.SUCCESS
-                DockerTaskService.exctract_data_from_execution(task_execution)
+                exctract_dataset_from_execution(task_execution)
 
             task_execution.status = status
             task_execution.save()
 
         return status.name
-
-    @staticmethod
-    def _recieve_data_from_container(task_execution, extract_path):
-        client = docker.from_env()
-        container = client.containers.get(task_execution.dockertaskexecution.container_id)
-        file_stream = BytesIO()
-        try:
-            bits, _ = container.get_archive(DockerTaskService.container_extract_datasets_path)
-        except APIError:
-            return False
-        for chunk in bits:
-            file_stream.write(chunk)
-        file_stream.seek(0)
-        with tarfile.open(fileobj=file_stream) as tar_file:
-            tar_file.extractall(path=extract_path)
-        file_stream.close()
-        return True
-
-    @staticmethod
-    def exctract_data_from_execution(task_execution):
-        extract_path = f"./task_{task_execution.id}"
-        if not DockerTaskService._recieve_data_from_container(task_execution, extract_path):
-            # There is no data to be extracted
-            return
-        extracted_files_dir = extract_path + DockerTaskService.container_extract_datasets_path
-        for file in os.listdir(extracted_files_dir):
-            if not is_file_valid(file):
-                print(f'{file} is not a supported type')
-            file_path = os.path.abspath(extracted_files_dir + file)
-            add_file_to_datasets(file_path, file, task_execution)
-        shutil.rmtree(extract_path, ignore_errors=True)
-
 
     def task_execution_status(self, task_execution):
         # convert inherited object to task execution if need
