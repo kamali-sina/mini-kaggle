@@ -5,8 +5,15 @@ from django.core.validators import FileExtensionValidator
 # Create your models here.
 from django.core.exceptions import ValidationError
 
+DATASETS_MEDIA_PATH = 'datasets/%s/'
+
 MAX_DATASETS_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
+ALLOWED_FILE_EXTENTIONS = ["csv"]
+
+def is_file_valid(filename):
+    file_extention = filename.split('.')[-1]
+    return file_extention in ALLOWED_FILE_EXTENTIONS
 
 def validate_file_size(file):
     filesize = file.size
@@ -38,7 +45,7 @@ class Dataset(models.Model):
         upload_to=user_dataset_directory_path,
         validators=[
             validate_file_size,
-            FileExtensionValidator(allowed_extensions=["csv"])
+            FileExtensionValidator(allowed_extensions=ALLOWED_FILE_EXTENTIONS)
         ]
     )
     tags = models.ManyToManyField(Tag, related_name='datasets')
