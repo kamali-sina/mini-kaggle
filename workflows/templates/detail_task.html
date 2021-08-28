@@ -63,7 +63,7 @@
                     <div class="ui grid" id="task-excution" style="display: inline;">
                         <div class="ui button" style="display: flex;">
                             <h3 class="ui left floated 4 wide column"
-                                style="background: {{ execution.status_color }};">{{ execution.status }}</h3>
+                                style="background: {{ execution.status_color }};">{{ execution.get_status_display }}</h3>
                             {% for mark_option in mark_options %}
                                 <form method="post"
                                       style="margin: 10px;"

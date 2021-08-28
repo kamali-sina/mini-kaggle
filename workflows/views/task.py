@@ -11,6 +11,8 @@ from workflows.services.docker import task_status_color, get_display_fields, get
     MarkTaskExecutionStatusOptions
 from workflows.services.runner import get_service_runner
 
+from workflows.services.run_task import run_task
+
 
 class CreatorOnlyMixin(AccessMixin):
     """Verify that the current user is the creator."""
@@ -31,14 +33,11 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         task = context["task"]
-        task_runner = get_service_runner(task)
         task.get_task_type_display = get_task_type(task)
-        task.status = task_runner.task_status(task)
 
         task_executions = TaskExecution.objects.filter(task=task)
         for task_execution in task_executions:
-            task_execution.status = task_runner.task_execution_status(task_execution)
-            task_execution.status_color = task_status_color(task_execution.status)
+            task_execution.status_color = task_status_color(task_execution.get_status_display())
         task.executions = task_executions
 
         context["display_fields"] = get_display_fields(task)
@@ -125,8 +124,6 @@ class TaskListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         tasks = Task.objects.filter(creator=self.request.user)
         for task in tasks:
-            task_runner = get_service_runner(task)
-            task.status = task_runner.task_status(task)
             task.get_task_type_display = get_task_type(task)
 
         return tasks
@@ -134,10 +131,7 @@ class TaskListView(LoginRequiredMixin, ListView):
 
 def run_task_view(request, pk):
     task = get_object_or_404(Task, pk=pk)
-
-    task_runner = get_service_runner(task)
-    task_runner.run_task(task)
-
+    run_task(task)
     success_url = reverse("workflows:detail_task", args=(task.pk,))
     return HttpResponseRedirect(success_url)
 
