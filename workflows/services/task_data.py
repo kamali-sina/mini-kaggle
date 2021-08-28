@@ -5,7 +5,6 @@ tasks_data = {
         {
             "name": "Docker",
             "task_related_name": "dockertask",
-            "execution_related_name": "dockertaskexecution",
             "display_fields": ["docker_image"],
         },
 
@@ -13,7 +12,6 @@ tasks_data = {
         {
             "name": "Python",
             "task_related_name": "pythontask",
-            "execution_related_name": "pythontaskexecution",
             "display_fields": ["python_file"],
         }
 }

@@ -1,16 +1,18 @@
+import signal
+import sys
 import os
 from io import BytesIO
 from enum import Enum
 import tarfile
 import shutil
 import docker
+from celery.result import AsyncResult
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from datasets.models import Dataset, is_file_valid, DATASETS_MEDIA_PATH
-from workflows.models import Task, DockerTaskExecution, TaskExecution
+from workflows.models import Task, TaskExecution
 from .task_data import get_task_data
-
 
 CREATED_DATASETS_NAME_ABSTRACT = 'created_by_%s'
 
@@ -18,8 +20,8 @@ CREATED_DATASETS_NAME_ABSTRACT = 'created_by_%s'
 def add_file_to_datasets(file_path, filename, task_execution):
     user = task_execution.task.creator
     task_name = task_execution.task.name
-    dataset_title  = CREATED_DATASETS_NAME_ABSTRACT%task_name
-    path_in_media = DATASETS_MEDIA_PATH%str(user.username)
+    dataset_title = CREATED_DATASETS_NAME_ABSTRACT % task_name
+    path_in_media = DATASETS_MEDIA_PATH % str(user.username)
     os.makedirs(settings.MEDIA_ROOT + path_in_media, exist_ok=True)
     os.replace(file_path, settings.MEDIA_ROOT + path_in_media + filename)
     Dataset.objects.create(creator=user, file=path_in_media + filename, title=dataset_title)
@@ -44,6 +46,7 @@ def check_validity_of_datasets(extracted_files_dir):
         if not is_file_valid(file):
             return False
     return True
+
 
 def exctract_dataset_from_execution(task_execution):
     extract_path = f"./task_{task_execution.id}"
@@ -74,6 +77,10 @@ class MarkTaskExecutionStatusOptions(Enum):
     SUCCESS = 1
 
 
+def get_task_type(task):
+    return get_task_data(task)["name"]
+
+
 def get_display_fields(task):
     task_map = get_task_data(task)
     if task.__class__ == Task:
@@ -85,97 +92,64 @@ def get_display_fields(task):
     }
 
 
-def get_task_type(task):
-    return get_task_data(task)["name"]
-
-
 class DockerTaskService():
     accessible_datasets_path = '/datasets/'
     container_extract_datasets_path = '/results/'
 
-    def run_task(self, task):
+    @staticmethod
+    def get_environment(task):
+        return {secret.name: secret.value
+                for secret in task.secret_variables.all()}
+
+    @staticmethod
+    def run_container(task_execution, **kwargs):
         """
         Creates a docker client using from_env
         Runs a new docker container in the background(detach=True) using containers.run
         Customize the docker image by editing the first field of client.containers.run
+        wait for finish work
+        return container status
         """
 
+        def stop_container_on_signal(sig, frame):
+            # pylint: disable=unused-argument
+            container.stop()
+
+            task_execution.status = TaskExecution.StatusChoices.FAILED
+            task_execution.save()
+
+            sys.exit(0)
+
         client = docker.from_env()
-        container = client.containers.run(task.dockertask.docker_image,
-                                          volumes=DockerTaskService.get_accessible_datasets_mount_dict(task),
-                                          detach=True,
-                                          environment=self.get_environment(task)
-                                          )
-        DockerTaskExecution.objects.create(task=task, container_id=container.id,
-                                           status=TaskExecution.StatusChoices.RUNNING)
+        try:
+            container = client.containers.run(**kwargs, detach=True)
+            signal.signal(signal.SIGTERM, stop_container_on_signal)
+            container.wait()
+            return TaskExecution.StatusChoices.SUCCESS
+        except docker.errors.ContainerError:
+            return TaskExecution.StatusChoices.FAILED
+
+    def run_task(self, task_execution):
+        task = task_execution.task
+        run_container_kwargs = {"image": task.dockertask.docker_image,
+                                "volumes": DockerTaskService.get_accessible_datasets_mount_dict(task),
+                                "environment": self.get_environment(task)}
+        return self.run_container(task_execution, **run_container_kwargs)
 
     @staticmethod
     def stop_task_execution(
             task_execution_id: str,
             mark_task_execution_status_as: MarkTaskExecutionStatusOptions,
     ):
-        client = docker.from_env()
-        docker_task_execution = DockerTaskExecution.objects.get(id=task_execution_id)
-        container = client.containers.get(container_id=docker_task_execution.container_id)
+        task_execution = TaskExecution.objects.get(id=task_execution_id)
+        AsyncResult(task_execution.celery_task_id).revoke(terminate=True, signal="SIGTERM")
         if mark_task_execution_status_as == MarkTaskExecutionStatusOptions.FAILED:
-            docker_task_execution.status = TaskExecution.StatusChoices.FAILED
+            task_execution.status = TaskExecution.StatusChoices.FAILED
         elif mark_task_execution_status_as == MarkTaskExecutionStatusOptions.SUCCESS:
-            docker_task_execution.status = TaskExecution.StatusChoices.SUCCESS
+            task_execution.status = TaskExecution.StatusChoices.SUCCESS
         else:
             raise ValidationError("invalid mark status choice")
-        container.stop()
-        docker_task_execution.save()
-
-    def task_status(self, task):
-
-        # convert inherited object to task  if need
-        if task.__class__ != Task:
-            if issubclass(task.__class__, Task):
-                task = task.task_ptr
-            else:
-                raise Exception("Wrong type object")
-
-        task_executions = TaskExecution.objects.filter(task=task)
-        if task_executions.count() == 0:
-            return "None"
-        return self.task_execution_status(task_executions.last())
-
-    # pylint: disable=no-member
-    @staticmethod
-    def _task_execution_status(task_execution):
-        client = docker.from_env()
-        container = client.containers.get(task_execution.dockertaskexecution.container_id)
-        status = TaskExecution.StatusChoices.RUNNING
-        if container.status in ["running", "restarting"]:
-            status = TaskExecution.StatusChoices.RUNNING
-        elif container.status == "exited":
-            if container.attrs["State"]["ExitCode"] != 0:
-                status = TaskExecution.StatusChoices.FAILED
-            else:
-                status = TaskExecution.StatusChoices.SUCCESS
-                exctract_dataset_from_execution(task_execution)
-
-            task_execution.status = status
-            task_execution.save()
-
-        return status.name
-
-    def task_execution_status(self, task_execution):
-        # convert inherited object to task execution if need
-        if task_execution.__class__ != TaskExecution:
-            if issubclass(task_execution.__class__, TaskExecution):
-                task_execution = task_execution.taskexecution_ptr
-            else:
-                raise Exception("Wrong type object")
-
-        if task_execution.status == task_execution.StatusChoices.RUNNING:
-            return self._task_execution_status(task_execution)
-        return task_execution.get_status_display()
-
-    @staticmethod
-    def get_environment(task):
-        return {secret.name: secret.value
-                for secret in task.secret_variables.all()}
+        task_execution.save()
 
     @staticmethod
     def get_accessible_datasets_mount_info(task):

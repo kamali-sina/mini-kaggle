@@ -38,3 +38,4 @@ class TaskExecution(models.Model):
 
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=StatusChoices.choices, default=StatusChoices.PENDING)
+    celery_task_id = models.CharField(max_length=50, null=True, blank=True)
