@@ -11,9 +11,11 @@ MAX_DATASETS_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 ALLOWED_FILE_EXTENTIONS = ["csv"]
 
+
 def is_file_valid(filename):
     file_extention = filename.split('.')[-1]
     return file_extention in ALLOWED_FILE_EXTENTIONS
+
 
 def validate_file_size(file):
     filesize = file.size
@@ -48,7 +50,7 @@ class Dataset(models.Model):
             FileExtensionValidator(allowed_extensions=ALLOWED_FILE_EXTENTIONS)
         ]
     )
-    tags = models.ManyToManyField(Tag, related_name='datasets')
+    tags = models.ManyToManyField(Tag, related_name='datasets', blank=True)
     is_public = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
