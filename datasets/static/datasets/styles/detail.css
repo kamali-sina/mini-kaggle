@@ -7,3 +7,9 @@
   padding: 30px;
 }
 
+.edit_link{
+  margin-right; 5px;
+  align-self: flex-end;
+  position: absolute;
+}
+
