@@ -26,4 +26,5 @@ urlpatterns = [
 
     path('datasets/', include('datasets.urls')),
     path('notifications/', include('notifications.urls')),
+    path('notebooks/', include('notebooks.urls')),
 ]
