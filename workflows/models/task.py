@@ -16,10 +16,10 @@ class Task(models.Model):
     name = models.CharField(max_length=255)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
-    secret_variables = models.ManyToManyField(Secret)
-    accessible_datasets = models.ManyToManyField(Dataset)
+    secret_variables = models.ManyToManyField(Secret, blank=True)
+    accessible_datasets = models.ManyToManyField(Dataset, blank=True)
 
-    notification_source = models.ForeignKey(NotificationSource, on_delete=models.SET_NULL, null=True)
+    notification_source = models.ForeignKey(NotificationSource, on_delete=models.SET_NULL, null=True, blank=True)
     alert_on_failure = models.BooleanField(default=False)
 
     timeout = models.DurationField(null=True, blank=True)
