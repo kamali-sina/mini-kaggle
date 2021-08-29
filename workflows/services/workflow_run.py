@@ -6,6 +6,8 @@ from workflows.models import TaskExecution, WorkflowExecution
 from workflows.models.task_dependency import TaskDependencyExecution
 from workflows.services.run_task import run_task
 
+MAX_RUNNING_WORKFLOWS = 10
+
 
 @app.on_after_finalize.connect
 def setup_run_triggered_workflows_periodic_task(sender, **kwargs):
@@ -17,7 +19,14 @@ def run_triggered_workflows():
     triggered_workflows = WorkflowExecution.objects.filter(
         status__in=[WorkflowExecution.StatusChoices.PENDING, WorkflowExecution.StatusChoices.RUNNING]).select_related(
         'workflow').prefetch_related('task_dependency_executions__task_execution__task')
+    currently_running_workflows_count = WorkflowExecution.objects.filter(
+        status=WorkflowExecution.StatusChoices.RUNNING
+    ).count()
     for workflow_execution in triggered_workflows:
+        if currently_running_workflows_count == MAX_RUNNING_WORKFLOWS:
+            break
+        if workflow_execution.status == WorkflowExecution.StatusChoices.PENDING:
+            currently_running_workflows_count += 1
         run_task_dependencies(workflow_execution)
 
 
