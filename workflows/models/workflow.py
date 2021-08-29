@@ -14,6 +14,24 @@ class Workflow(models.Model):
         return str(self.name)
 
 
+class WorkflowExecution(models.Model):
+    class StatusChoices(models.TextChoices):
+        """Different statuses of workflow execution, including:
+         PENDING: the status in which the workflow execution is waiting for its first task dependency to run
+         RUNNING: the status in which at least one task dependency of the workflow has started running
+         SUCCESS: the status in which all the task dependencies of the workflow have been successfully run
+         FAILED: the status in which at least one task dependency has failed
+         """
+        RUNNING = "R", _("Running")
+        SUCCESS = "S", _("Success")
+        FAILED = "F", _("Failed")
+        PENDING = "P", _("Pending")
+
+    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
+    status = models.CharField(max_length=1, choices=StatusChoices.choices, default=StatusChoices.PENDING, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 def validate_schedule_interval(value):
     if value < timedelta(minutes=1):
         raise ValidationError(_('Schedule interval should be more than 1 minute.'))
