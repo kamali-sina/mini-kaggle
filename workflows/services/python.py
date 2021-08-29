@@ -6,7 +6,7 @@ class PythonTaskService(DockerTaskService):
         task = task_execution.task
         run_container_kwargs = {"image": task.pythontask.docker_image,
                                 "volumes": {
-                                    "file_path": {"bind": "/run_file.py", "mode": "ro"},
+                                    task.pythontask.python_file.path: {"bind": "/run_file.py", "mode": "ro"},
                                     **DockerTaskService.get_accessible_datasets_mount_dict(task)
                                 },
                                 "environment": self.get_environment(task),
