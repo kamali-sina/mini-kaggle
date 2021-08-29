@@ -167,7 +167,10 @@ class DockerTaskService:
             mark_task_execution_status_as: MarkTaskExecutionStatusOptions,
     ):
         task_execution = TaskExecution.objects.get(id=task_execution_id)
-        AsyncResult(task_execution.celery_task_id).revoke(terminate=True, signal="SIGTERM")
+        try:
+            AsyncResult(task_execution.celery_task_id).revoke(terminate=True, signal="SIGTERM")
+        except ValueError:
+            pass  # task execution dont have valid task id
         if mark_task_execution_status_as == MarkTaskExecutionStatusOptions.FAILED:
             task_execution.status = TaskExecution.StatusChoices.FAILED
         elif mark_task_execution_status_as == MarkTaskExecutionStatusOptions.SUCCESS:
