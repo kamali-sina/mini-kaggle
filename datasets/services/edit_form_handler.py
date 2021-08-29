@@ -17,3 +17,8 @@ def submit_dataset_edition_forms(context):
     context['dataset_info_edition_form'].save()
     context['tag_deletion_form'].submit()
     context['tag_addition_form'].submit()
+
+
+def edition_forms_valid(context):
+    return context['dataset_info_edition_form'].is_valid() and context['tag_deletion_form'].is_valid() and context[
+        'tag_addition_form'].is_valid()

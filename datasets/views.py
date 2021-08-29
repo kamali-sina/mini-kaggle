@@ -21,7 +21,8 @@ from django.db.models import Count
 from datasets.models import Dataset, Tag
 from datasets.services.read_csv import read_csv_dataset
 from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, AddTagForm
-from datasets.services.form_handler import create_dataset_edition_forms_on_get, create_dataset_edition_forms_on_post, \
+from datasets.services.edit_form_handler import create_dataset_edition_forms_on_get, edition_forms_valid, \
+    create_dataset_edition_forms_on_post, \
     submit_dataset_edition_forms
 
 
@@ -169,7 +170,9 @@ def edit_dataset_view(request, pk):
         create_dataset_edition_forms_on_get(context, dataset)
     if request.method == 'POST':
         create_dataset_edition_forms_on_post(context, request.POST, dataset)
-        submit_dataset_edition_forms(context)
+        if edition_forms_valid(context):
+            submit_dataset_edition_forms(context)
+            return HttpResponseRedirect(reverse('datasets:detail', args=(pk,)))
     return render(request, 'datasets/edit.html', context=context)
 
 

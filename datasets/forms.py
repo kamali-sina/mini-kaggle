@@ -61,8 +61,7 @@ class DeleteTagForm(forms.Form):
         self.fields['deleting_tags'].queryset = dataset.tags
 
     def submit(self):
-        if self.is_valid():
-            self.dataset.tags.remove(*self.cleaned_data['deleting_tags'])
+        self.dataset.tags.remove(*self.cleaned_data['deleting_tags'])
 
 
 class AddTagForm(forms.Form):
@@ -81,6 +80,5 @@ class AddTagForm(forms.Form):
         return [] if not self.cleaned_data['adding_tags'] else set(re.split(r'\s+', self.cleaned_data['adding_tags']))
 
     def submit(self):
-        if self.is_valid():
-            for tag_text in self.cleaned_data['adding_tags']:
-                add_new_or_existing_tag(tag_text, self.dataset)
+        for tag_text in self.cleaned_data['adding_tags']:
+            add_new_or_existing_tag(tag_text, self.dataset)
