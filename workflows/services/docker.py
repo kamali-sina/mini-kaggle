@@ -10,6 +10,8 @@ from celery.result import AsyncResult
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
+
 from datasets.models import Dataset, is_file_valid, DATASETS_MEDIA_PATH
 from workflows.models import Task, TaskExecution
 from .task_data import get_task_data
@@ -92,7 +94,20 @@ def get_display_fields(task):
     }
 
 
-class DockerTaskService():
+def read_task_execution_log_file(task_execution):
+    if task_execution.log:
+        with open(task_execution.log.path, encoding="utf-8") as log_file:
+            return log_file.read()
+    else:
+        raise FileNotFoundError("log not found")
+
+
+def set_task_execution_log_file(task_execution, log):
+    task_execution.log.save(task_execution.pk, ContentFile(log))
+    task_execution.save()
+
+
+class DockerTaskService:
     accessible_datasets_path = '/datasets/'
     container_extract_datasets_path = '/results/'
 
@@ -108,6 +123,7 @@ class DockerTaskService():
         Runs a new docker container in the background(detach=True) using containers.run
         Customize the docker image by editing the first field of client.containers.run
         wait for finish work
+        save log
         return container status
         """
 
@@ -125,8 +141,17 @@ class DockerTaskService():
             container = client.containers.run(**kwargs, detach=True)
             signal.signal(signal.SIGTERM, stop_container_on_signal)
             container.wait()
+
+            container = client.containers.get(container.id)
+            container_log = container.logs().decode("utf-8")
+            set_task_execution_log_file(task_execution, container_log)
+
             return TaskExecution.StatusChoices.SUCCESS
         except docker.errors.ContainerError:
+            container_log = container.logs().decode("utf-8")
+            set_task_execution_log_file(task_execution, container_log)
+            return TaskExecution.StatusChoices.FAILED
+        except:  # pylint: disable=bare-except
             return TaskExecution.StatusChoices.FAILED
 
     def run_task(self, task_execution):
