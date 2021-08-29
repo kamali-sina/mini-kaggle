@@ -8,7 +8,7 @@ from django.shortcuts import render, get_object_or_404
 from workflows.models import Task, PythonTask, DockerTask, TaskExecution
 from workflows.forms import TaskForm, PythonTaskForm, DockerTaskForm
 from workflows.services.docker import task_status_color, get_display_fields, get_task_type, DockerTaskService, \
-    MarkTaskExecutionStatusOptions
+    MarkTaskExecutionStatusOptions, read_task_execution_log_file
 from workflows.services.runner import get_service_runner
 
 from workflows.services.run_task import run_task
@@ -21,6 +21,17 @@ class CreatorOnlyMixin(AccessMixin):
         task_id = kwargs.get("pk", None)
         task = Task.objects.get(id=task_id)
         if task.creator.id != request.user.id:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class TaskExecutionCreatorOnlyMixin(AccessMixin):
+    """Verify that the current user is the creator."""
+
+    def dispatch(self, request, *args, **kwargs):
+        task_execution_id = kwargs.get("pk", None)
+        task_execution = TaskExecution.objects.get(id=task_execution_id)
+        if task_execution.task.creator.id != request.user.id:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
@@ -146,3 +157,18 @@ def stop_task_execution_view(request, pk, exec_pk):
 
     success_url = reverse("workflows:detail_task", args=(task.pk,))
     return HttpResponseRedirect(success_url)
+
+
+class TaskExecutionDetailView(LoginRequiredMixin, TaskExecutionCreatorOnlyMixin, DetailView):
+    model = TaskExecution
+    template_name = 'detail_task_execution.html'
+    context_object_name = 'task_execution'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context["task_execution_have_log"] = True
+            context["task_execution_log"] = read_task_execution_log_file(context["task_execution"])
+        except FileNotFoundError:
+            context["task_execution_have_log"] = False
+        return context

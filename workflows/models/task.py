@@ -7,6 +7,11 @@ from datasets.models import Dataset
 from notifications.models import NotificationSource
 
 
+def task_execution_log_file_directory_path(instance, filename):
+    # pylint: disable=unused-argument
+    return f"workflows/task_execution_logs/{filename}"
+
+
 class Task(models.Model):
     class TaskTypeChoices(models.TextChoices):
         NONE = "N", _("None")
@@ -39,3 +44,4 @@ class TaskExecution(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=StatusChoices.choices, default=StatusChoices.PENDING)
     celery_task_id = models.CharField(max_length=50, null=True, blank=True)
+    log = models.FileField(upload_to=task_execution_log_file_directory_path, null=True, blank=True)

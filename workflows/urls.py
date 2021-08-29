@@ -29,6 +29,7 @@ secret_urls = [
 ]
 
 urlpatterns = [
+    path('tasks/executions/<int:pk>/', views.task.TaskExecutionDetailView.as_view(), name='detail_task_execution'),
     *tasks_urls,
     *secret_urls,
     *workflows_urls,

@@ -1,0 +1,42 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}Task Execution Details{% endblock %}
+
+{% block body %}
+
+    <div class="ui segment">
+        <ul>
+            <li><a href="{% url 'workflows:detail_task' task_execution.task.id %}">Back to task</a></li>
+            <hr>
+            <li>Task Name: {{ task_execution.task.name }}</li>
+            <li>status: {{ task_execution.get_status_display }}</li>
+
+            <li>log:</li>
+            <li>
+                {% if task_execution_have_log %}
+                    <div class="ui visible message">
+                        <p>{{ task_execution_log }}</p>
+                    </div>
+                {% else %}
+                    <div class="ui visible message red">
+                        <p>log not found</p>
+                    </div>
+                {% endif %}
+
+            </li>
+
+        </ul>
+    </div>
+
+
+{% endblock %}
