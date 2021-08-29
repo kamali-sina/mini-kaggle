@@ -39,7 +39,10 @@ def run_task_in_celery(task_execution_id):
 
 def run_task(task):
     task_execution = TaskExecution.objects.create(task=task, status=TaskExecution.StatusChoices.PENDING)
-    celery_task = run_task_in_celery.delay(task_execution.pk, time_limit=task.timeout)
+    if not task.timeout or task.timeout.total_seconds() == 0:
+        celery_task = run_task_in_celery.delay(task_execution.pk)
+    else:
+        celery_task = run_task_in_celery.delay(task_execution.pk, time_limit=task.timeout.total_seconds())
     task_execution.celery_task_id = celery_task.id
     task_execution.save()
     return task_execution.pk
