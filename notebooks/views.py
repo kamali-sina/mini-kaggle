@@ -1,12 +1,10 @@
-import json
-
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 
 from notebooks.models import Notebook, Cell
 
@@ -78,10 +76,10 @@ def cell_create_view(request):
     code = get_code_from_request(request)
 
     cell = Cell.objects.create(notebook=notebook, code=code)
-    return HttpResponse(json.dumps({
+    return JsonResponse({
         "message": "successful",
         "data": {"cell": cell_serializer(cell)}
-    }), status=200)
+    })
 
 
 @login_required
@@ -93,10 +91,10 @@ def cell_update_view(request, pk):
     cell.code = code
     cell.save()
 
-    return HttpResponse(json.dumps({
+    return JsonResponse({
         "message": "successful",
         "data": {"cell": cell_serializer(cell)}
-    }), status=200)
+    })
 
 
 @login_required
@@ -105,6 +103,6 @@ def cell_delete_view(request, pk):
     get_notebook_from_request(request)
     cell.delete()
 
-    return HttpResponse(json.dumps({
+    return JsonResponse({
         "message": "successful",
-        "data": None}), status=200)
+        "data": None})
