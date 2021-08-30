@@ -13,7 +13,9 @@ class Cell(models.Model):
         PENDING = "P", _("Pending")
         RUNNING = "R", _("Running")
         DONE = "D", _("Done")
+        NONE = "N", _("None")
 
     code = models.TextField()
-    result = models.TextField()
-    cell_status = models.CharField(max_length=2, choices=CellStatus.choices, default=CellStatus.PENDING)
+    result = models.TextField(null=True,blank=True)
+    cell_status = models.CharField(max_length=2, choices=CellStatus.choices, default=CellStatus.NONE)
+    notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE)
