@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import User
@@ -45,3 +46,13 @@ class TaskExecution(models.Model):
     status = models.CharField(max_length=1, choices=StatusChoices.choices, default=StatusChoices.PENDING, db_index=True)
     celery_task_id = models.CharField(max_length=50, null=True, blank=True)
     log = models.FileField(upload_to=task_execution_log_file_directory_path, null=True, blank=True)
+    timestamps = models.JSONField(blank=True, null=True)
+
+    def add_timestamp(self, status_label):
+        timestamp = '$' + status_label + ':' + (datetime.now()).strftime("%m/%d/%Y, %H:%M:%S")
+        self.timestamps
+        self.save()
+
+    def decode_timestamps(self):
+        timestamps = {}
+        self.timestamps.split

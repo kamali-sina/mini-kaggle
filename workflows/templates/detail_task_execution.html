@@ -20,21 +20,28 @@
             <hr>
             <li>Task Name: {{ task_execution.task.name }}</li>
             <li>status: {{ task_execution.get_status_display }}</li>
-
-            <li>log:</li>
-            <li>
-                {% if task_execution_have_log %}
-                    <div class="ui visible message">
-                        <p>{{ task_execution_log }}</p>
+            <div class="ui message">
+                <div class="header" style="text-align: left">
+                    <h۴>Status time stamps</h۴>
+                </div>
+                <ul class="list">
+                    {% for status, time in task_execution.timestamps.items %}
+                        <li>{{ status }}: {{ time }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% if task_execution_have_log %}
+                <div class="ui message" style="text-align: left;">
+                    <div class="header">
+                        <h3>Log</h3>
                     </div>
-                {% else %}
-                    <div class="ui visible message red">
-                        <p>log not found</p>
-                    </div>
-                {% endif %}
-
-            </li>
-
+                    <p style="white-space: pre-line;">{{ task_execution_log }}</p>
+                </div>
+            {% else %}
+                <div class="ui visible message red">
+                    <p>log not found</p>
+                </div>
+            {% endif %}
         </ul>
     </div>
 
