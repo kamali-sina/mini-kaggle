@@ -32,8 +32,8 @@ def run_task_in_celery(task_execution_id):
         task_execution_status = runner.run_task(task_execution)
     except:  # pylint: disable=bare-except
         task_execution_status = TaskExecution.StatusChoices.FAILED
-    task_execution.timestamps[str(TaskExecution.StatusChoices.FAILED.label)] = (datetime.datetime.now()).strftime(
-        "%m/%d/%Y, %H:%M:%S")
+        task_execution.timestamps[str(TaskExecution.StatusChoices.FAILED.label)] = (datetime.datetime.now()).strftime(
+            "%m/%d/%Y, %H:%M:%S")
     task_execution.status = task_execution_status
     task_execution.timestamps[str(task_execution_status.label)] = (datetime.datetime.now()).strftime(
         "%m/%d/%Y, %H:%M:%S")
