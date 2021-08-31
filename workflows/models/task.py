@@ -45,3 +45,4 @@ class TaskExecution(models.Model):
     status = models.CharField(max_length=1, choices=StatusChoices.choices, default=StatusChoices.PENDING, db_index=True)
     celery_task_id = models.CharField(max_length=50, null=True, blank=True)
     log = models.FileField(upload_to=task_execution_log_file_directory_path, null=True, blank=True)
+    extracted_datasets = models.ManyToManyField(Dataset, blank=True)
