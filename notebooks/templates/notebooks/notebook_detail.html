@@ -3,6 +3,13 @@
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{%static 'notebooks/styles/detail.css' %}">
+<link rel="stylesheet" type="text/css" href="{%static 'data_platform/styles/toast.css' %}">
+<script src="{%static 'data_platform/scripts/toast.js' %}"></script>
+<script>
+const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}`
+const cellItemHtmlString = `{% include 'notebooks/cell_item.html' with id="{id_placeholder}" %}`
+const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{id_placeholder}" %}`
+</script>
 <script src="{% static 'notebooks/scripts/detail.js' %}"></script>
 <link rel="stylesheet" href="{% static 'notebooks/styles/codemirror.css' %}">
 <script src="{% static 'notebooks/scripts/codemirror.js' %}"></script>
@@ -19,13 +26,13 @@
 
     <div class="filler"></div>
 
-    <button class="ui icon button" data-tooltip="Add new cell">
+    <button class="ui icon button" data-tooltip="Add new cell" onclick="addCell()">
         <i class="plus icon"></i>
     </button>
-    <button class="ui disabled icon button" data-tooltip="Factory reset">
+    <button class="ui disabled icon button" data-tooltip="Factory reset" onclick="restartSession()">
         <i class="disabled sync alternate icon"></i>
     </button>
-    <button class="ui icon button" data-tooltip="Start session">
+    <button class="ui icon button" data-tooltip="Start session" onclick="startSession()">
         <i class="power off icon"></i>
     </button>
     <a class="ui icon negative button" data-tooltip="Delete notebook" href="{% url 'notebooks:delete' object.id %}">
@@ -38,5 +45,9 @@
     {% include 'notebooks/cell_item.html' with id=1 %}
     {% include 'notebooks/cell_item.html' with id=2 %}
 </div>
+
+
+<div id="toast"></div>
+
 
 {% endblock %}
