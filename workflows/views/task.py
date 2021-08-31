@@ -47,13 +47,13 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         task.get_task_type_display = get_task_type(task)
 
         task_executions = TaskExecution.objects.filter(task=task)
+        extracted_datasets = []
         for task_execution in task_executions:
             task_execution.status_color = task_status_color(task_execution.get_status_display())
-        task.executions = task_executions
-
+            extracted_datasets.extend(list(task_execution.extracted_datasets.all()))
         context["display_fields"] = get_display_fields(task)
         context["accessible_datasets"] = DockerTaskService.get_accessible_datasets_mount_info(task)
-
+        context["extracted_datasets"] = extracted_datasets
         context["mark_options"] = [
             {
                 "value": MarkTaskExecutionStatusOptions.FAILED.value,
