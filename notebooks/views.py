@@ -1,8 +1,14 @@
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.urls import reverse_lazy
+from django.contrib import messages
+from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+
+from workflows.models import PythonTask
 
 from notebooks.models import Notebook
+from notebooks.forms import ExportNotebookForm
 
 
 class NotebookCreatorOnlyMixin(AccessMixin):
@@ -29,3 +35,20 @@ class NotebookDetailView(LoginRequiredMixin, generic.DetailView):
 class NotebookDeleteView(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.DeleteView):
     model = Notebook
     success_url = reverse_lazy('notebooks:index')
+
+
+class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.CreateView):
+    model = PythonTask
+    form_class = ExportNotebookForm
+    template_name = 'notebooks/export.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        kwargs['notebook'] = get_object_or_404(Notebook, pk=self.kwargs['pk'])
+        return kwargs
+
+    def form_valid(self, form):
+        task = form.save()
+        messages.success(self.request, 'Your task has been created :)')
+        return HttpResponseRedirect(reverse('workflows:detail_task', args=(task.id,)))
