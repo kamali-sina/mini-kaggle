@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+CODE_SNIPPETS_DIR = './notebooks/static/notebooks/snippets'
+
 class Session(models.Model):
     class SessionStatus(models.TextChoices):
         NOTRUNNING = "NR", _("Not Running")
