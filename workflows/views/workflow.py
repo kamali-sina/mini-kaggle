@@ -6,8 +6,29 @@ from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution, TaskExecution
+from django.template.defaulttags import register
+from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
+
+
+STATUS_CONTEXT_DICT = {
+    WorkflowExecution.StatusChoices.FAILED: {
+        "text": "failed",
+        "color": "red",
+    },
+    WorkflowExecution.StatusChoices.SUCCESS: {
+        "text": "success",
+        "color": "green",
+    },
+    WorkflowExecution.StatusChoices.RUNNING: {
+        "text": "running",
+        "color": "grey",
+    },
+    WorkflowExecution.StatusChoices.PENDING: {
+        "text": "pending",
+        "color": "white",
+    }
+}
 
 
 class WorkflowCreatorOnlyMixin(AccessMixin):
@@ -52,10 +73,19 @@ class WorkflowListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Workflow.objects.filter(creator=self.request.user)
 
+    @register.filter
+    def get_value(self, key):
+        return self.get(key)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status'] = STATUS_CONTEXT_DICT
+        return context
+
 
 def random_color():
-    r = lambda: random.randint(0, 255)
-    return '#%02X%02X%02X' % (r(), r(), r())
+    color = lambda: random.randint(0, 255)
+    return '#%02X%02X%02X' % (color(), color(), color())
 
 
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
@@ -81,6 +111,7 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
 
         # chart lines colors
         context['colors'] = []
+        # pylint: disable=unused-variable
         for i in range(len(context['tasks'])):
             context['colors'].append(random_color())
 
@@ -132,22 +163,3 @@ class WorkflowScheduleUpdateView(WorkflowScheduleFormView, UpdateView):
     def get_object(self, queryset=None):
         workflow = get_object_or_404(Workflow, pk=self.kwargs['pk'])
         return workflow.schedule
-
-
-class WorkflowExecutionDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
-    model = WorkflowExecution
-    template_name = 'detail_workflow_execution.html'
-    context_object_name = 'workflow_execution'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        task_executions = TaskExecution.objects.all()
-        context['task_execution_count'] = len(task_executions)
-        context['task_execution_run_time'] = []
-        context['task_execution_status'] = []
-        for task_execution in task_executions:
-            context['task_execution_run_time'].append(task_execution.run_time)
-            context['task_execution_status'].append(task_execution.get_status_display())
-        # context['task_executions'] = TaskExecution.objects.filter(
-        #     taskdependencyexecution__in=context['workflow_execution'].task_dependency_executions)
-        return context

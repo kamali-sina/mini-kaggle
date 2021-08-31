@@ -1,0 +1,87 @@
+.toolbar {
+    display: flex;
+    align-items: center;
+}
+
+.filler {
+    flex-grow: 1;
+}
+
+.cell-list {
+    padding-top: 30px;
+}
+
+.cell-item {
+    margin-bottom: 40px;
+}
+
+.cell {
+    border-radius: 5px;
+    display: flex;
+}
+
+.cell-run {
+    border-radius: 5px 0 0 5px;
+    border-width: 0 0 0 4px;
+    border-style: solid;
+    border-color: black;
+    width: 5%;
+    padding: 5px 20px 0px 20px;
+    cursor: pointer;
+}
+
+.cell-code {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0 5px 5px 0;
+    width: 97%;
+}
+
+.cell-res {
+    margin: 20px 0px 10px 0px;
+    width: 100%;
+    height: 100%;
+    font-size: 15px;
+    padding: 20px;
+    border-width: 1px;
+    border-radius: 0px 0px 5px 5px;
+    border-style: solid;
+}
+
+.cell-res-succeeded {
+    border-color: #cfffb8;
+}
+
+.cell-res-failed {
+    background-color: #edd2ce;
+    border-color: #edd2ce;
+    color: #661a0f;
+}
+
+.cell-toolbar {
+    display: flex;
+    padding-top: 8px;
+}
+
+.cell-buttons {
+    display: inline-block;
+    margin-left: 5%;
+}
+
+.cell-status {
+    color: #cfcfcf;
+    margin-right: 8px;
+}
+
+.editor {
+    width: 100%;
+    height: 100%;
+    font-size: 15px;
+    border-radius: 5px;
+    background-color: aliceblue;
+    border-color: #def0ff;
+    border-style: solid;
+    border-width: 1px;
+    padding: 20px;
+}

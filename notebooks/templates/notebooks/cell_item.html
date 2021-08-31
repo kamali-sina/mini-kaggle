@@ -1,0 +1,25 @@
+<div class="cell-item">
+    <div class="cell">
+        <div class="cell-run" onclick="runCell({{ id }})">
+            <i class="play icon"></i>
+        </div>
+        <div class="cell-code" onfocusout="saveCell({{ id }})" onchange="markUnsaved({{ id }})">
+            <div class="editor" id="cell_code_{{ id }}">print('hi')</div>
+        </div>
+    </div>
+    <div class="cell-toolbar">
+        <div class="cell-buttons">
+        <span class="ui disabled circular icon basic button" data-tooltip="Add cell" data-position="right center">
+            <i class="ui disabled plus icon"></i>
+        </span>
+            <span data-tooltip="Delete cell" data-position="right center" onclick="deleteCell({{ id }})">
+            <i class="ui trash alternate outline link icon"></i>
+        </span>
+        </div>
+        <div class="filler"></div>
+        <div class="cell-status" id="cell_stat_{{ id }}">
+            <i class=""></i>
+        </div>
+    </div>
+
+</div>

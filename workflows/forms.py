@@ -52,7 +52,7 @@ class DockerTaskForm(TaskForm):
 class WorkflowForm(ModelForm):
     class Meta:
         model = Workflow
-        fields = ['name']
+        fields = ['name', 'max_active_executions_count']
 
 
 class SecretForm(ModelForm):

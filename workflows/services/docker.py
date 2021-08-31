@@ -17,6 +17,9 @@ from workflows.models import Task, TaskExecution
 from .task_data import get_task_data
 
 CREATED_DATASETS_NAME_ABSTRACT = 'created_by_%s'
+CPU_PERIOD = 100000
+CPU_QUOTA = 50000 # The number of microseconds per cpu-period that the container is limited to before throttled
+MEMORY_LIMIT = '20m'
 
 
 def add_file_to_datasets(file_path, filename, task_execution):
@@ -29,11 +32,9 @@ def add_file_to_datasets(file_path, filename, task_execution):
     Dataset.objects.create(creator=user, file=path_in_media + filename, title=dataset_title)
 
 
-def recieve_dataset_from_container(task_execution, extract_path):
-    client = docker.from_env()
-    container = client.containers.get(task_execution.dockertaskexecution.container_id)
+def recieve_dataset_from_container(extract_path, docker_container):
     file_stream = BytesIO()
-    bits, _ = container.get_archive(DockerTaskService.container_extract_datasets_path)
+    bits, _ = docker_container.get_archive(DockerTaskService.container_extract_datasets_path)
     for chunk in bits:
         file_stream.write(chunk)
     file_stream.seek(0)
@@ -50,9 +51,9 @@ def check_validity_of_datasets(extracted_files_dir):
     return True
 
 
-def exctract_dataset_from_execution(task_execution):
+def exctract_dataset_from_execution(task_execution, docker_container):
     extract_path = f"./task_{task_execution.id}"
-    if not recieve_dataset_from_container(task_execution, extract_path):
+    if not recieve_dataset_from_container(extract_path, docker_container):
         # There is no data to be extracted
         return
     extracted_files_dir = extract_path + DockerTaskService.container_extract_datasets_path
@@ -122,6 +123,10 @@ class DockerTaskService:
         Creates a docker client using from_env
         Runs a new docker container in the background(detach=True) using containers.run
         Customize the docker image by editing the first field of client.containers.run
+        Set memory limit using mem_limit.
+        Set cpu usage limit for the container using cpu period and cpu quota.
+        For more information on cpu quota visit:
+            https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler
         wait for finish work
         save log
         return container status
@@ -138,15 +143,17 @@ class DockerTaskService:
 
         client = docker.from_env()
         try:
-            container = client.containers.run(**kwargs, detach=True)
+            container = client.containers.run(**kwargs, detach=True, cpu_period=CPU_PERIOD, cpu_quota=CPU_QUOTA,
+                                              mem_limit=MEMORY_LIMIT)
             signal.signal(signal.SIGTERM, stop_container_on_signal)
             container.wait()
-
             container = client.containers.get(container.id)
+            exctract_dataset_from_execution(task_execution, container)
             container_log = container.logs().decode("utf-8")
             set_task_execution_log_file(task_execution, container_log)
-
-            return TaskExecution.StatusChoices.SUCCESS
+            if container.attrs["State"]["ExitCode"] == 0:
+                return TaskExecution.StatusChoices.SUCCESS
+            return TaskExecution.StatusChoices.FAILED
         except docker.errors.ContainerError:
             container_log = container.logs().decode("utf-8")
             set_task_execution_log_file(task_execution, container_log)
