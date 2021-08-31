@@ -18,6 +18,9 @@ def run_triggered_workflows():
         status__in=[WorkflowExecution.StatusChoices.PENDING, WorkflowExecution.StatusChoices.RUNNING]).select_related(
         'workflow').prefetch_related('task_dependency_executions__task_execution__task')
     for workflow_execution in triggered_workflows:
+        if workflow_execution.status == WorkflowExecution.StatusChoices.PENDING and \
+                workflow_execution.workflow.exceeds_active_execution_limit():
+            continue
         run_task_dependencies(workflow_execution)
 
 
