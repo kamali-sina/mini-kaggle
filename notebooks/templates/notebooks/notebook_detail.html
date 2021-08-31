@@ -35,6 +35,9 @@ const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{
     <button class="ui icon button" data-tooltip="Start session" onclick="startSession()">
         <i class="power off icon"></i>
     </button>
+    <a class="ui icon button" data-tooltip="Export notebook as task" href="{% url 'notebooks:export' object.id %}">
+        <i class="share square icon"></i>
+    </a>
     <a class="ui icon negative button" data-tooltip="Delete notebook" href="{% url 'notebooks:delete' object.id %}">
         <i class="trash alternate icon"></i>
     </a>
