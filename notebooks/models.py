@@ -26,6 +26,7 @@ class Cell(models.Model):
         RUNNING = "R", _("Running")
         DONE = "D", _("Done")
 
+    notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE, related_name='cells', blank=True)
     code = models.TextField()
     result = models.TextField()
     cell_status = models.CharField(max_length=2, choices=CellStatus.choices, default=CellStatus.PENDING)
