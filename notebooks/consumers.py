@@ -7,6 +7,7 @@ from notebooks.services.session import SessionService, make_new_session
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
+        # pylint: disable=attribute-defined-outside-init
         self.notebook_id = self.scope['url_route']['kwargs']['notebook_id']
         self.notebook = Notebook.objects.get(pk=self.notebook_id)
 
