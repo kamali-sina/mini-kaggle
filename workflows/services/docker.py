@@ -17,6 +17,9 @@ from workflows.models import Task, TaskExecution
 from .task_data import get_task_data
 
 CREATED_DATASETS_NAME_ABSTRACT = 'created_by_%s'
+CPU_PERIOD = 100000
+CPU_QUOTA = 50000 # The number of microseconds per cpu-period that the container is limited to before throttled
+MEMORY_LIMIT = '20m'
 
 
 def add_file_to_datasets(file_path, filename, task_execution):
@@ -122,6 +125,10 @@ class DockerTaskService:
         Creates a docker client using from_env
         Runs a new docker container in the background(detach=True) using containers.run
         Customize the docker image by editing the first field of client.containers.run
+        Set memory limit using mem_limit.
+        Set cpu usage limit for the container using cpu period and cpu quota.
+        For more information on cpu quota visit:
+            https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler
         wait for finish work
         save log
         return container status
@@ -138,7 +145,8 @@ class DockerTaskService:
 
         client = docker.from_env()
         try:
-            container = client.containers.run(**kwargs, detach=True)
+            container = client.containers.run(**kwargs, detach=True, cpu_period=CPU_PERIOD, cpu_quota=CPU_QUOTA,
+                                              mem_limit=MEMORY_LIMIT)
             signal.signal(signal.SIGTERM, stop_container_on_signal)
             container.wait()
 
