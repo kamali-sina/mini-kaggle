@@ -1,0 +1,58 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    </style>
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+    </script>
+{% endblock %}
+
+{% block title %}Workflow Execution Details{% endblock %}
+
+{% block body %}
+    <canvas id="myChart" width="400" height="400"></canvas>
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var xValues = [0, {{ task_execution.run_time }}];
+        var yValues = ['Running', '{{ task_execution.status }}'];
+
+        new Chart("myChart", {
+            type: "line",
+            data: {
+                labels: yValues,
+                datasets: [{
+                    fill: false,
+                    lineTension: 0,
+                    backgroundColor: "rgba(0,0,255,1.0)",
+                    borderColor: "rgba(0,0,255,0.1)",
+                    data: xValues
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Task Execution Status Chart'
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: function (val, index) {
+                                return this.getLabelForValue(val);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}
