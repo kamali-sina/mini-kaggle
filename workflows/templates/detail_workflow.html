@@ -2,14 +2,15 @@
 {% load static %}
 
 {% block head %}
-<style>li {
-    font-size: 17px;
-    list-style: none;
-    margin: 15px auto;
-}
-
-
-</style>
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    </style>
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+    </script>
 {% endblock %}
 
 {% block title %}Workflow Details{% endblock %}
@@ -17,53 +18,88 @@
 {% block body %}
 
 
-<div class="ui segment">
-    <ul>
-        <li><strong>Name: </strong>{{ workflow.name }}</li>
+    <div class="ui segment">
+        <ul>
+            <li><strong>Name: </strong>{{ workflow.name }}</li>
 
-        <li><strong>Creator: </strong>
-            {% if workflow.creator.get_full_name %}
-            {{ workflow.creator.get_full_name }}
-            {% else %}
-            {{ workflow.creator.username }}
-            {% endif %}
-        </li>
-        <div>
-            <br>
-            <h3>Tasks:</h3>
-            {% if workflow.task_set.all %}
-            <div class="ui relaxed divided list">
-                {% for task in workflow.task_set.all %}
-                <div class="item">
-                    <i class="large tasks middle aligned icon"></i>
-                    <div class="content">
-                        <a class="header" href="{% url 'workflows:detail_task' task.id %}">{{ task.name }}</a>
+            <li><strong>Creator: </strong>
+                {% if workflow.creator.get_full_name %}
+                    {{ workflow.creator.get_full_name }}
+                {% else %}
+                    {{ workflow.creator.username }}
+                {% endif %}
+            </li>
+            <div>
+                <br>
+                <h3>Tasks:</h3>
+                {% if workflow.task_set.all %}
+                    <div class="ui relaxed divided list">
+                        {% for task in workflow.task_set.all %}
+                            <div class="item">
+                                <i class="large tasks middle aligned icon"></i>
+                                <div class="content">
+                                    <a class="header"
+                                       href="{% url 'workflows:detail_task' task.id %}">{{ task.name }}</a>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                </div>
-                {% endfor %}
+                {% else %}
+                    <li>No tasks registered to the workflow</li>
+                {% endif %}
+                <a href="{% url 'workflows:create_task' %}">add new task</a>
             </div>
-            {% else %}
-            <li>No tasks registered to the workflow</li>
-            {% endif %}
-            <a href="{% url 'workflows:create_task' %}">add new task</a>
-        </div>
-        <br>
-        <div style="display: flex;">
-            <form method="post" style="margin: 10px;" action="delete/">
-                {% csrf_token %}
-                <input type="submit" value="Delete Workflow" class="negative ui button">
-            </form>
-            <form method="post" style="margin: 10px;" action="run/">
-                {% csrf_token %}
-                <input type="submit" value="Run Workflow" class="ui button">
-            </form>
-            <form style="margin: 10px;" action="{% url 'workflows:schedule_workflow' workflow.id %}">
-                {% csrf_token %}
-                <input type="submit" value="Schedule" class="ui button">
-            </form>
-        </div>
-    </ul>
-</div>
+            <br>
+            <div style="display: flex;">
+                <form method="post" style="margin: 10px;" action="delete/">
+                    {% csrf_token %}
+                    <input type="submit" value="Delete Workflow" class="negative ui button">
+                </form>
+                <form method="post" style="margin: 10px;" action="run/">
+                    {% csrf_token %}
+                    <input type="submit" value="Run Workflow" class="ui button">
+                </form>
+                <form style="margin: 10px;" action="{% url 'workflows:schedule_workflow' workflow.id %}">
+                    {% csrf_token %}
+                    <input type="submit" value="Schedule" class="ui button">
+                </form>
+            </div>
+        </ul>
+    </div>
+
+    <canvas id="myChart" width="400" height="400"></canvas>
+
+    <script>
+        var colors = {{ colors|safe }};
+        var datasetdata = [];
+        var graph_labels = {{ execution_timestamps|safe }};
+        var chart = document.getElementById('myChart').getContext('2d');
+        for (var i = 0; i < {{ tasks|length }}; i++) {
+            const newDataset = {
+                label: {{ tasks|safe }},
+                backgroundColor: colors[i],
+                borderColor: colors[i],
+                data: {{ task_executions_run_time.task|safe }},
+            };
+            chart.data.datasets.push(newDataset);
+            chart.update();
+            {#datasetdata[i] = {#}
+            {#    label: {{ tasks.i.name }}, // custom filter might be needed?#}
+            {#    data: {{ task_executions_run_time.task|safe }}, // type is query set. need list#}
+            {#    backgroundColor: colors[i],#}
+            {#    hoverBackgroundColor: colors[i],#}
+            {#    borderStyle: 'solid',#}
+            {#    borderWidth: 2,#}
+        }
+        var graph_data = {
+            labels: graph_labels,
+            datasets: datasetdata
+        };
+        new Chart("myChart", {
+            type: "line",
+            data: graph_data
+        });
+    </script>
 
 
 {% endblock %}

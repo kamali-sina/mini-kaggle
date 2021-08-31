@@ -1,3 +1,5 @@
+import random
+
 from django.http import HttpResponseRedirect
 from django.views.generic import View, CreateView, DeleteView, DetailView, ListView, UpdateView, FormView
 from django.urls import reverse
@@ -51,10 +53,39 @@ class WorkflowListView(LoginRequiredMixin, ListView):
         return Workflow.objects.filter(creator=self.request.user)
 
 
+def random_color():
+    r = lambda: random.randint(0, 255)
+    return '#%02X%02X%02X' % (r(), r(), r())
+
+
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
     model = Workflow
     template_name = 'detail_workflow.html'
     context_object_name = 'workflow'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        workflow = context['workflow']
+
+        # labels for xAxis
+        context['execution_timestamps'] = []
+        workflow_executions = workflow.workflowexecution_set.all()
+        for workflow_execution in workflow_executions:
+            context['execution_timestamps'].append(workflow_execution.created_at.strftime("%m/%d/%Y"))
+
+        # chart lines (each task is a line)
+        context['tasks'] = workflow.task_set.all()
+
+        # chart lines colors
+        context['colors'] = []
+        for i in range(context['tasks'].count()):
+            context['colors'].append(random_color())
+
+        # chart lines data and yAxis
+        context['task_executions_run_time'] = {}
+        for task in context['tasks']:
+            context['task_executions_run_time']['task'] = task.taskexecution_set.all()
+        return context
 
 
 class WorkflowScheduleRedirectView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, View):
