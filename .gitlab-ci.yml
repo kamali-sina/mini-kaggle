@@ -1,4 +1,4 @@
-image: m.docker-registry.ir/python:3.8-alpine
+image: m.docker-registry.ir/python:3.8-slim-buster
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -9,10 +9,7 @@ cache:
     - venv/
 
 before_script:
-  - apk update && apk add make
-  - pip install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
+  - apt-get update && apt-get install make
   - pip install -r requirements.txt
 
 stages:
