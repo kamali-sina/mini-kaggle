@@ -43,8 +43,7 @@ def has_notebook_owner_perm(request, notebook_id, *args, **kwargs):
 def serialize_cell(cell):
     return {"id": cell.id,
             "code": cell.code,
-            "cell_status": cell.get_cell_status_display(),
-            "result": cell.result}
+            "cell_status": cell.get_cell_status_display()}
 
 
 def get_code_from_request(request):
@@ -68,6 +67,7 @@ def cell_create_view(request, notebook_pk):
 @login_required
 @has_permission(has_notebook_owner_perm)
 def cell_update_view(request, notebook_pk, cell_pk):
+    # pylint: disable=unused-argument
     cell = get_object_or_404(Cell, pk=cell_pk)
     code = get_code_from_request(request)
 
@@ -80,6 +80,7 @@ def cell_update_view(request, notebook_pk, cell_pk):
 @login_required
 @has_permission(has_notebook_owner_perm)
 def cell_delete_view(request, notebook_pk, cell_pk):
+    # pylint: disable=unused-argument
     cell = get_object_or_404(Cell, pk=cell_pk)
     cell.delete()
 
