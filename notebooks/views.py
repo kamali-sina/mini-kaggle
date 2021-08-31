@@ -4,7 +4,7 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.urls import reverse_lazy
 from django.http import JsonResponse
-from django.conf import settings
+
 from notebooks.models import Notebook
 
 
@@ -42,5 +42,5 @@ def snippets_list_view(request):
 
 
 def snippet_detail_view(request, name):
-    with open(f'./notebooks/static/notebooks/snippets/{name}', 'r') as file:
+    with open(f'./notebooks/static/notebooks/snippets/{name}', 'r', encoding="utf8") as file:
         return JsonResponse({'snippet': file.read()})
