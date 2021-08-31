@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock:z
+    command: >
+      sh -c "python3 manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+      - IS_DOCKER=1
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: m.docker-registry.ir/postgres:10-alpine
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=supersecretpassword
+
+  redis:
+    image: m.docker-registry.ir/redis:alpine
+    ports:
+      - "6379:6379"
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A data_platform worker -l INFO
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock:z
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+      - IS_DOCKER=1
+    depends_on:
+      - db
+      - redis
