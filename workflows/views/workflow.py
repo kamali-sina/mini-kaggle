@@ -4,8 +4,29 @@ from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from workflows.models import Workflow, WorkflowSchedule
+from django.template.defaulttags import register
+from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
+
+
+STATUS_CONTEXT_DICT = {
+    WorkflowExecution.StatusChoices.FAILED: {
+        "text": "failed",
+        "color": "red",
+    },
+    WorkflowExecution.StatusChoices.SUCCESS: {
+        "text": "success",
+        "color": "green",
+    },
+    WorkflowExecution.StatusChoices.RUNNING: {
+        "text": "running",
+        "color": "grey",
+    },
+    WorkflowExecution.StatusChoices.PENDING: {
+        "text": "pending",
+        "color": "white",
+    }
+}
 
 
 class WorkflowCreatorOnlyMixin(AccessMixin):
@@ -49,6 +70,15 @@ class WorkflowListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Workflow.objects.filter(creator=self.request.user)
+
+    @register.filter
+    def get_value(self, key):
+        return self.get(key)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status'] = STATUS_CONTEXT_DICT
+        return context
 
 
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
