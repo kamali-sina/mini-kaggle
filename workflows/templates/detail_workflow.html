@@ -71,34 +71,30 @@
 
     <script>
         var colors = {{ colors|safe }};
-        var datasetdata = [];
+        var tasks = {{ tasks|safe }};
+        var task_execution_run_time = {{ task_executions_run_time|safe }};
         var graph_labels = {{ execution_timestamps|safe }};
-        var chart = document.getElementById('myChart').getContext('2d');
-        for (var i = 0; i < {{ tasks|length }}; i++) {
-            const newDataset = {
-                label: {{ tasks|safe }},
+        datasets_list = []
+        for (let i = 1; i <= {{ tasks|length }}; i++) {
+            datasets_list.push({
+                label: tasks[i],
                 backgroundColor: colors[i],
                 borderColor: colors[i],
-                data: {{ task_executions_run_time.task|safe }},
-            };
-            chart.data.datasets.push(newDataset);
-            chart.update();
-            {#datasetdata[i] = {#}
-            {#    label: {{ tasks.i.name }}, // custom filter might be needed?#}
-            {#    data: {{ task_executions_run_time.task|safe }}, // type is query set. need list#}
-            {#    backgroundColor: colors[i],#}
-            {#    hoverBackgroundColor: colors[i],#}
-            {#    borderStyle: 'solid',#}
-            {#    borderWidth: 2,#}
+                data: task_execution_run_time[i],
+                fill: false,
+            });
         }
-        var graph_data = {
-            labels: graph_labels,
-            datasets: datasetdata
-        };
-        new Chart("myChart", {
-            type: "line",
-            data: graph_data
-        });
+        new Chart("myChart",
+            {
+                type: 'line',
+                options: {
+                    legend: {display: false},
+                },
+                data: {
+                    labels: graph_labels,
+                    datasets: datasets_list,
+                }
+            });
     </script>
 
 
