@@ -10,7 +10,6 @@ class Notebook(models.Model):
 
 class Cell(models.Model):
     class CellStatus(models.TextChoices):
-        PENDING = "P", _("Pending")
         RUNNING = "R", _("Running")
         DONE = "D", _("Done")
         NONE = "N", _("None")
