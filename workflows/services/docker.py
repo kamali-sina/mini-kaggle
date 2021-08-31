@@ -29,7 +29,9 @@ def add_file_to_datasets(file_path, filename, task_execution):
     path_in_media = DATASETS_MEDIA_PATH % str(user.username)
     os.makedirs(settings.MEDIA_ROOT + path_in_media, exist_ok=True)
     os.replace(file_path, settings.MEDIA_ROOT + path_in_media + filename)
-    Dataset.objects.create(creator=user, file=path_in_media + filename, title=dataset_title)
+    dataset = Dataset.objects.create(creator=user, file=path_in_media + filename, title=dataset_title)
+    task_execution.extracted_datasets.add(dataset)
+    task_execution.save()
 
 
 def recieve_dataset_from_container(extract_path, docker_container):
