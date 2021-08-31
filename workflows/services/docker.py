@@ -151,7 +151,9 @@ class DockerTaskService:
             exctract_dataset_from_execution(task_execution, container)
             container_log = container.logs().decode("utf-8")
             set_task_execution_log_file(task_execution, container_log)
-            return TaskExecution.StatusChoices.SUCCESS
+            if container.attrs["State"]["ExitCode"] == 0:
+                return TaskExecution.StatusChoices.SUCCESS
+            return TaskExecution.StatusChoices.FAILED
         except docker.errors.ContainerError:
             container_log = container.logs().decode("utf-8")
             set_task_execution_log_file(task_execution, container_log)
