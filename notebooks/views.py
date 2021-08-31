@@ -4,7 +4,6 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.http import JsonResponse
 
-from notebooks.models import CODE_SNIPPETS_DIR
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404
@@ -14,6 +13,7 @@ from workflows.models import PythonTask
 
 from notebooks.models import Notebook
 from notebooks.forms import ExportNotebookForm
+from notebooks.models import CODE_SNIPPETS_DIR
 
 
 class NotebookCreatorOnlyMixin(AccessMixin):
