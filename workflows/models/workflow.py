@@ -5,13 +5,20 @@ from django.contrib import auth
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+DEFAULT_MAX_ACTIVE_EXECUTIONS = 10
+
 
 class Workflow(models.Model):
     name = models.CharField(max_length=255)
     creator = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
+    max_active_executions_count = models.IntegerField(default=DEFAULT_MAX_ACTIVE_EXECUTIONS, blank=True)
 
     def __str__(self):
         return str(self.name)
+
+    def exceeds_active_execution_limit(self):
+        active_executions_count = self.workflowexecution_set.all().count()
+        return active_executions_count >= self.max_active_executions_count
 
 
 class WorkflowExecution(models.Model):
