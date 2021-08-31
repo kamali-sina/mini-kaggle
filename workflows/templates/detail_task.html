@@ -46,13 +46,18 @@
                     {% endfor %}
                 </ul>
             </li>
+            <li><strong>Extracted datasets: </strong>
+                <ul>
+                    {% for dataset in extracted_datasets %}
+                        <li><a href="{% url 'datasets:detail' dataset.id %}">{{ dataset }}</a>
+                    {% endfor %}
+                </ul>
+            </li>
             <div style="display: flex;">
-                <form method="post" style="
-    margin: 10px;" action="delete/">{% csrf_token %}
+                <form method="post" style="margin: 10px;" action="delete/">{% csrf_token %}
                     <input type="submit" value="Delete" class="negative ui button">
                 </form>
-                <form method="post" style="
-    margin: 10px;" action="run/">{% csrf_token %}
+                <form method="post" style="margin: 10px;" action="run/">{% csrf_token %}
                     <input type="submit" value="Run task" class="ui button">
                 </form>
             </div>
@@ -78,6 +83,7 @@
                     </div>
                 {% endfor %}
             {% endif %}
+
         </ul>
     </div>
 
