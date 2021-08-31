@@ -38,10 +38,40 @@
     width: 97%;
 }
 
+.cell-res {
+    margin: 20px 0px 10px 0px;
+    width: 100%;
+    height: 100%;
+    font-size: 15px;
+    padding: 20px;
+    border-width: 1px;
+    border-radius: 0px 0px 5px 5px;
+    border-style: solid;
+}
+
+.cell-res-succeeded {
+    border-color: #cfffb8;
+}
+
+.cell-res-failed {
+    background-color: #edd2ce;
+    border-color: #edd2ce;
+    color: #661a0f;
+}
+
+.cell-toolbar {
+    display: flex;
+    padding-top: 8px;
+}
+
 .cell-buttons {
     display: inline-block;
     margin-left: 5%;
-    margin-top: 8px;
+}
+
+.cell-status {
+    color: #cfcfcf;
+    margin-right: 8px;
 }
 
 .editor {
