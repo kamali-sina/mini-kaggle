@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-tf@3n31o!2s-rl@%_33u6kbraad5wf@4ncz6#y0pwb!c!#p&jb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0"]
+ALLOWED_HOSTS = ["0.0.0.0","127.0.0.1","localhost"]
 
 # Application definition
 
@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # third party apps
+    'channels',
+    # apps
     'workflows',
     'datasets',
     'users',
@@ -73,6 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'data_platform.wsgi.application'
+ASGI_APPLICATION = 'data_platform.asgi.application'
 
 # Database
 if os.environ.get("IS_DOCKER"):
