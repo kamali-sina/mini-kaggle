@@ -21,13 +21,14 @@
 <a href="{% url 'datasets:delete' pk=dataset.id %}" class="ui negative button">
     Delete
 </a>
-
-<div style="font-style: italic; margin-top: 20px;">
-    Tags:
-    {% for tag in dataset.tags.all %}
-    <a class="ui medium label">{{ tag.text }}</a>
-    {% endfor %}
-</div>
+{% if dataset.tags.all %}
+    <div style="font-style: italic; margin-top: 20px;">
+        Tags:
+        {% for tag in dataset.tags.all %}
+        <a class="ui medium label">{{ tag.text }}</a>
+        {% endfor %}
+    </div>
+{% endif %}
 
 
 {% endblock %}
