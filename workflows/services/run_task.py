@@ -32,7 +32,7 @@ def run_task_in_celery(task_execution_id):
     except:  # pylint: disable=bare-except
         task_execution_status = TaskExecution.StatusChoices.FAILED
     task_execution.status = task_execution_status
-    run_time = (datetime.datetime.now() - start_task_time).microseconds
+    run_time = (datetime.datetime.now() - start_task_time).seconds
     task_execution.run_time = run_time
     task_execution.save()
 

@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from workflows.models import Workflow, WorkflowSchedule
+from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution, TaskExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
 
 
@@ -91,3 +91,22 @@ class WorkflowScheduleUpdateView(WorkflowScheduleFormView, UpdateView):
     def get_object(self, queryset=None):
         workflow = get_object_or_404(Workflow, pk=self.kwargs['pk'])
         return workflow.schedule
+
+
+class WorkflowExecutionDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
+    model = WorkflowExecution
+    template_name = 'detail_workflow_execution.html'
+    context_object_name = 'workflow_execution'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        task_executions = TaskExecution.objects.all()
+        context['task_execution_count'] = len(task_executions)
+        context['task_execution_run_time'] = []
+        context['task_execution_status'] = []
+        for task_execution in task_executions:
+            context['task_execution_run_time'].append(task_execution.run_time)
+            context['task_execution_status'].append(task_execution.get_status_display())
+        # context['task_executions'] = TaskExecution.objects.filter(
+        #     taskdependencyexecution__in=context['workflow_execution'].task_dependency_executions)
+        return context
