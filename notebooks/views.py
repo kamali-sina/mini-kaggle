@@ -72,5 +72,5 @@ def snippets_list_view(request):
 
 
 def snippet_detail_view(request, name):
-    with open(f"{CODE_SNIPPETS_DIR}/{name}", "r", encoding="utf8") as file:
+    with open(f"{CODE_SNIPPETS_DIR}/{name}.py", "r", encoding="utf8") as file:
         return JsonResponse({"snippet": file.read()})
