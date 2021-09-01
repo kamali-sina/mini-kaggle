@@ -56,7 +56,7 @@ class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.Creat
 
 
 def restart_notebook_kernel_view(request, pk):
-    notebook = Notebook.objects.get(pk=pk)
+    notebook = get_object_or_404(Notebook, pk=pk)
 
     if notebook.session_id:
         session_id = notebook.session_id
