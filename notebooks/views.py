@@ -55,7 +55,7 @@ class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.Creat
         return HttpResponseRedirect(reverse('workflows:detail_task', args=(task.id,)))
 
 
-def RestartNotebookKernelView(request, pk):
+def restart_notebook_kernel_view(request, pk):
     notebook = Notebook.objects.get(pk=pk)
 
     if notebook.session_id:
