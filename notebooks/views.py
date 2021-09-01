@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from workflows.models import PythonTask
 
 from notebooks.models import Notebook
-from notebooks.forms import ExportNotebookForm
+from notebooks.forms import ExportNotebookForm, NotebookForm
 
 
 class NotebookCreatorOnlyMixin(AccessMixin):
@@ -35,6 +35,22 @@ class NotebookDetailView(LoginRequiredMixin, generic.DetailView):
 class NotebookDeleteView(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.DeleteView):
     model = Notebook
     success_url = reverse_lazy('notebooks:index')
+
+
+class NotebookCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Notebook
+    form_class = NotebookForm
+    template_name = 'notebooks/notebook_create.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        notebook = form.save()
+        messages.success(self.request, 'Your task has been created :)')
+        return HttpResponseRedirect(reverse('notebooks:detail', args=(notebook.id,)))
 
 
 class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.CreateView):

@@ -1,10 +1,29 @@
 from django.core.files.base import ContentFile
+from django.forms import ModelForm
 
+from notebooks.models import Notebook
 from notebooks.services.export import get_notebook_code
 from workflows.models import Task
 
 from workflows.models import PythonTask
 from workflows.forms import TaskForm
+
+
+class NotebookForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.creator = kwargs.pop('user')
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Notebook
+        fields = ['name']
+
+    def save(self, commit=True):
+        notebook = super().save(commit=False)
+        notebook.creator = self.creator
+        if commit:
+            notebook.save()
+        return notebook
 
 
 class ExportNotebookForm(TaskForm):
