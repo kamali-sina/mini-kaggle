@@ -3,10 +3,15 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.http import JsonResponse
+
 from datasets.views import has_permission
 from notebooks.models import Notebook, Cell
+from notebooks.forms import ExportNotebookForm
+from workflows.models import PythonTask
 
 
 class NotebookCreatorOnlyMixin(AccessMixin):
@@ -34,6 +39,21 @@ class NotebookDeleteView(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.D
     model = Notebook
     success_url = reverse_lazy('notebooks:index')
 
+class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.CreateView):
+    model = PythonTask
+    form_class = ExportNotebookForm
+    template_name = 'notebooks/export.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        kwargs['notebook'] = get_object_or_404(Notebook, pk=self.kwargs['pk'])
+        return kwargs
+
+    def form_valid(self, form):
+        task = form.save()
+        messages.success(self.request, 'Your task has been created :)')
+        return HttpResponseRedirect(reverse('workflows:detail_task', args=(task.id,)))
 
 def has_notebook_owner_perm(request, notebook_id, *args, **kwargs):
     notebook = get_object_or_404(Notebook, pk=notebook_id)

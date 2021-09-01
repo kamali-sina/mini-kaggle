@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.NotebooksListView.as_view(), name="index"),
     path("<int:pk>/", views.NotebookDetailView.as_view(), name="detail"),
     path("<int:pk>/delete", views.NotebookDeleteView.as_view(), name="delete"),
+    path("<int:pk>/export", views.ExportNotebook.as_view(), name="export"),
     # cell api
     path("<int:notebook_pk>/cell/create/", views.cell_create_view, name="cell_create"),
     path("<int:notebook_pk>/cell/update/<int:cell_pk>/", views.cell_update_view, name="cell_update"),

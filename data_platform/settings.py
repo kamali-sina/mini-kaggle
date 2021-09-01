@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-tf@3n31o!2s-rl@%_33u6kbraad5wf@4ncz6#y0pwb!c!#p&jb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["0.0.0.0"]
 
 # Application definition
 
@@ -75,14 +75,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'data_platform.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.environ.get("IS_DOCKER"):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'HOST': os.environ.get('DB_HOST'),
+            'NAME': os.environ.get('DB_NAME'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASS'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -105,11 +114,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Tags for managing messages
 
 MESSAGE_TAGS = {
-        messages.DEBUG: 'orange',
-        messages.INFO: 'blue',
-        messages.SUCCESS: 'green',
-        messages.WARNING: 'yellow',
-        messages.ERROR: 'red',
+    messages.DEBUG: 'orange',
+    messages.INFO: 'blue',
+    messages.SUCCESS: 'green',
+    messages.WARNING: 'yellow',
+    messages.ERROR: 'red',
 }
 
 # Internationalization
@@ -144,8 +153,10 @@ MEDIA_ROOT = './media/'
 LOGIN_URL = '/users/login'
 LOGIN_REDIRECT_URL = '/datasets/'
 
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'django-db'
+if os.environ.get("IS_DOCKER"):
+    CELERY_BROKER_URL = 'redis://redis:6379'
+else:
+    CELERY_BROKER_URL = 'redis://localhost:6379'
 
 # Email settings
 # https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-EMAIL_BACKEND
