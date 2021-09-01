@@ -24,6 +24,16 @@
             {% endfor %}
 
             <li><strong>Type: </strong>{{ task.get_task_type_display }}</li>
+            <li><strong>Accessible secret variables: </strong>
+                <ul>
+                    {% for secret_variable in task.secret_variables.all %}
+                        <li>
+                            <i class="right triangle icon grey"></i>
+                            {{ secret_variable.name }}
+                        <li>
+                    {% endfor %}
+                </ul>
+            </li>
             <li><strong>Creator: </strong>
                 {% if task.creator.get_full_name %}
                 {{ task.creator.get_full_name }}
@@ -35,9 +45,11 @@
             <li><strong>Accessible datasets: </strong>
                 <ul>
                     {% for dataset_path in accessible_datasets %}
-                    <li>{{ dataset_path }}
                     <li>
-                        {% endfor %}
+                        <i class="right triangle icon grey"></i>
+                        {{ dataset_path }}
+                    </li>
+                    {% endfor %}
                 </ul>
             </li>
             {% endif %}
