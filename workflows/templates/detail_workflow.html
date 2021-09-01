@@ -80,6 +80,7 @@
                 label: tasks[i],
                 backgroundColor: colors[i],
                 borderColor: colors[i],
+                borderWidth: 3,
                 data: task_execution_run_time[i],
                 fill: false,
             });
@@ -88,7 +89,14 @@
             {
                 type: 'line',
                 options: {
-                    legend: {display: false},
+                    legend: {display: true},
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
                 },
                 data: {
                     labels: graph_labels,

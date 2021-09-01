@@ -11,6 +11,10 @@ from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
 
 
+TASK_EXECUTIONS_RUNTIME = 'task_executions_run_time'
+COLORS = 'colors'
+TASKS = "tasks"
+EXECUTION_TIMESTAMPS = 'execution_timestamps'
 STATUS_CONTEXT_DICT = {
     WorkflowExecution.StatusChoices.FAILED: {
         "text": "failed",
@@ -98,33 +102,33 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
         workflow = context['workflow']
 
         # labels for xAxis
-        context['execution_timestamps'] = ["31 AUG 2021", "31 AUG 2021"]
+        context[EXECUTION_TIMESTAMPS] = ["31 AUG 2021", "31 AUG 2021"]
         workflow_executions = workflow.workflowexecution_set.all()
         for workflow_execution in workflow_executions:
-            context['execution_timestamps'].append(workflow_execution.created_at.strftime("%m/%d/%Y"))
+            context[EXECUTION_TIMESTAMPS].append(workflow_execution.created_at.strftime("%m/%d/%Y"))
 
         # chart lines (each task is a line)
-        context['tasks'] = []
+        context[TASKS] = []
         workflow_tasks= workflow.task_set.all()
         for workflow_task in workflow_tasks:
-            context['tasks'].append(workflow_task.name)
+            context[TASKS].append(workflow_task.name)
 
         # chart lines colors
-        context['colors'] = []
+        context[COLORS] = []
         # pylint: disable=unused-variable
-        for i in range(len(context['tasks'])):
-            context['colors'].append(random_color())
+        for i in range(len(context[TASKS])):
+            context[COLORS].append(random_color())
 
         # chart lines data and yAxis
-        context['task_executions_run_time'] = {}
+        context[TASK_EXECUTIONS_RUNTIME] = {}
         for task in workflow_tasks:
             task_executions = task.taskexecution_set.all()
-            context['task_executions_run_time'][task.id] = []
+            context[TASK_EXECUTIONS_RUNTIME][task.id] = []
             for task_execution in task_executions:
                 if task_execution.run_time:
-                    context['task_executions_run_time'][task.id].append(task_execution.run_time)
+                    context[TASK_EXECUTIONS_RUNTIME][task.id].append(task_execution.run_time)
                 else:
-                    context['task_executions_run_time'][task.id].append(0)
+                    context[TASK_EXECUTIONS_RUNTIME][task.id].append(0)
 
         return context
 
