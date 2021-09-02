@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
+from django.contrib.auth.decorators import login_required
 
 from workflows.models import Task, TaskExecution
 from workflows.forms import TaskForm, TASK_TYPED_FORM_REGISTRY
@@ -72,6 +73,7 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         return context
 
 
+@login_required
 def create_task_view(request):
     if request.method == 'POST':
         form = TaskForm(request.POST, request.FILES, user=request.user)
