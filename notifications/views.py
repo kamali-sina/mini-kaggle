@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.shortcuts import render
 
 from notifications.models import NotificationSource
-from notifications.forms import CreateNotificationSourceForm, NOTIFICATION_CHILD_FORM_REGISTRY
+from notifications.forms import CreateNotificationSourceForm, NOTIFICATION_TYPED_FORM_REGISTRY
 
 
 # Create your views here.
@@ -14,17 +14,17 @@ from notifications.forms import CreateNotificationSourceForm, NOTIFICATION_CHILD
 def create_notification_source(request):
     if request.method == 'POST':
         form = CreateNotificationSourceForm(request.POST, user=request.user)
-        typed_form = NOTIFICATION_CHILD_FORM_REGISTRY[request.POST['type']](request.POST)
+        typed_form = NOTIFICATION_TYPED_FORM_REGISTRY[request.POST['type']](request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Notification source created successfully :)")
     else:
         form = CreateNotificationSourceForm(user=request.user)
-        typed_form = NOTIFICATION_CHILD_FORM_REGISTRY[NotificationSource.DEFAULT_TYPE]()
+        typed_form = NOTIFICATION_TYPED_FORM_REGISTRY[NotificationSource.DEFAULT_TYPE]()
     return HttpResponse(
         render(request, 'notifications/create_notification.html', context={'form': form, 'typed_form': typed_form}))
 
 
 def get_typed_notification_form(request, notification_type):
-    context = {'form': NOTIFICATION_CHILD_FORM_REGISTRY[notification_type]()}
+    context = {'form': NOTIFICATION_TYPED_FORM_REGISTRY[notification_type]()}
     return JsonResponse({'form': render_to_string('notifications/create_typed_notification.html', context=context)})

@@ -9,7 +9,7 @@ class CreateNotificationSourceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         notification_source_type = args[0]['type'] if args else NotificationSource.DEFAULT_TYPE
-        self.typed_form = NOTIFICATION_CHILD_FORM_REGISTRY[notification_source_type](*args, **kwargs)
+        self.typed_form = NOTIFICATION_TYPED_FORM_REGISTRY[notification_source_type](*args, **kwargs)
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -57,6 +57,6 @@ class CreateEmailNotificationSourceForm(forms.ModelForm):
         return list(set(re.split(r'\s+', self.cleaned_data['recipients'])))
 
 
-NOTIFICATION_CHILD_FORM_REGISTRY = {
+NOTIFICATION_TYPED_FORM_REGISTRY = {
     NotificationSource.NotificationSourceType.EMAIL: CreateEmailNotificationSourceForm
 }
