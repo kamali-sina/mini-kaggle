@@ -14,7 +14,12 @@ class CreateDatasetForm(forms.ModelForm):
     adding_tags = forms.CharField(label='Add as many space separated tags as you want',
                                   required=False,
                                   max_length=300,
-                                  validators=[RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)])
+                                  validators=[RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)],
+                                  widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        setattr(self.fields['adding_tags'], 'interactive_input', True)
 
     class Meta:
         fields = ["title", "file", "description", 'is_public']
@@ -69,12 +74,14 @@ class AddTagForm(forms.Form):
                                   required=False,
                                   max_length=300,
                                   validators=[
-                                      RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)])
+                                      RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)],
+                                  widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         self.dataset = kwargs.pop('dataset')
         super().__init__(*args, **kwargs)
         self.fields['adding_tags'].validators.append(get_unique_tags_validator_for_dataset(self.dataset))
+        setattr(self.fields['adding_tags'], 'interactive_input', True)
 
     def clean_adding_tags(self):
         return [] if not self.cleaned_data['adding_tags'] else set(re.split(r'\s+', self.cleaned_data['adding_tags']))

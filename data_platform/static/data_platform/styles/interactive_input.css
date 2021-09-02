@@ -1,0 +1,11 @@
+.interactive_input {
+    border-radius: 5px;
+    border: 1px solid lightgray;
+    margin-top: 5px;
+    text-align: left;
+}
+
+.interactive_input:focus {
+    outline: 0px solid transparent;
+    border: 1px solid lightblue;
+}
