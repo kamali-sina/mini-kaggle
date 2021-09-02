@@ -15,10 +15,16 @@ class Session(models.Model):
     status = models.CharField(max_length=3, choices=SessionStatus.choices, default=SessionStatus.NOTRUNNING)
     run_counter = models.IntegerField(default=1)
 
+    def __str__(self):
+        return str(self.uuid)
+
 class Notebook(models.Model):
     name = models.CharField(max_length=255)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return str(self.name)
 
 class Cell(models.Model):
     class CellStatus(models.TextChoices):

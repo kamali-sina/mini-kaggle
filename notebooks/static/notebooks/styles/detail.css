@@ -1,3 +1,23 @@
+#split-pane {
+    display: flex;
+    flex-direction: row-reverse;
+    height: 100%;
+}
+
+#main-pane {
+    width: 80%;
+    padding: 0px 100px 0px 100px;
+}
+
+#side-pane {
+    height: 100%;
+    width: 20%;
+    padding-left: 50px;
+    border-width: 0px 0px 0px 1px;
+    border-style: solid;
+    border-color: #d6d6d6;
+}
+
 .toolbar {
     display: flex;
     align-items: center;
