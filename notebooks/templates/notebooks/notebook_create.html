@@ -1,0 +1,22 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+{% endblock %}
+
+{% block title %}Create Notebook{% endblock %}
+
+{% block body %}
+
+
+<div class="ui center aligned page grid segment">
+    <form method="post" class="ui form">
+        {% csrf_token %}
+        {% include 'registration/basic_form.html' with form=form title='Create Notebook' submit_value='Create'%}
+    </form>
+</div>
+
+
+{% endblock %}
+

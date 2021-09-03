@@ -12,7 +12,7 @@ tasks_data = {
         {
             "name": "Python",
             "task_related_name": "pythontask",
-            "display_fields": ["python_file"],
+            "display_fields": ["python_file", "docker_image"],
         }
 }
 
