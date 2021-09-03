@@ -24,8 +24,8 @@ def run_task_in_celery(task_execution_id):
     task_execution = TaskExecution.objects.get(pk=task_execution_id)
 
     task_execution.status = TaskExecution.StatusChoices.RUNNING
-    start_task_time = datetime.datetime.now()
     task_execution.save()
+    start_task_time = datetime.datetime.now()
     runner = get_service_runner(task_execution.task)
     try:
         task_execution_status = runner.run_task(task_execution)
