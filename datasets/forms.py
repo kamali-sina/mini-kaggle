@@ -11,7 +11,7 @@ from .models import Dataset
 
 
 class CreateDatasetForm(forms.ModelForm):
-    adding_tags = forms.CharField(label='Add a few tags',
+    adding_tags = forms.CharField(label='Add tags',
                                   required=False,
                                   max_length=300,
                                   validators=[RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)],
