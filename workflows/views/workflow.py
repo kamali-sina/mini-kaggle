@@ -88,8 +88,8 @@ class WorkflowListView(LoginRequiredMixin, ListView):
 
 
 def random_color():
-    color = lambda: random.randint(0, 255)
-    return '#%02X%02X%02X' % (color(), color(), color())
+    color = ["#" + ''.join([random.choice('ABCDEF0123456789') for i in range(6)])]
+    return color
 
 
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
