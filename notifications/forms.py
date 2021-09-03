@@ -18,7 +18,7 @@ def email_list_validator(value):
 
 
 class CreateEmailNotificationSourceForm(forms.ModelForm):
-    recipients = forms.CharField(label='Add white-space separated emails',
+    recipients = forms.CharField(label="Add recipients' emails",
                                  required=True,
                                  max_length=1000,
                                  validators=[email_list_validator],
