@@ -34,7 +34,10 @@ def add_file_to_datasets(file_path, filename, task_execution):
 
 def recieve_dataset_from_container(extract_path, docker_container):
     file_stream = BytesIO()
-    bits, _ = docker_container.get_archive(DockerTaskService.container_extract_datasets_path)
+    try:
+        bits, _ = docker_container.get_archive(DockerTaskService.container_extract_datasets_path)
+    except docker.errors.NotFound:
+        return False
     for chunk in bits:
         file_stream.write(chunk)
     file_stream.seek(0)
@@ -84,11 +87,10 @@ def get_task_type(task):
     return get_task_data(task)["name"]
 
 
-def get_display_fields(task):
+def get_special_display_fields(task):
     task_map = get_task_data(task)
     if task.__class__ == Task:
         task = getattr(task, task_map["task_related_name"])
-
     return {
         field_name.replace("_", " "): getattr(task, field_name)
         for field_name in task_map["display_fields"]

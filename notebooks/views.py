@@ -1,17 +1,34 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.urls import reverse, reverse_lazy
 from django.contrib import messages
-from django.http import HttpResponseRedirect
-from django.http import JsonResponse
+from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect, JsonResponse
 
 from datasets.views import has_permission
-from notebooks.models import Notebook, Cell
-from notebooks.forms import ExportNotebookForm
+from notebooks.models import Cell
+from notebooks.services.session import make_new_session, SessionService
 from workflows.models import PythonTask
+
+from notebooks.models import Notebook
+from notebooks.forms import ExportNotebookForm, NotebookForm
+
+
+class NotebookCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Notebook
+    form_class = NotebookForm
+    template_name = 'notebooks/notebook_create.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        notebook = form.save()
+        return HttpResponseRedirect(reverse('notebooks:detail', args=(notebook.id,)))
 
 
 class NotebookCreatorOnlyMixin(AccessMixin):
@@ -39,6 +56,7 @@ class NotebookDeleteView(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.D
     model = Notebook
     success_url = reverse_lazy('notebooks:index')
 
+
 class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.CreateView):
     model = PythonTask
     form_class = ExportNotebookForm
@@ -54,6 +72,20 @@ class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.Creat
         task = form.save()
         messages.success(self.request, 'Your task has been created :)')
         return HttpResponseRedirect(reverse('workflows:detail_task', args=(task.id,)))
+
+
+def restart_kernel_view(request, pk):
+    notebook = get_object_or_404(Notebook, pk=pk)
+
+    if notebook.session_id:
+        session_id = notebook.session_id
+    else:
+        session_id = make_new_session()
+
+    session_service = SessionService(session_id)
+    session_service.restart()
+    return JsonResponse({})
+
 
 def has_notebook_owner_perm(request, notebook_id, *args, **kwargs):
     notebook = get_object_or_404(Notebook, pk=notebook_id)
