@@ -34,7 +34,10 @@ def add_file_to_datasets(file_path, filename, task_execution):
 
 def recieve_dataset_from_container(extract_path, docker_container):
     file_stream = BytesIO()
-    bits, _ = docker_container.get_archive(DockerTaskService.container_extract_datasets_path)
+    try:
+        bits, _ = docker_container.get_archive(DockerTaskService.container_extract_datasets_path)
+    except docker.errors.NotFound:
+        return False
     for chunk in bits:
         file_stream.write(chunk)
     file_stream.seek(0)

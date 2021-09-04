@@ -12,8 +12,11 @@
         <span class="ui disabled circular icon basic button" data-tooltip="Add cell" data-position="right center">
             <i class="ui disabled plus icon"></i>
         </span>
-            <span data-tooltip="Delete cell" data-position="right center" onclick="deleteCell({{ id }})">
+        <span data-tooltip="Delete cell" data-position="right center" onclick="deleteCell({{ id }})">
             <i class="ui trash alternate outline link icon"></i>
+        </span>
+        <span data-tooltip="Save" data-position="right center" onclick="saveCell({{ id }})">
+            <i class="save outline link icon"></i>
         </span>
         </div>
         <div class="filler"></div>
