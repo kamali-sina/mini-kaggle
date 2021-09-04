@@ -155,10 +155,11 @@ function deleteCell(cellId) {
         const initObject = {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': CSRFToken
             }
         }
-        fetch(`${url}cell/delete/${cellId}`, initObject)
+        fetch(`${url}cell/delete/${cellId}/`, initObject)
             .then(handleErrors)
             .then(r => showToast('Cell deleted'))
             .then(() => removeCellElement(cellId))
