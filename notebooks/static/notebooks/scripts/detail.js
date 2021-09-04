@@ -78,30 +78,29 @@ function handleErrors(response) {
 function addCell() {
     /* Creates a new cell at the end of the current notebook's cells and adds it to the DOM */
 
-
     const initObject = {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRFToken
         },
         body: JSON.stringify({code: ""})
     }
-    fetch(`${url}cell/create`, initObject)
+    fetch(`${url}cell/create/`, initObject)
         .then(handleErrors)
         .then(response => response.json())
-        .then(data => data.cell)
-        .then(cell => addCellElement(cell))
+        .then(data => addCellElement(data.id, data.code))
         .then(() => showToast('New cell created'))
         .catch(e => showToast('Failed to create the new cell'))
 }
 
 
-function addCellElement(cell) {
+function addCellElement(cellId, cellCode) {
     /* Creates a cell element for the given cell */
 
-    document.getElementsByClassName('cell-list')[0].insertAdjacentHTML('beforeend', cellItemHtmlString.replaceAll('{id_placeholder}', cell.id))
-    const cellElement = document.getElementById(getCellCodeElementId(cell.id))
-    cellElement.innerHTML = cell.code
+    document.getElementsByClassName('cell-list')[0].insertAdjacentHTML('beforeend', cellItemHtmlString.replaceAll('{id_placeholder}', cellId))
+    const cellElement = document.getElementById(getCellCodeElementId(cellId))
+    cellElement.innerHTML = cellCode
     createEditorForCellElement(cellElement)
 }
 
