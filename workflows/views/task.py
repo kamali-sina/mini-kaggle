@@ -1,12 +1,15 @@
 from django.http import HttpResponseRedirect
 
-from django.views.generic import CreateView, DeleteView, DetailView, ListView
+from django.views.generic import DeleteView, DetailView, ListView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
-from workflows.models import Task, PythonTask, DockerTask, TaskExecution
-from workflows.forms import TaskForm, PythonTaskForm, DockerTaskForm
+from django.template.loader import render_to_string
+from django.http import JsonResponse, HttpResponse
+from django.contrib.auth.decorators import login_required
+
+from workflows.models import Task, TaskExecution
+from workflows.forms import TaskForm, TASK_TYPED_FORM_REGISTRY
 from workflows.services.docker import task_status_color, get_special_display_fields, get_task_type, DockerTaskService, \
     MarkTaskExecutionStatusOptions, read_task_execution_log_file
 from workflows.services.runner import get_service_runner
@@ -47,13 +50,12 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         task.get_task_type_display = get_task_type(task)
 
         task_executions = TaskExecution.objects.filter(task=task)
+        task.executions = task_executions
         for task_execution in task_executions:
             task_execution.status_color = task_status_color(task_execution.get_status_display())
-        task.executions = task_executions
 
         context["special_display_fields"] = get_special_display_fields(task)
         context["accessible_datasets"] = DockerTaskService.get_accessible_datasets_mount_info(task)
-
         context["mark_options"] = [
             {
                 "value": MarkTaskExecutionStatusOptions.FAILED.value,
@@ -70,52 +72,23 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         return context
 
 
-class TaskCreateView(LoginRequiredMixin, CreateView):
-    model = Task
-    form_class = TaskForm
-    template_name = "create_task.html"
+@login_required
+def create_task_view(request):
+    if request.method == 'POST':
+        form = TaskForm(request.POST, request.FILES, user=request.user)
+        typed_form = TASK_TYPED_FORM_REGISTRY[request.POST['task_type']](request.POST, request.FILES)
+        if form.is_valid():
+            task = form.save()
+            return HttpResponseRedirect(reverse('workflows:detail_task', args=(task.id,)))
+    else:
+        form = TaskForm(user=request.user)
+        typed_form = TASK_TYPED_FORM_REGISTRY[Task.DEFAULT_TYPE]()
+    return HttpResponse(render(request, 'create_task.html', context={'form': form, 'typed_form': typed_form}))
 
-    task_types_data = {
-        "docker": {"model": DockerTask, "task_type": Task.TaskTypeChoices.DOCKER, "form_class": DockerTaskForm},
-        "python": {"model": PythonTask, "task_type": Task.TaskTypeChoices.PYTHON, "form_class": PythonTaskForm},
-    }
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-
-    def get(self, request, *args, **kwargs):
-        task_type = self.request.GET.get("type")
-        if not task_type:
-            context = {
-                "task_types": {task_type: reverse("workflows:create_task") + f"?type={task_type}"
-                               for task_type in self.task_types_data}
-            }
-            return render(request, "select_type_for_create_task.html", context)
-        return super().get(request, *args, **kwargs)
-
-    def get_form_class(self):
-        task_type = self.request.GET.get("type")
-        if task_type not in self.task_types_data:
-            raise Exception("task type is invalid!")
-
-        task_type_data = self.task_types_data[task_type]
-        self.model = task_type_data["model"]
-        self.form_class = task_type_data["form_class"]
-
-        return self.form_class
-
-    def form_valid(self, form):
-        task_type = self.request.GET.get("type")
-        task = form.save(commit=False)
-        task.creator = self.request.user
-        task.task_type = self.task_types_data[task_type]["task_type"]
-        task.save()
-        form.save_m2m()
-        messages.success(self.request, 'Your task has been created :)')
-        success_url = reverse("workflows:detail_task", args=(task.pk,))
-        return HttpResponseRedirect(success_url)
+def get_typed_task_form(request, task_type):
+    context = {'form': TASK_TYPED_FORM_REGISTRY[task_type]()}
+    return JsonResponse({'form': render_to_string('registration/base_inline_form.html', context=context)})
 
 
 class TaskDeleteView(LoginRequiredMixin, CreatorOnlyMixin, DeleteView):
@@ -166,9 +139,11 @@ class TaskExecutionDetailView(LoginRequiredMixin, TaskExecutionCreatorOnlyMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        task_execution = context["task_execution"]
+        context["extracted_datasets"] = task_execution.extracted_datasets.all()
         try:
             context["task_execution_have_log"] = True
-            context["task_execution_log"] = read_task_execution_log_file(context["task_execution"])
+            context["task_execution_log"] = read_task_execution_log_file(task_execution)
         except FileNotFoundError:
             context["task_execution_have_log"] = False
         return context

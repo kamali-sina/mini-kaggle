@@ -13,7 +13,8 @@ workflows_urls = [
 
 tasks_urls = [
     path('tasks/', views.TaskListView.as_view(), name='list_task'),
-    path('tasks/create/', views.TaskCreateView.as_view(), name='create_task'),
+    path('tasks/create/', views.create_task_view, name='create_task'),
+    path('tasks/create/forms/<str:task_type>', views.get_typed_task_form, name='typed_form'),
     path('tasks/<int:pk>/', views.TaskDetailView.as_view(), name='detail_task'),
     path('tasks/<int:pk>/delete/', views.TaskDeleteView.as_view(), name='delete_task'),
     path('tasks/<int:pk>/executions/<int:exec_pk>/mark/', views.task.stop_task_execution_view,

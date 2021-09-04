@@ -14,9 +14,10 @@ def task_execution_log_file_directory_path(instance, filename):
 
 class Task(models.Model):
     class TaskTypeChoices(models.TextChoices):
-        NONE = "N", _("None")
         DOCKER = "DC", _("Docker")
         PYTHON = "PY", _("Python")
+
+    DEFAULT_TYPE = TaskTypeChoices.DOCKER
 
     name = models.CharField(max_length=255)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -28,7 +29,7 @@ class Task(models.Model):
     alert_on_failure = models.BooleanField(default=False)
 
     timeout = models.DurationField(null=True, blank=True)
-    task_type = models.CharField(max_length=2, choices=TaskTypeChoices.choices, default=TaskTypeChoices.NONE)
+    task_type = models.CharField(max_length=2, choices=TaskTypeChoices.choices, default=DEFAULT_TYPE)
 
     def __str__(self):
         return str(self.name)
@@ -45,3 +46,4 @@ class TaskExecution(models.Model):
     status = models.CharField(max_length=1, choices=StatusChoices.choices, default=StatusChoices.PENDING, db_index=True)
     celery_task_id = models.CharField(max_length=50, null=True, blank=True)
     log = models.FileField(upload_to=task_execution_log_file_directory_path, null=True, blank=True)
+    extracted_datasets = models.ManyToManyField(Dataset, blank=True)

@@ -13,14 +13,16 @@ TAG_INPUT_FORMAT_MESSAGE = 'Tags should be space separated. Only letters, _ - an
 
 
 class CreateDatasetForm(forms.ModelForm):
-    adding_tags = forms.CharField(label='Add as many space separated tags as you want',
+    adding_tags = forms.CharField(label='Add tags',
                                   required=False,
                                   max_length=300,
-                                  validators=[RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)])
+                                  validators=[RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)],
+                                  widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         self.creator = kwargs.pop('user')
         super().__init__(*args, **kwargs)
+        setattr(self.fields['adding_tags'], 'interactive_input', True)
 
     class Meta:
         fields = ["title", "file", "description", 'is_public']
@@ -42,11 +44,12 @@ class CreateDatasetForm(forms.ModelForm):
 
 
 class UpdateDatasetForm(forms.ModelForm):
-    adding_tags = forms.CharField(label='Add as many space separated tags as you want',
+    adding_tags = forms.CharField(label='Add tags',
                                   required=False,
                                   max_length=300,
                                   validators=[
-                                      RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)])
+                                      RegexValidator(regex=TAG_INPUT_REGEX, message=TAG_INPUT_FORMAT_MESSAGE)],
+                                  widget=forms.HiddenInput())
     deleting_tags = forms.ModelMultipleChoiceField(queryset=None,
                                                    required=False,
                                                    label='Select tags to delete',
@@ -54,6 +57,7 @@ class UpdateDatasetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        setattr(self.fields['adding_tags'], 'interactive_input', True)
         self.fields['deleting_tags'].queryset = self.instance.tags
 
     class Meta:

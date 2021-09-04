@@ -28,11 +28,11 @@ class Notebook(models.Model):
 
 class Cell(models.Model):
     class CellStatus(models.TextChoices):
-        PENDING = "P", _("Pending")
         RUNNING = "R", _("Running")
         DONE = "D", _("Done")
+        NONE = "N", _("None")
 
     notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE, related_name='cells', blank=True)
     code = models.TextField()
-    result = models.TextField()
-    cell_status = models.CharField(max_length=2, choices=CellStatus.choices, default=CellStatus.PENDING)
+    cell_status = models.CharField(max_length=1, choices=CellStatus.choices, default=CellStatus.NONE)
+    notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE)

@@ -54,12 +54,10 @@
             </li>
             {% endif %}
             <div style="display: flex;">
-                <form method="post" style="
-    margin: 10px;" action="delete/">{% csrf_token %}
+                <form method="post" style="margin: 10px;" action="delete/">{% csrf_token %}
                     <input type="submit" value="Delete" class="negative ui button">
                 </form>
-                <form method="post" style="
-    margin: 10px;" action="run/">{% csrf_token %}
+                <form method="post" style="margin: 10px;" action="run/">{% csrf_token %}
                     <input type="submit" value="Run task" class="ui button">
                 </form>
             </div>
@@ -85,6 +83,7 @@
                     </div>
                 {% endfor %}
             {% endif %}
+
         </ul>
     </div>
 

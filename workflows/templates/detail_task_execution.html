@@ -35,6 +35,14 @@
 
             </li>
 
+            <li><strong>Extracted datasets: </strong>
+                <ul>
+                    {% for dataset in extracted_datasets %}
+                        <li><a href="{% url 'datasets:detail' dataset.id %}">{{ dataset }}</a>
+                    {% endfor %}
+                </ul>
+            </li>
+
         </ul>
     </div>
 

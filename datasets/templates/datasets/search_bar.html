@@ -1,6 +1,11 @@
 {% load static %}
 
-<form action="{% url 'datasets:index' %}?{{ request.GET.urlencode }}" method="post">
+<script>
+    const filterBarHtmlString = `{% include 'datasets/filter_bar.html' %}`
+</script>
+<script src="{% static 'datasets/scripts/search_bar.js' %}"></script>
+
+<form action="{% url 'datasets:index' %}?{{ request.GET.urlencode }}" method="post" id="search_bar">
     {% csrf_token %}
     <div class="ui menu">
         <div class="ui category search item">
@@ -9,6 +14,10 @@
                 <i class="search link icon"></i>
             </div>
             <div class="results"></div>
+        </div>
+        <div style="width: 100%;"></div>
+        <div style="margin: 10px; display: flex;" data-tooltip="Filter">
+            <i class="angle right link icon" onclick="toggleFilterBar(this)"></i>
         </div>
     </div>
 </form>
