@@ -107,7 +107,8 @@ def restart_kernel_view(request, pk):
     return JsonResponse({})
 
 
-def has_notebook_owner_perm(request, notebook_pk):
+# pylint: disable=unused-argument
+def has_notebook_owner_perm(request, notebook_pk, cell_pk=0):
     notebook = get_object_or_404(Notebook, pk=notebook_pk)
     return notebook.creator.id == request.user.id
 
