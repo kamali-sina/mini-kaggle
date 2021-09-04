@@ -101,7 +101,7 @@ function addCellElement(cellId, cellCode) {
     document.getElementsByClassName('cell-list')[0].insertAdjacentHTML('beforeend', cellItemHtmlString.replaceAll('{id_placeholder}', cellId))
     const cellElement = document.getElementById(getCellCodeElementId(cellId))
     cellElement.innerHTML = cellCode
-    createEditorForCellElement(cellElement)
+    createEditorForCellElement(cellElement, cellId)
 }
 
 
@@ -116,11 +116,12 @@ function saveCell(cellId) {
         const initObject = {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': CSRFToken
             },
             body: JSON.stringify({code: cellEditor.getValue()})
         }
-        fetch(`${url}cell/update/${cellId}`, initObject)
+        fetch(`${url}cell/update/${cellId}/`, initObject)
             .then(handleErrors)
             .then(r => markSaved(cellId))
             .catch(e => showToast('Failed to save the cell'))
