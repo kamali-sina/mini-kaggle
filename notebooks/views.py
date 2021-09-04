@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
@@ -5,8 +7,9 @@ from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 
+from datasets.views import has_permission
 from workflows.models import PythonTask
-
+from notebooks.models import Cell
 from notebooks.services.session import make_new_session, SessionService
 from notebooks.models import Notebook
 from notebooks.forms import ExportNotebookForm, NotebookForm
@@ -80,4 +83,56 @@ def restart_kernel_view(request, pk):
 
     session_service = SessionService(session_id)
     session_service.restart()
+    return JsonResponse({})
+
+
+def has_notebook_owner_perm(request, notebook_id, *args, **kwargs):
+    notebook = get_object_or_404(Notebook, pk=notebook_id)
+    return notebook.creator.id == request.user.id
+
+
+def serialize_cell(cell):
+    return {"id": cell.id,
+            "code": cell.code,
+            "cell_status": cell.get_cell_status_display()}
+
+
+def get_code_from_request(request):
+    code = request.POST.get('code', None)
+    if not code:
+        raise ValidationError("code is required")
+    return code
+
+
+@login_required
+@has_permission(has_notebook_owner_perm)
+def cell_create_view(request, notebook_pk):
+    code = get_code_from_request(request)
+    notebook = Notebook.objects.filter(pk=notebook_pk).first()
+    if not notebook:
+        raise ValidationError("notebook is not valid")
+    cell = Cell.objects.create(notebook=notebook, code=code)
+    return JsonResponse(serialize_cell(cell))
+
+
+@login_required
+@has_permission(has_notebook_owner_perm)
+def cell_update_view(request, notebook_pk, cell_pk):
+    # pylint: disable=unused-argument
+    cell = get_object_or_404(Cell, pk=cell_pk)
+    code = get_code_from_request(request)
+
+    cell.code = code
+    cell.save()
+
+    return JsonResponse(serialize_cell(cell))
+
+
+@login_required
+@has_permission(has_notebook_owner_perm)
+def cell_delete_view(request, notebook_pk, cell_pk):
+    # pylint: disable=unused-argument
+    cell = get_object_or_404(Cell, pk=cell_pk)
+    cell.delete()
+
     return JsonResponse({})
