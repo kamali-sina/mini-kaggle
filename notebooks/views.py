@@ -107,8 +107,8 @@ def restart_kernel_view(request, pk):
     return JsonResponse({})
 
 
-def has_notebook_owner_perm(request, notebook_id, *args, **kwargs):
-    notebook = get_object_or_404(Notebook, pk=notebook_id)
+def has_notebook_owner_perm(request, notebook_pk):
+    notebook = get_object_or_404(Notebook, pk=notebook_pk)
     return notebook.creator.id == request.user.id
 
 

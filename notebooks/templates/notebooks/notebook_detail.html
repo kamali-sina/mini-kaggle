@@ -7,6 +7,7 @@
 <script src="{%static 'data_platform/scripts/toast.js' %}"></script>
 <script>
 const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}`
+const CSRFToken = `{{ csrf_token }}`
 const cellItemHtmlString = `{% include 'notebooks/cell_item.html' with id="{id_placeholder}" %}`
 const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{id_placeholder}" %}`
 </script>
