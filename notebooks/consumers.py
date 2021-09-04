@@ -42,3 +42,4 @@ class NotebookConsumer(WebsocketConsumer):
             'cell_id': cell_id,
             'result': result,
         }))
+
