@@ -38,23 +38,19 @@ class CreateDatasetForm(forms.ModelForm):
         return [] if not self.cleaned_data['adding_tags'] else set(re.split(r'\s+', self.cleaned_data['adding_tags']))
 
     def clean(self):
-        data_source = self.cleaned_data['data_source']
-        file = self.cleaned_data['file']
+        cleaned_data = super().clean()
+        data_source = cleaned_data['data_source']
+        file = cleaned_data['file']
         try:
             conform_dataset(file, data_source)
         except Exception as exc:
             raise ValidationError(exc) from exc
-        cleaned_data = super().clean()
-        duplicate_tag = self.instance.tags.filter(text__in=cleaned_data.get('adding_tags', '')).first()
-        if duplicate_tag:
-            raise ValidationError(f'The tag {duplicate_tag} already exists in this dataset')
 
     def save(self, commit=True):
         dataset = super().save(commit=False)
         dataset.creator = self.creator
         if commit:
             dataset.save()
-            dataset.tags.remove(*self.cleaned_data['deleting_tags'])
             save_tags(self.cleaned_data['adding_tags'], dataset)
         return dataset
 
@@ -82,6 +78,20 @@ class UpdateDatasetForm(forms.ModelForm):
 
     def clean_adding_tags(self):
         return [] if not self.cleaned_data['adding_tags'] else set(re.split(r'\s+', self.cleaned_data['adding_tags']))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        duplicate_tag = self.instance.tags.filter(text__in=cleaned_data.get('adding_tags', '')).first()
+        if duplicate_tag:
+            raise ValidationError(f'The tag {duplicate_tag} already exists in this dataset')
+
+    def save(self, commit=True):
+        dataset = super().save()
+        if commit:
+            dataset.save()
+            dataset.tags.remove(*self.cleaned_data['deleting_tags'])
+            save_tags(self.cleaned_data['adding_tags'], dataset)
+        return dataset
 
 
 class CreateDataSourceForm(forms.ModelForm):
