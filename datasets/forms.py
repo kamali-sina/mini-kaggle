@@ -51,8 +51,7 @@ class EditDatasetInfoForm(forms.ModelForm):
 class DeleteTagForm(forms.Form):
     deleting_tags = forms.ModelMultipleChoiceField(queryset=None,
                                                    required=False,
-                                                   label='Select tags to delete',
-                                                   widget=forms.CheckboxSelectMultiple)
+                                                   label='Select tags to delete')
 
     def __init__(self, *args, **kwargs):
         self.dataset = kwargs.pop('dataset')

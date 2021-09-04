@@ -21,7 +21,9 @@
                 <a href="{% url 'workflows:list_secret' %}" class="menu-item">Your Secrets</a>
                 <a href="{% url 'notebooks:index' %}" class="menu-item">Your Notebooks</a>
                 <a href="{% url 'users:logout' %}" class="menu-item">Sign out</a>
-                <span style="font-style: italic">Signed in as: {{ request.user.username }}</span>
+                <span style="font-style: italic">
+                    <i class="user circle outline icon"></i>
+                    Signed in as: {{ request.user.username }}</span>
             {% endif %}
         </nav>
     </div>
