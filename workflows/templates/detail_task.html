@@ -7,13 +7,6 @@
         list-style: none;
         margin: 15px auto;
     }
-
-
-    #task-execution {
-        width: 50px;
-        height: 25px;
-        margin: 4px;
-    }
     </style>
 {% endblock %}
 
@@ -26,26 +19,40 @@
         <ul>
             <li><a href="{% url 'workflows:detail_workflow' task.workflow.id %}">Back to list</a></li>
             <li><strong>Name: </strong>{{ task.name }}</li>
-            {% for key,value in special_fields.items %}
+            {% for key,value in special_display_fields.items %}
                 <li><strong>{{ key }}: </strong>{{ value }}</li>
             {% endfor %}
 
             <li><strong>Type: </strong>{{ task.get_task_type_display }}</li>
-            <li><strong>Creator: </strong>
-                {% if task.creator.get_full_name %}
-                    {{ task.creator.get_full_name }}
-                {% else %}
-                    {{ task.creator.username }}
-                {% endif %}
-            </li>
-            <li><strong>Accessible datasets: </strong>
+            <li><strong>Accessible secret variables: </strong>
                 <ul>
-                    {% for dataset_path in accessible_datasets %}
-                        <li>{{ dataset_path }}
+                    {% for secret_variable in task.secret_variables.all %}
+                        <li>
+                            <i class="right triangle icon grey"></i>
+                            {{ secret_variable.name }}
                         <li>
                     {% endfor %}
                 </ul>
             </li>
+            <li><strong>Creator: </strong>
+                {% if task.creator.get_full_name %}
+                {{ task.creator.get_full_name }}
+                {% else %}
+                {{ task.creator.username }}
+                {% endif %}
+            </li>
+            {% if accessible_datasets %}
+            <li><strong>Accessible datasets: </strong>
+                <ul>
+                    {% for dataset_path in accessible_datasets %}
+                    <li>
+                        <i class="right triangle icon grey"></i>
+                        {{ dataset_path }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
             <div style="display: flex;">
                 <form method="post" style="margin: 10px;" action="delete/">{% csrf_token %}
                     <input type="submit" value="Delete" class="negative ui button">
@@ -79,7 +86,5 @@
 
         </ul>
     </div>
-
-
 
 {% endblock %}

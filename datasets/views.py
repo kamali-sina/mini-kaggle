@@ -13,17 +13,13 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.http import QueryDict
-from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Q
 from django.db.models import Count
 
 from datasets.models import Dataset, Tag
 from datasets.services.read_csv import read_csv_dataset
-from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, AddTagForm
-from datasets.services.edit_form_handler import create_dataset_edition_forms_on_get, edition_forms_valid, \
-    create_dataset_edition_forms_on_post, \
-    submit_dataset_edition_forms
+from datasets.forms import CreateDatasetForm, UpdateDatasetForm
 
 
 def has_permission(permission_func):
@@ -98,6 +94,11 @@ class DatasetCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = CreateDatasetForm
     template_name = 'datasets/upload.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         candidate = form.save(self.request.user)
         success_url = reverse("datasets:detail", args=(candidate.pk,))
@@ -113,8 +114,6 @@ def dataset_detail_view(request, pk):
         context = {'csv': read_csv_dataset(str(dataset.file)),
                    'dataset': dataset}
         return render(request, 'datasets/detail.html', context)
-    if request.method == 'POST':
-        return handle_dataset_post_method(request, pk)
     if request.method == 'PATCH':
         return handle_dataset_patch_method(request, pk)
     if request.method == 'DELETE':
@@ -122,26 +121,15 @@ def dataset_detail_view(request, pk):
     return HttpResponse("Bad request!", status=400)
 
 
-def handle_dataset_post_method(request, pk):
-    user = get_object_or_404(User, pk=request.POST['creator'])
-    form = CreateDatasetForm(request.POST, request.FILES)
-    if not form.is_valid():
-        return HttpResponse("Invalid format!", status=400)
-    form.save(user, pk=pk)
-    return HttpResponse(f'Dataset {pk} created successfully', status=201)
-
-
 def handle_dataset_patch_method(request, pk):
     data = QueryDict(request.body)
     dataset = get_object_or_404(Dataset, pk=pk)
 
-    info_form = EditDatasetInfoForm(data, instance=dataset)
-    add_tag_form = AddTagForm(data, dataset=dataset)
-    if not info_form.is_valid() or not add_tag_form.is_valid():
+    form = UpdateDatasetForm(data, instance=dataset)
+    if not form.is_valid():
         return HttpResponse("Invalid format!", status=400)
 
-    info_form.save()
-    add_tag_form.submit()
+    form.save()
 
     return HttpResponse(f"Dataset {pk} edited successfully", status=200)
 
@@ -161,19 +149,13 @@ def dataset_download_view(request, pk):
         return response
 
 
-@login_required
-@has_permission(has_dataset_owner_perm)
-def edit_dataset_view(request, pk):
-    dataset = get_object_or_404(Dataset, pk=pk)
-    context = {'pk': pk}
-    if request.method == 'GET':
-        create_dataset_edition_forms_on_get(context, dataset)
-    if request.method == 'POST':
-        create_dataset_edition_forms_on_post(context, request.POST, dataset)
-        if edition_forms_valid(context):
-            submit_dataset_edition_forms(context)
-            return HttpResponseRedirect(reverse('datasets:detail', args=(pk,)))
-    return render(request, 'datasets/edit.html', context=context)
+@method_decorator(has_permission(has_dataset_owner_perm), name='dispatch')
+class DatasetUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Dataset
+    form_class = UpdateDatasetForm
+
+    def get_success_url(self):
+        return reverse('datasets:detail', args=(self.object.pk,))
 
 
 @method_decorator(login_required, name='dispatch')

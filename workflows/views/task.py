@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 from workflows.models import Task, PythonTask, DockerTask, TaskExecution
 from workflows.forms import TaskForm, PythonTaskForm, DockerTaskForm
-from workflows.services.docker import task_status_color, get_display_fields, get_task_type, DockerTaskService, \
+from workflows.services.docker import task_status_color, get_special_display_fields, get_task_type, DockerTaskService, \
     MarkTaskExecutionStatusOptions, read_task_execution_log_file
 from workflows.services.runner import get_service_runner
 
@@ -47,9 +47,11 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         task.get_task_type_display = get_task_type(task)
 
         task_executions = TaskExecution.objects.filter(task=task)
+        task.executions = task_executions
         for task_execution in task_executions:
             task_execution.status_color = task_status_color(task_execution.get_status_display())
-        context["display_fields"] = get_display_fields(task)
+
+        context["special_display_fields"] = get_special_display_fields(task)
         context["accessible_datasets"] = DockerTaskService.get_accessible_datasets_mount_info(task)
         context["mark_options"] = [
             {

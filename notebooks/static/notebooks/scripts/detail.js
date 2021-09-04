@@ -6,7 +6,18 @@ const EDITOR_CONFIG = {
 
 
 window.onload = function() {
+
+    // Initialize notebook cells with editor
     createEditorForCellElements()
+
+    // Initialize Semantic dropdown
+    $('.ui.dropdown').dropdown({
+        values: [{  // should get this with GET
+            name: 'Read dataset',
+            value: 'read_dataset'
+        }, ],
+        placeholder: 'Select snippet ...'
+    })
 }
 
 
@@ -194,4 +205,12 @@ function showCellResult(resultData, cellId) {
     const resElement = document.getElementById(getCellResElementId(cellId))
     resElement.innerHTML = resultData.result
     resElement.classList.add(resultData.status ? 'cell-res-succeeded' : 'cell-res-failed')
+}
+
+
+function addSnippet() {
+    sample_codes = {
+        'read_dataset': 'print("I read a dataset")'
+    }
+    console.log(sample_codes[$('.ui.dropdown').dropdown('get value')])
 }
