@@ -1,10 +1,9 @@
 import os
-
+import json
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404
@@ -107,8 +106,8 @@ def restart_kernel_view(request, pk):
     return JsonResponse({})
 
 
-def has_notebook_owner_perm(request, notebook_id, *args, **kwargs):
-    notebook = get_object_or_404(Notebook, pk=notebook_id)
+def has_notebook_owner_perm(request, notebook_pk, *args, **kwargs):
+    notebook = get_object_or_404(Notebook, pk=notebook_pk)
     return notebook.creator.id == request.user.id
 
 
@@ -119,11 +118,11 @@ def serialize_cell(cell):
 
 
 def get_code_from_request(request):
-    code = request.body.get('code', None)
+    data = json.loads(request.body)
+    code = data.get('code', None)
     if not code:
-        return ""
+        code = ""
     return code
-
 
 @login_required
 @has_permission(has_notebook_owner_perm)
