@@ -47,13 +47,12 @@ class TaskDetailView(LoginRequiredMixin, CreatorOnlyMixin, DetailView):
         task.get_task_type_display = get_task_type(task)
 
         task_executions = TaskExecution.objects.filter(task=task)
+        task.executions = task_executions
         for task_execution in task_executions:
             task_execution.status_color = task_status_color(task_execution.get_status_display())
-        task.executions = task_executions
 
         context["special_display_fields"] = get_special_display_fields(task)
         context["accessible_datasets"] = DockerTaskService.get_accessible_datasets_mount_info(task)
-
         context["mark_options"] = [
             {
                 "value": MarkTaskExecutionStatusOptions.FAILED.value,
@@ -166,9 +165,11 @@ class TaskExecutionDetailView(LoginRequiredMixin, TaskExecutionCreatorOnlyMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        task_execution = context["task_execution"]
+        context["extracted_datasets"] = task_execution.extracted_datasets.all()
         try:
             context["task_execution_have_log"] = True
-            context["task_execution_log"] = read_task_execution_log_file(context["task_execution"])
+            context["task_execution_log"] = read_task_execution_log_file(task_execution)
         except FileNotFoundError:
             context["task_execution_have_log"] = False
         return context
