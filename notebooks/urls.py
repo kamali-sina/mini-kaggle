@@ -8,5 +8,5 @@ urlpatterns = [
     path("<int:pk>/", views.NotebookDetailView.as_view(), name="detail"),
     path("<int:pk>/delete", views.NotebookDeleteView.as_view(), name="delete"),
     path("<int:pk>/export", views.ExportNotebook.as_view(), name="export"),
-    path("<int:pk>/restart_kernel", views.restart_notebook_kernel_view, name="restart_notebook_kernel"),
+    path("<int:pk>/restart_kernel", views.restart_notebook_kernel_view, name="restart_kernel"),
 ]
