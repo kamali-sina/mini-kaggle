@@ -25,7 +25,7 @@
     <div style="font-style: italic; margin-top: 20px;">
         Tags:
         {% for tag in dataset.tags.all %}
-        <a class="ui medium label">{{ tag.text }}</a>
+        <a class="ui medium label" style="margin-top: 5px;" href="{% url 'datasets:index' %}?tag={{ tag.text }}">{{ tag.text }}</a>
         {% endfor %}
     </div>
 {% endif %}

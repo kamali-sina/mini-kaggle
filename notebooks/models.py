@@ -13,18 +13,24 @@ class Session(models.Model):
     status = models.CharField(max_length=3, choices=SessionStatus.choices, default=SessionStatus.NOTRUNNING)
     run_counter = models.IntegerField(default=1)
 
+    def __str__(self):
+        return str(self.uuid)
+
 class Notebook(models.Model):
     name = models.CharField(max_length=255)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
 
+    def __str__(self):
+        return str(self.name)
+
 class Cell(models.Model):
     class CellStatus(models.TextChoices):
-        PENDING = "P", _("Pending")
         RUNNING = "R", _("Running")
         DONE = "D", _("Done")
+        NONE = "N", _("None")
 
     notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE, related_name='cells', blank=True)
     code = models.TextField()
-    result = models.TextField()
-    cell_status = models.CharField(max_length=2, choices=CellStatus.choices, default=CellStatus.PENDING)
+    cell_status = models.CharField(max_length=1, choices=CellStatus.choices, default=CellStatus.NONE)
+    notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE)
