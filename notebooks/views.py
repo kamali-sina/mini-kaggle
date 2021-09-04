@@ -8,10 +8,9 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 
 from datasets.views import has_permission
+from workflows.models import PythonTask
 from notebooks.models import Cell
 from notebooks.services.session import make_new_session, SessionService
-from workflows.models import PythonTask
-
 from notebooks.models import Notebook
 from notebooks.forms import ExportNotebookForm, NotebookForm
 
