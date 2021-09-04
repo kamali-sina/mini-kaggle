@@ -15,21 +15,6 @@ from notebooks.models import Notebook
 from notebooks.forms import ExportNotebookForm, NotebookForm
 
 
-class NotebookCreateView(LoginRequiredMixin, generic.CreateView):
-    model = Notebook
-    form_class = NotebookForm
-    template_name = 'notebooks/notebook_create.html'
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-
-    def form_valid(self, form):
-        notebook = form.save()
-        return HttpResponseRedirect(reverse('notebooks:detail', args=(notebook.id,)))
-
-
 class NotebookCreatorOnlyMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         notebook = Notebook.objects.get(pk=kwargs['pk'])
@@ -54,6 +39,21 @@ class NotebookDetailView(LoginRequiredMixin, generic.DetailView):
 class NotebookDeleteView(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.DeleteView):
     model = Notebook
     success_url = reverse_lazy('notebooks:index')
+
+
+class NotebookCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Notebook
+    form_class = NotebookForm
+    template_name = 'notebooks/notebook_create.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        notebook = form.save()
+        return HttpResponseRedirect(reverse('notebooks:detail', args=(notebook.id,)))
 
 
 class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.CreateView):
