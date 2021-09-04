@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
+
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404
@@ -123,6 +124,7 @@ def get_code_from_request(request):
     if not code:
         code = ""
     return code
+
 
 @login_required
 @has_permission(has_notebook_owner_perm)

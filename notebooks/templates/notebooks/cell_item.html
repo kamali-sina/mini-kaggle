@@ -4,7 +4,7 @@
             <i class="play icon"></i>
         </div>
         <div class="cell-code" onfocusout="saveCell({{ id }})" onchange="markUnsaved({{ id }})">
-            <div class="editor" id="cell_code_{{ id }}">print('hi')</div>
+            <div class="editor" id="cell_code_{{ id }}">{{ code }}</div>
         </div>
     </div>
     <div class="cell-toolbar">
