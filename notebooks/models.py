@@ -33,6 +33,5 @@ class Cell(models.Model):
         NONE = "N", _("None")
 
     notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE, related_name='cells', blank=True)
-    code = models.TextField()
+    code = models.TextField(null=True, blank=True)
     cell_status = models.CharField(max_length=1, choices=CellStatus.choices, default=CellStatus.NONE)
-    notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE)
