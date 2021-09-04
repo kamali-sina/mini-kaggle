@@ -1,0 +1,36 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/detail.css' %}">
+{% endblock %}
+
+{% block title %}DataSource Details{% endblock %}
+
+{% block body %}
+    <div class="ui segment">
+        <h4><a href="{% url 'datasets:list_datasource' %}">Back to list</a></h4>
+        <hr>
+        <div style="font-style: italic; margin-top: 20px;">
+            <h3>{{ datasource.title }}</h3>
+        </div>
+        <br>
+        <table class="ui very basic table">
+            <thead>
+            <tr>
+                <th>Column Title</th>
+                {% for column in datasource.column_set.all %}
+                    <th>{{ column.title }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th>Column Type</th>
+                {% for column in datasource.column_set.all %}
+                    <th>{{ column.type }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+        </table>
+    </div>
+
+{% endblock %}

@@ -120,7 +120,7 @@ def serialize_cell(cell):
 
 
 def get_code_from_request(request):
-    code = request.POST.get('code', None)
+    code = request.body.get('code', None)
     if not code:
         return ""
     return code
