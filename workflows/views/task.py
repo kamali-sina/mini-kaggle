@@ -1,4 +1,3 @@
-from typing import ContextManager
 from django.http import HttpResponseRedirect
 
 from django.views.generic import CreateView, DeleteView, DetailView, ListView
