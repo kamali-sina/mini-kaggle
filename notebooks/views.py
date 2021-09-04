@@ -112,7 +112,7 @@ def cell_create_view(request, notebook_pk):
     if not notebook:
         raise ValidationError("notebook is not valid")
     cell = Cell.objects.create(notebook=notebook, code=code)
-    return JsonResponse({"cell": serialize_cell(cell)})
+    return JsonResponse(serialize_cell(cell))
 
 
 @login_required
@@ -125,7 +125,7 @@ def cell_update_view(request, notebook_pk, cell_pk):
     cell.code = code
     cell.save()
 
-    return JsonResponse({"cell": serialize_cell(cell)})
+    return JsonResponse(serialize_cell(cell))
 
 
 @login_required
