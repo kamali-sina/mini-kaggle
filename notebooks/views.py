@@ -49,7 +49,6 @@ class NotebookCreateView(LoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form):
         notebook = form.save()
-        messages.success(self.request, 'Your task has been created :)')
         return HttpResponseRedirect(reverse('notebooks:detail', args=(notebook.id,)))
 
 
