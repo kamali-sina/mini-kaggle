@@ -8,7 +8,7 @@
 <script>
 const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}`
 </script>
-<script src="{% static 'notifications/scripts/create_form.js' %}"></script>
+<script src="{% static 'data_platform/scripts/typed_form.js' %}"></script>
 {% endblock %}
 
 {% block title %}Create Notification{% endblock %}
@@ -24,7 +24,7 @@ const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path 
                 {% include 'registration/basic_form.html' with form=form title='Create a notification source'%}
             </div>
             <div class="left floated left aligned sixteen wide column" id="typed_form">
-                {% include 'notifications/create_typed_notification.html' with form=typed_form %}
+                {% include 'registration/base_inline_form.html' with form=typed_form %}
             </div>
             <input type="submit" value="Submit" class="ui button" style="margin-top: 20px;">
         </div>

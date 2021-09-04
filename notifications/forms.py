@@ -21,9 +21,9 @@ class CreateNotificationSourceForm(forms.ModelForm):
 
     def save(self, commit=True):
         notification_source = self.typed_form.save(commit=False)
-        notification_source.title = self.cleaned_data['title']
-        notification_source.type = self.cleaned_data['type']
         notification_source.user = self.user
+        for field in self.Meta.fields:
+            setattr(notification_source, field, self.cleaned_data[field])
         if commit:
             notification_source.save()
         return notification_source

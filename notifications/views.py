@@ -27,4 +27,4 @@ def create_notification_source(request):
 
 def get_typed_notification_form(request, notification_type):
     context = {'form': NOTIFICATION_TYPED_FORM_REGISTRY[notification_type]()}
-    return JsonResponse({'form': render_to_string('notifications/create_typed_notification.html', context=context)})
+    return JsonResponse({'form': render_to_string('registration/base_inline_form.html', context=context)})
