@@ -35,7 +35,11 @@ class NotebookConsumer(WebsocketConsumer):
 
         result = self.session_service.run_script(code)
 
+        cell.cell_status = Cell.CellStatus.DONE
+        cell.save()
+
         self.send(text_data=json.dumps({
             'cell_id': cell_id,
             'result': result,
         }))
+
