@@ -29,12 +29,17 @@ def add_file_to_datasets(file_path, filename, task_execution):
     path_in_media = DATASETS_MEDIA_PATH % str(user.username)
     os.makedirs(settings.MEDIA_ROOT + path_in_media, exist_ok=True)
     os.replace(file_path, settings.MEDIA_ROOT + path_in_media + filename)
-    Dataset.objects.create(creator=user, file=path_in_media + filename, title=dataset_title)
+    dataset = Dataset.objects.create(creator=user, file=path_in_media + filename, title=dataset_title)
+    task_execution.extracted_datasets.add(dataset)
+    task_execution.save()
 
 
 def recieve_dataset_from_container(extract_path, docker_container):
     file_stream = BytesIO()
-    bits, _ = docker_container.get_archive(DockerTaskService.container_extract_datasets_path)
+    try:
+        bits, _ = docker_container.get_archive(DockerTaskService.container_extract_datasets_path)
+    except docker.errors.NotFound:
+        return False
     for chunk in bits:
         file_stream.write(chunk)
     file_stream.seek(0)
@@ -84,11 +89,10 @@ def get_task_type(task):
     return get_task_data(task)["name"]
 
 
-def get_display_fields(task):
+def get_special_display_fields(task):
     task_map = get_task_data(task)
     if task.__class__ == Task:
         task = getattr(task, task_map["task_related_name"])
-
     return {
         field_name.replace("_", " "): getattr(task, field_name)
         for field_name in task_map["display_fields"]
@@ -151,7 +155,9 @@ class DockerTaskService:
             exctract_dataset_from_execution(task_execution, container)
             container_log = container.logs().decode("utf-8")
             set_task_execution_log_file(task_execution, container_log)
-            return TaskExecution.StatusChoices.SUCCESS
+            if container.attrs["State"]["ExitCode"] == 0:
+                return TaskExecution.StatusChoices.SUCCESS
+            return TaskExecution.StatusChoices.FAILED
         except docker.errors.ContainerError:
             container_log = container.logs().decode("utf-8")
             set_task_execution_log_file(task_execution, container_log)

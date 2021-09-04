@@ -16,17 +16,52 @@
 {% if  workflows %}
 <h2>Workflows:<br></h2>
 
-<div class="ui relaxed divided list">
-    {% for workflow in workflows %}
-    <div class="item">
-        <i class="large check circle middle aligned icon"></i>
-        <div class="content">
-            <a class="header" href="{{ workflow.pk }}/">{{ workflow.name }}</a>
-            <div class="description">(Type: {{ task.get_task_type_display }} ~ Status: {{ task.status }})</div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
+<table class="ui very basic table">
+    <thead>
+        <tr>
+        <th>Name</th>
+        <th>Creator</th>
+        <th>Last run status</th>
+        <th>Last run time</th>
+        <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for workflow in workflows %}
+        <tr>
+            <td>
+                <i class="list alternate large middle aligned icon"></i>
+                <a class="header" href="{{ workflow.pk }}/">{{ workflow.name }}</a>
+            </td>
+            <td>{{ workflow.creator.username }}</td>
+            {% if workflow.workflowexecution_set.last %}
+                <td>
+                    {% with workflow_execution_status=status|get_value:workflow.workflowexecution_set.last.status %}
+                    <div class="column"
+                        style=" margin: 5px; border-radius: 50%; width: 30px; height: 30px;
+                        border-style: solid; border-color: black; border-width: 1px;
+                        background-color: {{ workflow_execution_status.color }}"
+                        title="status: {{ workflow_execution_status.text }}">
+                    </div>
+                    {% endwith %}
+                </td>
+            {% endif %}
+            <td>{{ workflow.workflowexecution_set.last.created_at }}</td>
+            <td>
+                <button class="positive ui button" onclick="location.href = '{{ workflow.pk }}/run/';">
+                    <div>
+                        <i class="play circle middle aligned icon"></i></button>
+                    </div>
+                <button class="negative ui button" onclick="location.href = '{{ workflow.pk }}/delete/';">
+                    <div>
+                        <i class="trash middle aligned icon"></i>
+                    </div>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <br>
 
