@@ -34,16 +34,18 @@
                 <a class="header" href="{{ workflow.pk }}/">{{ workflow.name }}</a>
             </td>
             <td>{{ workflow.creator.username }}</td>
-            <td>
-                {% with workflow_execution_status=status|get_value:workflow.workflowexecution_set.last.status %}
-                <div class="column"
-                    style=" margin: 5px; border-radius: 50%; width: 30px; height: 30px;
-                    border-style: solid; border-color: black; border-width: 1px;
-                    background-color: {{ workflow_execution_status.color }}"
-                    title="status: {{ workflow_execution_status.text }}">
-                </div>
-                {% endwith %}
-            </td>
+            {% if workflow.workflowexecution_set.last %}
+                <td>
+                    {% with workflow_execution_status=status|get_value:workflow.workflowexecution_set.last.status %}
+                    <div class="column"
+                        style=" margin: 5px; border-radius: 50%; width: 30px; height: 30px;
+                        border-style: solid; border-color: black; border-width: 1px;
+                        background-color: {{ workflow_execution_status.color }}"
+                        title="status: {{ workflow_execution_status.text }}">
+                    </div>
+                    {% endwith %}
+                </td>
+            {% endif %}
             <td>{{ workflow.workflowexecution_set.last.created_at }}</td>
             <td>
                 <button class="positive ui button" onclick="location.href = '{{ workflow.pk }}/run/';">

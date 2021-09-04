@@ -11,4 +11,5 @@ urlpatterns = [
     path("snippets", views.snippets_list_view, name="snippets"),
     path("snippets/<str:name>", views.snippet_detail_view, name="snippet_detail"),
     path("<int:pk>/export", views.ExportNotebook.as_view(), name="export"),
+    path("<int:pk>/restart_kernel", views.restart_kernel_view, name="restart_kernel"),
 ]
