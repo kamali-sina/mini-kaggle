@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.template.defaulttags import register
 from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
+from workflows.service.workflow import generate_dag
 
 
 STATUS_CONTEXT_DICT = {
@@ -56,6 +57,7 @@ class WorkflowCreateView(LoginRequiredMixin, CreateView):
         workflow = form.save(commit=False)
         workflow.creator = self.request.user
         workflow.save()
+        generate_dag(workflow)
         messages.success(self.request, 'Workflow created successfully.')
         success_url = reverse("workflows:detail_workflow", args=(workflow.pk,))
         return HttpResponseRedirect(success_url)
