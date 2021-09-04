@@ -172,6 +172,7 @@ def edit_dataset_view(request, pk):
         create_dataset_edition_forms_on_post(context, request.POST, dataset)
         if edition_forms_valid(context):
             submit_dataset_edition_forms(context)
+            messages.success(request, 'Dataset edited successfully :)')
             return HttpResponseRedirect(reverse('datasets:detail', args=(pk,)))
     return render(request, 'datasets/edit.html', context=context)
 
