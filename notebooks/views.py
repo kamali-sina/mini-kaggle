@@ -1,7 +1,10 @@
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
+
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404
@@ -12,12 +15,13 @@ from workflows.models import PythonTask
 from notebooks.models import Cell
 from notebooks.services.session import make_new_session, SessionService
 from notebooks.models import Notebook
+from notebooks.models import CODE_SNIPPETS_DIR
 from notebooks.forms import ExportNotebookForm, NotebookForm
 
 
 class NotebookCreatorOnlyMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        notebook = Notebook.objects.get(pk=kwargs['pk'])
+        notebook = Notebook.objects.get(pk=kwargs["pk"])
         if notebook.creator.id != request.user.id:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
@@ -71,6 +75,23 @@ class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.Creat
         task = form.save()
         messages.success(self.request, 'Your task has been created :)')
         return HttpResponseRedirect(reverse('workflows:detail_task', args=(task.id,)))
+
+
+def snippets_list_view(request):
+    _, _, filenames = next(os.walk(CODE_SNIPPETS_DIR))
+    values = [
+        {
+            "name": os.path.splitext(name)[0],
+            "value": os.path.splitext(name)[0].replace("_", " ").capitalize(),
+        }
+        for name in filenames
+    ]
+    return JsonResponse({"success": True, "results": values})
+
+
+def snippet_detail_view(request, name):
+    with open(f"{CODE_SNIPPETS_DIR}/{name}.py", "r", encoding="utf8") as file:
+        return JsonResponse({"snippet": file.read()})
 
 
 def restart_kernel_view(request, pk):

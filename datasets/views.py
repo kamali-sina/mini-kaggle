@@ -7,7 +7,7 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
@@ -144,9 +144,15 @@ def handle_dataset_delete_method(pk):
 @has_permission(has_dataset_owner_perm)
 def dataset_download_view(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
-    with open(dataset.file.path, 'rb') as file:
-        response = FileResponse(file)
+
+    try:
+        with open(dataset.file.path, 'r', encoding="utf-8") as file:
+            file_data = file.read()
+        response = FileResponse(file_data)
+        response['Content-Disposition'] = f'attachment; filename="{dataset.file.name}"'
         return response
+    except IOError:
+        return HttpResponseNotFound('File not exist')
 
 
 @method_decorator(has_permission(has_dataset_owner_perm), name='dispatch')
