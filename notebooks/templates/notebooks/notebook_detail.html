@@ -8,8 +8,9 @@
 <script>
 const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}`
 const CSRFToken = `{{ csrf_token }}`
-const cellItemHtmlString = `{% include 'notebooks/cell_item.html' with id="{id_placeholder}" %}`
+const cellItemHtmlString = `{% include 'notebooks/cell_item.html' with id="{id_placeholder}" code="" %}`
 const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{id_placeholder}" %}`
+
 </script>
 <script src="{% static 'notebooks/scripts/detail.js' %}"></script>
 <link rel="stylesheet" href="{% static 'notebooks/styles/codemirror.css' %}">
@@ -62,8 +63,9 @@ const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{
         </div>
 
         <div class="cell-list">
-            {% include 'notebooks/cell_item.html' with id=1 %}
-            {% include 'notebooks/cell_item.html' with id=2 %}
+            {% for cell in object.cells.all %}
+            {% include 'notebooks/cell_item.html' with id=cell.id code=cell.code %}
+            {% endfor %}
         </div>
     </div>
 </div>
