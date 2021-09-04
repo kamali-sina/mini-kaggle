@@ -131,5 +131,4 @@ class WorkflowRunView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, View):
             workflow = get_object_or_404(Workflow, pk=kwargs['pk'])
             trigger_workflow(workflow)
             return HttpResponseRedirect(reverse('workflows:detail_workflow', args=(workflow.pk,)))
-        else:
-            return HttpResponse(status=400)
+        return HttpResponse(status=400)
