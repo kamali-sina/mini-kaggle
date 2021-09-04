@@ -36,7 +36,7 @@ def recieve_dataset_from_container(extract_path, docker_container):
     file_stream = BytesIO()
     try:
         bits, _ = docker_container.get_archive(DockerTaskService.container_extract_datasets_path)
-    except:# pylint: disable=bare-except
+    except docker.errors.NotFound:
         return False
     for chunk in bits:
         file_stream.write(chunk)
