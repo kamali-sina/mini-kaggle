@@ -3,10 +3,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 
 from workflows.models import PythonTask
 
+from notebooks.services.session import make_new_session, SessionService
 from notebooks.models import Notebook
 from notebooks.forms import ExportNotebookForm, NotebookForm
 
@@ -67,3 +68,16 @@ class ExportNotebook(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.Creat
         task = form.save()
         messages.success(self.request, 'Your task has been created :)')
         return HttpResponseRedirect(reverse('workflows:detail_task', args=(task.id,)))
+
+
+def restart_notebook_kernel_view(request, pk):
+    notebook = get_object_or_404(Notebook, pk=pk)
+
+    if notebook.session_id:
+        session_id = notebook.session_id
+    else:
+        session_id = make_new_session()
+
+    session_service = SessionService(session_id)
+    session_service.restart()
+    return JsonResponse({})
