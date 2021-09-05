@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
-
-# Create your models here.
 from django.core.exceptions import ValidationError
 
 DATASETS_MEDIA_PATH = 'datasets/%s/'
@@ -30,6 +28,24 @@ def user_dataset_directory_path(instance, filename):
     return f"datasets/{instance.creator.username}/{filename}"
 
 
+class DataSource(models.Model):
+    creator = models.ForeignKey(User, null=False, on_delete=models.CASCADE, related_name='data_sources')
+    title = models.CharField(max_length=100, null=False, default="No Title")
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return str(self.title)
+
+
+class Column(models.Model):
+    title = models.CharField(max_length=100, null=False)
+    data_source = models.ForeignKey(DataSource, on_delete=models.CASCADE)
+    type = models.CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.title)
+
+
 class Tag(models.Model):
     text = models.CharField(max_length=50)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tags')
@@ -52,6 +68,7 @@ class Dataset(models.Model):
     )
     tags = models.ManyToManyField(Tag, related_name='datasets', blank=True)
     is_public = models.BooleanField(default=False, blank=True)
+    data_source = models.ForeignKey(DataSource, on_delete=models.DO_NOTHING, blank=True, null=True)
 
     def __str__(self):
         return str(self.title)

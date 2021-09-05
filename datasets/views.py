@@ -17,9 +17,9 @@ from django.contrib import messages
 from django.db.models import Q
 from django.db.models import Count
 
-from datasets.models import Dataset, Tag
+from datasets.models import Dataset, Tag, DataSource
 from datasets.services.read_csv import read_csv_dataset
-from datasets.forms import CreateDatasetForm, UpdateDatasetForm
+from datasets.forms import CreateDatasetForm, UpdateDatasetForm, CreateDataSourceForm, ColumnsFormSet
 
 
 def has_permission(permission_func):
@@ -37,6 +37,61 @@ def has_permission(permission_func):
 def has_dataset_owner_perm(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
     return dataset.creator.id == request.user.id
+
+
+class DataSourceCreateView(LoginRequiredMixin, generic.CreateView):
+    """Data SOurce create view in which column objects can be dynamically added to the data source-to-be-created"""
+    model = DataSource
+    form_class = CreateDataSourceForm
+    template_name = 'datasources/create.html'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.object = None
+
+    def get(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        column_form = ColumnsFormSet()
+        return self.render_to_response(
+            self.get_context_data(form=form,
+                                  column_form=column_form))
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        column_form = ColumnsFormSet(self.request.POST)
+        if form.is_valid() and column_form.is_valid():
+            return self.form_valid(form, column_form)
+        return HttpResponse("Something went wrong!")
+
+    def form_valid(self, form, column_form):
+        datasource = form.save(self.request.user)
+        column_form.instance = datasource
+        column_form.save()
+        success_url = reverse("datasets:detail_datasource", args=(datasource.pk,))
+        messages.success(self.request, 'Data source created successfully')
+        return HttpResponseRedirect(success_url)
+
+
+class DataSourceListView(LoginRequiredMixin, generic.ListView):
+    ITEMS_PER_PAGE = 10
+    paginate_by = ITEMS_PER_PAGE
+    template_name = "datasources/list.html"
+    context_object_name = "datasources_list"
+
+    def get_queryset(self):
+        return DataSource.objects.filter(creator=self.request.user)
+
+
+@login_required
+def datasource_detail_view(request, pk):
+    if request.method == 'GET':
+        datasource = get_object_or_404(DataSource, pk=pk)
+        context = {'datasource': datasource}
+        return render(request, 'datasources/detail.html', context)
+    return HttpResponse("Bad request!", status=400)
 
 
 class DatasetListView(LoginRequiredMixin, generic.ListView):

@@ -1,5 +1,5 @@
 import os
-
+import json
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.views import generic
@@ -107,8 +107,9 @@ def restart_kernel_view(request, pk):
     return JsonResponse({})
 
 
-def has_notebook_owner_perm(request, notebook_id, *args, **kwargs):
-    notebook = get_object_or_404(Notebook, pk=notebook_id)
+# pylint: disable=unused-argument
+def has_notebook_owner_perm(request, notebook_pk, cell_pk=0):
+    notebook = get_object_or_404(Notebook, pk=notebook_pk)
     return notebook.creator.id == request.user.id
 
 
@@ -119,9 +120,10 @@ def serialize_cell(cell):
 
 
 def get_code_from_request(request):
-    code = request.POST.get('code', None)
+    data = json.loads(request.body)
+    code = data.get('code', None)
     if not code:
-        raise ValidationError("code is required")
+        code = ""
     return code
 
 
