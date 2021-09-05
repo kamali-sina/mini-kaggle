@@ -29,19 +29,16 @@ class NotebookConsumer(WebsocketConsumer):
         try:
             session_service = get_notebook_session_service(self.notebook_id)
             result = session_service.run_script(code)
-
-            self.send(text_data=json.dumps({
-                'cell_id': cell_id,
-                'result': result,
-                'message_type': "run_cell",
-            }))
+            message_type = "run_cell"
         except SessionIsDown:
+            result = "Session is down. Please restart session"
+            message_type = "notification"
 
-            self.send(text_data=json.dumps({
-                'cell_id': cell_id,
-                'result': "Session is down. Please restart session",
-                'message_type': "notification",
-            }))
+        self.send(text_data=json.dumps({
+            'cell_id': cell_id,
+            'result': result,
+            'message_type': message_type,
+        }))
 
         cell.cell_status = Cell.CellStatus.DONE
         cell.save()
