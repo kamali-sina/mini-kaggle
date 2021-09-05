@@ -1,13 +1,15 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View, CreateView, DeleteView, DetailView, ListView, UpdateView, FormView
 from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.template.defaulttags import register
+
 from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
 
+from workflows.services.workflow_run import trigger_workflow
 
 STATUS_CONTEXT_DICT = {
     WorkflowExecution.StatusChoices.FAILED: {
@@ -121,3 +123,12 @@ class WorkflowScheduleUpdateView(WorkflowScheduleFormView, UpdateView):
     def get_object(self, queryset=None):
         workflow = get_object_or_404(Workflow, pk=self.kwargs['pk'])
         return workflow.schedule
+
+
+class WorkflowRunView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            workflow = get_object_or_404(Workflow, pk=kwargs['pk'])
+            trigger_workflow(workflow)
+            return HttpResponseRedirect(reverse('workflows:detail_workflow', args=(workflow.pk,)))
+        return HttpResponse(status=400)
