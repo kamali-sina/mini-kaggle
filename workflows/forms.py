@@ -5,6 +5,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from workflows.models import Secret, Task, PythonTask, Workflow, DockerTask, WorkflowSchedule
+from workflows.models.task_dependency import TaskDependency
 
 
 class TaskForm(ModelForm):
@@ -15,8 +16,6 @@ class TaskForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['notification_source'].label = 'Select a notification source for this task'
         self.fields['notification_source'].queryset = self.creator.notification_sources
-        self.fields['workflow'] = forms.ModelChoiceField(
-            queryset=Workflow.objects.filter(creator=self.creator))
         self.fields['accessible_datasets'].label = 'Select the datasets this task will make use of'
         self.fields['accessible_datasets'].queryset = self.creator.datasets
         self.fields['timeout'].help_text = 'leave empty, for no time limit'
@@ -36,7 +35,7 @@ class TaskForm(ModelForm):
 
     class Meta:
         model = Task
-        non_m2m_fields = ['name', 'task_type', 'timeout', 'notification_source', 'alert_on_failure', 'workflow']
+        non_m2m_fields = ['name', 'task_type', 'timeout', 'notification_source', 'alert_on_failure']
         m2m_fields = ['secret_variables', 'accessible_datasets']
         fields = non_m2m_fields + m2m_fields
 
@@ -77,6 +76,20 @@ class WorkflowForm(ModelForm):
     class Meta:
         model = Workflow
         fields = ['name', 'max_active_executions_count']
+
+
+class TaskDependencyForm(forms.ModelForm):
+    class Meta:
+        fields = ['task', 'parent_tasks']
+        model = TaskDependency
+
+    def __init__(self, *args, **kwargs):
+        self.creator = kwargs.pop('user')
+        self.workflow_id = kwargs.pop('workflow_id')
+        super().__init__(*args, **kwargs)
+        self.fields['parent_tasks'].queryset = TaskDependency.objects.filter(workflow_id=self.workflow_id)
+        used_tasks_id = self.fields['parent_tasks'].queryset.values_list('task', flat=True)
+        self.fields['task'].queryset = Task.objects.filter(creator=self.creator).exclude(pk__in=used_tasks_id)
 
 
 class SecretForm(ModelForm):

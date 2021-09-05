@@ -2,14 +2,14 @@
 {% load static %}
 
 {% block head %}
-<style>li {
-    font-size: 17px;
-    list-style: none;
-    margin: 15px auto;
-}
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
 
 
-</style>
+    </style>
 {% endblock %}
 
 {% block title %}Workflow Details{% endblock %}
@@ -17,41 +17,44 @@
 {% block body %}
 
 
-<div class="ui segment">
-    <ul>
-        <li><strong>Name: </strong>{{ workflow.name }}</li>
+    <div class="ui segment">
+        <ul>
+            <li><strong>Name: </strong>{{ workflow.name }}</li>
 
-        <li><strong>Creator: </strong>
-            {% if workflow.creator.get_full_name %}
-            {{ workflow.creator.get_full_name }}
-            {% else %}
-            {{ workflow.creator.username }}
-            {% endif %}
-        </li>
-        <div>
-            <br>
-            <h3>Tasks:</h3>
-            {% if workflow.task_set.all %}
-            <div class="ui relaxed divided list">
-                {% for task in workflow.task_set.all %}
-                <div class="item">
-                    <i class="large tasks middle aligned icon"></i>
-                    <div class="content">
-                        <a class="header" href="{% url 'workflows:detail_task' task.id %}">{{ task.name }}</a>
+            <li><strong>Creator: </strong>
+                {% if workflow.creator.get_full_name %}
+                    {{ workflow.creator.get_full_name }}
+                {% else %}
+                    {{ workflow.creator.username }}
+                {% endif %}
+            </li>
+            <li>
+                <br>
+                <h3>Tasks:</h3>
+                {% if workflow.task_dependencies.all %}
+                    <div class="ui relaxed divided list">
+                        {% for task_dependency in workflow.task_dependencies.all %}
+                            <div class="item">
+                                <i class="large tasks middle aligned icon"></i>
+                                <div class="content">
+                                    <a class="header"
+                                       href="{% url 'workflows:detail_dependency' wf_pk=workflow.id pk=task_dependency.id %}">
+                                        {{ task_dependency.task.name }}
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <li>No tasks registered to the workflow</li>
-            {% endif %}
-            <a href="{% url 'workflows:create_task' %}">add new task</a>
-        </div>
-        <br>
-        <div style="display: flex;">
-            <span style="margin: 10px;">
-                <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui button">Delete Workflow</a>
-            </span>
+                {% else %}
+                    <li>No tasks registered to the workflow</li>
+                {% endif %}
+            <li><a href="{% url 'workflows:create_task' %}">create new task</a></li>
+            <li><a href="{% url 'workflows:create_dependency' workflow.id %}">add new task dependency</a></li>
+            <br>
+            <div style="display: flex;">
+                <span style="margin: 10px;">
+                    <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui button">Delete Workflow</a>
+                </span>
             <form method="post" action="{% url 'workflows:run_workflow' workflow.id %}" style="margin: 10px;">
                 {% csrf_token %}
                 <input type="submit" value="Run workflow" class="ui button">
@@ -59,9 +62,7 @@
             <span style="margin: 10px;">
                 <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui button">Schedule</a>
             </span>
-        </div>
-    </ul>
-</div>
-
-
+            </div>
+        </ul>
+    </div>
 {% endblock %}

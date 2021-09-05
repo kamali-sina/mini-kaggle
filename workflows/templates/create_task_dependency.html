@@ -11,14 +11,14 @@
     </style>
 {% endblock %}
 
-{% block title %}Create Workflow{% endblock %}
+{% block title %}Create Task Dependency{% endblock %}
 
 {% block body %}
     <div class="ui center aligned page grid segment">
         <div class="ui center aligned page grid segment">
             <form enctype="multipart/form-data" action="" method="post" class="ui form">
                 {% csrf_token %}
-                {% include 'registration/basic_form.html' with form=form title='Create a workflow' submit_value='Create Workflow' %}
+                {% include 'registration/basic_form.html' with form=form title='Create Task Dependency' submit_value='Create Task Dependency' %}
             </form>
         </div>
         </form>
