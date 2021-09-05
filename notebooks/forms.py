@@ -34,7 +34,7 @@ class ExportNotebookForm(TaskForm):
     class Meta:
         model = PythonTask
         fields = ['name', 'timeout', 'secret_variables', 'accessible_datasets', 'notification_source',
-                  'alert_on_failure', 'workflow', 'docker_image']
+                  'alert_on_failure', 'docker_image']
 
     def save(self, commit=True):
         task = super().save(commit=False)
