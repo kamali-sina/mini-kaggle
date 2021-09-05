@@ -51,7 +51,7 @@
             <td>N/A</td>
             {% endif %}
             <td>
-                <form method="post" style="margin: 10px;" action="{{ workflow.pk }}/run/">
+                <form method="post" style="margin: 10px;" action="{% url 'workflows:run_workflow' workflow.id %}">
                     {% csrf_token %}
                     <button type="submit" class="positive ui button">
                         <div>
