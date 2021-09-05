@@ -7,9 +7,9 @@
         list-style: none;
         margin: 15px auto;
     }
-
-
     </style>
+    <script src="{% static 'data_platform/scripts/sigma.min.js' %}"></script>
+    <script src="{% static 'data_platform/scripts/plugins/sigma.parsers.json.min.js' %}"></script>
 {% endblock %}
 
 {% block title %}Workflow Details{% endblock %}
@@ -68,12 +68,47 @@
     </div>
 
     <div id="container" class="ui segment">
+        <div id="g-container" style="position: relative; width: 100%; height: 100%;"></div>
     </div>
     <script>
-        sigma.parsers.json('data.json', {
-            container: 'container',
+        var i,
+            s,
+            N = 6,
+            E = 5,
+            g = {
+                nodes: [],
+                edges: []
+            };
+
+        for (i = 0; i < N; i++)
+            g.nodes.push({
+                id: 'n' + i,
+                label: 'Node ' + i,
+                x: 100 * Math.random(),
+                y: 100 * Math.random(),
+                size: 2,
+            });
+
+        for (i = 0; i < E; i++)
+            g.edges.push({
+                id: 'e' + i,
+                source: 'n' + (Math.random() * N | 0),
+                target: 'n' + (Math.random() * N | 0),
+                size: 1,
+                color: '#000000',
+                type: 'arrow'
+            });
+
+        s = new sigma({
+            graph: g,
+            container: 'g-container',
             settings: {
-                defaultNodeColor: '#ec5148'
+                defaultNodeColor: '#22ea29',
+                maxNodeSize: 16,
+                minNodeSize: 45,
+                minEdgeSize: 5,
+                maxEdgeSize: 5,
+                minArrowSize: 25
             }
         });
     </script>
