@@ -1,5 +1,8 @@
-const webSocket = new WebSocket('ws://' + window.location.host + '/ws/notebook/1/' );
-webSocket.onmessage = (message) => showCellResult(JSON.parse(message.data).cell_id, JSON.parse(message.data).result)
+const webSocket = new WebSocket(`ws://${window.location.host}/ws/notebook/${notebookId}/` );
+webSocket.onmessage = function(message) {
+    responseData = JSON.parse(message.data)
+    showCellResult(responseData.cell_id, responseData.result)
+}
 
 
 const EDITOR_CONFIG = {
@@ -196,7 +199,8 @@ function runCell(cellId) {
 
     const cellEditor = window[getCellEditorName(cellId)]
     if(webSocket.readyState == 1) {
-        webSocket.send(JSON.stringify({cell_id: cellId, code: cellEditor.getValue()}))
+        data = JSON.stringify({cell_id: cellId, code: cellEditor.getValue()})
+        webSocket.send(data)
     } else {
         showToast('Trying to connect to the server ...')
     }

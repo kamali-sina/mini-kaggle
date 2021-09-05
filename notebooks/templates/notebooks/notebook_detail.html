@@ -6,6 +6,7 @@
 <link rel="stylesheet" type="text/css" href="{%static 'data_platform/styles/toast.css' %}">
 <script src="{%static 'data_platform/scripts/toast.js' %}"></script>
 <script>
+const notebookId = {{ object.id }}
 const CSRFToken = `{{ csrf_token }}`
 const cellItemHtmlString = `{% include 'notebooks/cell_item.html' with id="{id_placeholder}" code="" %}`
 const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{id_placeholder}" %}`
