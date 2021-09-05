@@ -121,7 +121,7 @@ class SessionService:
         returns(str): updated script
         """
         start = f"print('{self.LOGSTART%(self.session.uuid, self.session.run_counter)}')\n"
-        end = f"\nprint('{self.LOGEND%(self.session.uuid, self.session.run_counter)}')\n"
+        end = f"\n\nprint('{self.LOGEND%(self.session.uuid, self.session.run_counter)}')\n"
         return start + script + end
 
     def _send_script(self, script):
