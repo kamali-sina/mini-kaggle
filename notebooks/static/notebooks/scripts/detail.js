@@ -210,9 +210,10 @@ function runCell(cellId) {
 function showCellResult(cellId, result) {
     /* renders the result of running the given cell */
 
-    const cellElement = document.getElementById(getCellCodeElementId(cellId)).parentNode.parentNode
-    cellElement.insertAdjacentHTML('afterend', cellResultHtmlString.replace('{id_placeholder}', cellId))
-
+    if (!document.getElementById(getCellResElementId(cellId))) {
+        const cellElement = document.getElementById(getCellCodeElementId(cellId)).parentNode.parentNode
+        cellElement.insertAdjacentHTML('afterend', cellResultHtmlString.replace('{id_placeholder}', cellId))
+    }
     const resElement = document.getElementById(getCellResElementId(cellId))
     resElement.innerText = result
 }
