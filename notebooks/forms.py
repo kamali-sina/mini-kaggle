@@ -3,7 +3,7 @@ from django.forms import ModelForm
 
 from notebooks.models import Notebook
 from notebooks.services.export import get_notebook_code
-from workflows.models import Task
+from workflows.models import Task, Secret
 
 from workflows.models import PythonTask
 from workflows.forms import TaskForm
@@ -26,10 +26,18 @@ class NotebookForm(ModelForm):
         return notebook
 
 
-class ExportNotebookForm(TaskForm):
+class ExportNotebookForm(ModelForm):
     def __init__(self, *args, **kwargs):
+        self.creator = kwargs.pop('user')
         self.notebook = kwargs.pop('notebook')
         super().__init__(*args, **kwargs)
+        self.fields['notification_source'].label = 'Select a notification source for this task'
+        self.fields['notification_source'].queryset = self.creator.notification_sources
+        self.fields['accessible_datasets'].label = 'Select the datasets this task will make use of'
+        self.fields['accessible_datasets'].queryset = self.creator.datasets
+        self.fields['timeout'].help_text = 'leave empty, for no time limit'
+        self.fields['secret_variables'].label = 'Add secret variable to task execution'
+        self.fields['secret_variables'].queryset = Secret.objects.filter(creator=self.creator)
 
     class Meta:
         model = PythonTask
