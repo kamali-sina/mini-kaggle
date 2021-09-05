@@ -1,9 +1,9 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
 
-from notebooks.models import Notebook, Cell
+from notebooks.models import Cell
 from notebooks.services.notebook import get_notebook_session_service
-from notebooks.services.session import SessionService, make_new_session, SessionIsDown
+from notebooks.services.session import SessionIsDown
 
 
 class NotebookConsumer(WebsocketConsumer):
