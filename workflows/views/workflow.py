@@ -8,11 +8,7 @@ from django.template.defaulttags import register
 
 from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
-<<<<<<< HEAD
 from workflows.services.workflow import generate_dag
-
-=======
->>>>>>> 67cfa365672c4afc4173cddbc03f079deb06741e
 from workflows.services.workflow_run import trigger_workflow
 
 STATUS_CONTEXT_DICT = {

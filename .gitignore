@@ -25,8 +25,8 @@ package.json
 plugins/
 src/
 test/
-dag.json
-!build/plugins
+workflows/templates/dag.json
+!data_platform/static/data_platform/scripts/plugins
 
 # Distribution / packaging
 .Python
