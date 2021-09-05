@@ -1,3 +1,11 @@
+const webSocket = new WebSocket(`ws://${window.location.host}/ws/notebook/${notebookId}/` );
+webSocket.onmessage = function(message) {
+    responseData = JSON.parse(message.data)
+    markStopped(responseData.cell_id)
+    showCellResult(responseData.cell_id, responseData.result)
+}
+
+
 const EDITOR_CONFIG = {
     lineNumbers: true,
     mode: "python",
@@ -6,17 +14,20 @@ const EDITOR_CONFIG = {
 
 
 window.onload = function() {
+    if(document.querySelectorAll('[id^=cell_code_]').length) {
+        // Initialize notebook cells with editor
+        createEditorForCellElements()
+    } else {
+        // Add an initial empty cell
+        addCell("")
+    }
 
-    // Initialize notebook cells with editor
-    createEditorForCellElements()
 
     // Initialize Semantic dropdown
     $('.ui.dropdown').dropdown({
-        values: [{  // should get this with GET
-            name: 'Read dataset',
-            value: 'read_dataset'
-        }, ],
-        placeholder: 'Select snippet ...'
+        apiSettings: {
+          url: `${window.location.origin}/notebooks/snippets/`
+        }
     })
 }
 
@@ -65,6 +76,12 @@ function getCellResElementId(cellId) {
 }
 
 
+function getCellRunElementId(cellId) {
+    /* returns the id of the cell's running elements by cell id */
+
+    return `cell_run_${cellId}`
+}
+
 function handleErrors(response) {
     /* Meant to handle response errors other than connection errors. Throws exception in case the response status is not ok' */
 
@@ -75,7 +92,7 @@ function handleErrors(response) {
 }
 
 
-function addCell() {
+function addCell(code) {
     /* Creates a new cell at the end of the current notebook's cells and adds it to the DOM */
 
     const initObject = {
@@ -84,9 +101,9 @@ function addCell() {
             'Content-Type': 'application/json',
             'X-CSRFToken': CSRFToken
         },
-        body: JSON.stringify({code: ""})
+        body: JSON.stringify({code: code})
     }
-    fetch(`${url}cell/create/`, initObject)
+    fetch(`${window.location.href}cell/create/`, initObject)
         .then(handleErrors)
         .then(response => response.json())
         .then(data => addCellElement(data.id, data.code))
@@ -101,7 +118,7 @@ function addCellElement(cellId, cellCode) {
     document.getElementsByClassName('cell-list')[0].insertAdjacentHTML('beforeend', cellItemHtmlString.replaceAll('{id_placeholder}', cellId))
     const cellElement = document.getElementById(getCellCodeElementId(cellId))
     cellElement.innerHTML = cellCode
-    createEditorForCellElement(cellElement)
+    createEditorForCellElement(cellElement, cellId)
 }
 
 
@@ -116,11 +133,12 @@ function saveCell(cellId) {
         const initObject = {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': CSRFToken
             },
             body: JSON.stringify({code: cellEditor.getValue()})
         }
-        fetch(`${url}cell/update/${cellId}`, initObject)
+        fetch(`${window.location.href}cell/update/${cellId}/`, initObject)
             .then(handleErrors)
             .then(r => markSaved(cellId))
             .catch(e => showToast('Failed to save the cell'))
@@ -154,10 +172,11 @@ function deleteCell(cellId) {
         const initObject = {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': CSRFToken
             }
         }
-        fetch(`${url}cell/delete/${cellId}`, initObject)
+        fetch(`${window.location.href}cell/delete/${cellId}/`, initObject)
             .then(handleErrors)
             .then(r => showToast('Cell deleted'))
             .then(() => removeCellElement(cellId))
@@ -182,34 +201,89 @@ function startSession() {
 
 
 function restartSession() {
-    /* Restarts the session for the current notebook */
+    /* Restart the session for the current notebook */
 
-    console.log("Not implemented")
+    const initObject = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRFToken
+        }
+    }
+    markRestarting()
+    fetch(`${window.location.href}restart_kernel/`, initObject)
+        .then(handleErrors)
+        .then(r => markStoppedRestarting())
+        .then(() => showToast('Session restarted'))
+        .catch(e => showToast('Failed to restart the session'))
+}
+
+
+function markRestarting() {
+    const restartSessionIcon = document.getElementById("restart-session-icon")
+    restartSessionIcon.classList.add('loading')
+    restartSessionIcon.parentNode.style.pointerEvents = 'none'
+}
+
+
+function markStoppedRestarting() {
+    const restartSessionIcon = document.getElementById("restart-session-icon")
+    restartSessionIcon.classList.remove('loading')
+    restartSessionIcon.parentNode.style.pointerEvents = 'auto'
 }
 
 
 function runCell(cellId) {
     /* Runs the given cell for the current notebook and renders the results in the DOM */
 
-    console.log("Not implemented")
+    markRunning(cellId)
+    const cellEditor = window[getCellEditorName(cellId)]
+    if(webSocket.readyState == 1) {
+        data = JSON.stringify({cell_id: cellId, code: cellEditor.getValue()})
+        webSocket.send(data)
+    } else {
+        showToast('Trying to connect to the server ...')
+    }
 }
 
 
-function showCellResult(resultData, cellId) {
+function markRunning(cellId) {
+    const runElement = document.getElementById(getCellRunElementId(cellId))
+    runElement.style.pointerEvents = 'none'
+    const iconElement = runElement.childNodes[1]
+    iconElement.classList = ""
+    iconElement.classList.add('ui', 'mini', 'active', 'inline', 'loader')
+}
+
+
+function markStopped(cellId) {
+    const runElement = document.getElementById(getCellRunElementId(cellId))
+    runElement.style.pointerEvents = 'auto'
+    const iconElement = runElement.childNodes[1]
+    iconElement.classList = ""
+    iconElement.classList.add('play', 'icon')
+}
+
+
+function showCellResult(cellId, result) {
     /* renders the result of running the given cell */
 
-    const cellElement = document.getElementById(getCellCodeElementId(cellId)).parentNode.parentNode
-    cellElement.insertAdjacentHTML('afterend', cellResultHtmlString.replace('{id_placeholder}', cellId))
-
+    if (!document.getElementById(getCellResElementId(cellId))) {
+        const cellElement = document.getElementById(getCellCodeElementId(cellId)).parentNode.parentNode
+        cellElement.insertAdjacentHTML('afterend', cellResultHtmlString.replace('{id_placeholder}', cellId))
+    }
     const resElement = document.getElementById(getCellResElementId(cellId))
-    resElement.innerHTML = resultData.result
-    resElement.classList.add(resultData.status ? 'cell-res-succeeded' : 'cell-res-failed')
+    resElement.innerText = result
 }
 
 
 function addSnippet() {
-    sample_codes = {
-        'read_dataset': 'print("I read a dataset")'
-    }
-    console.log(sample_codes[$('.ui.dropdown').dropdown('get value')])
+    /* adds the selected code snippet from the dropdown menu to the notebook cells */
+
+    fetch(`${window.origin}/notebooks/snippets/${$('.ui.dropdown').dropdown('get value')}/`)
+        .then(handleErrors)
+        .then(response => response.json())
+        .then(data => addCell(data.snippet))
+        .then(() => showToast('Snippet added successfully'))
+        .catch(e => showToast('Failed to add the snippet'))
 }

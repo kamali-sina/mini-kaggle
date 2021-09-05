@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="{%static 'data_platform/styles/toast.css' %}">
 <script src="{%static 'data_platform/scripts/toast.js' %}"></script>
 <script>
-const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}`
+const notebookId = {{ object.id }}
 const CSRFToken = `{{ csrf_token }}`
 const cellItemHtmlString = `{% include 'notebooks/cell_item.html' with id="{id_placeholder}" code="" %}`
 const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{id_placeholder}" %}`
@@ -31,7 +31,7 @@ const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{
             <div class="fields">
                 <div class="field">
                     <div class="ui selection dropdown">
-                        <div class="default text"></div>
+                        <div class="default text">Select code snippet...</div>
                         <i class="dropdown icon"></i>
                     </div>
                 </div>
@@ -47,15 +47,18 @@ const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{
 
             <div class="filler"></div>
 
-            <button class="ui icon button" data-tooltip="Add new cell" onclick="addCell()">
+            <button class="ui icon button" data-tooltip="Add new cell" onclick="addCell('')">
                 <i class="plus icon"></i>
             </button>
-            <button class="ui disabled icon button" data-tooltip="Factory reset" onclick="restartSession()">
-                <i class="disabled sync alternate icon"></i>
+            <button class="ui icon button" data-tooltip="Factory reset" onclick="restartSession()">
+                <i class="sync alternate icon" id="restart-session-icon" ></i>
             </button>
             <button class="ui icon button" data-tooltip="Start session" onclick="startSession()">
                 <i class="power off icon"></i>
             </button>
+            <a class="ui icon button" data-tooltip="Export notebook as task" href="{% url 'notebooks:export' object.id %}">
+                <i class="share square icon"></i>
+            </a>
             <a class="ui icon negative button" data-tooltip="Delete notebook"
                href="{% url 'notebooks:delete' object.id %}">
                 <i class="trash alternate icon"></i>
