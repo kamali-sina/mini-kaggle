@@ -57,10 +57,9 @@
                 {% csrf_token %}
                 <input type="submit" value="Run Workflow" class="ui button">
             </form>
-            <form style="margin: 10px;" action="{% url 'workflows:schedule_workflow' workflow.id %}">
-                {% csrf_token %}
-                <input type="submit" value="Schedule" class="ui button">
-            </form>
+            <span style="margin: 10px;">
+                <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui button">Schedule</a>
+            </span>
         </div>
     </ul>
 </div>
