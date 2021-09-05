@@ -26,6 +26,7 @@ plugins/
 src/
 test/
 dag.json
+!build/plugins
 
 # Distribution / packaging
 .Python

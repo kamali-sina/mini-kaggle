@@ -28,17 +28,19 @@
                     {{ workflow.creator.username }}
                 {% endif %}
             </li>
-            <div>
+            <li>
                 <br>
                 <h3>Tasks:</h3>
-                {% if workflow.task_set.all %}
+                {% if workflow.task_dependencies.all %}
                     <div class="ui relaxed divided list">
-                        {% for task in workflow.task_set.all %}
+                        {% for task_dependency in workflow.task_dependencies.all %}
                             <div class="item">
                                 <i class="large tasks middle aligned icon"></i>
                                 <div class="content">
                                     <a class="header"
-                                       href="{% url 'workflows:detail_task' task.id %}">{{ task.name }}</a>
+                                       href="{% url 'workflows:detail_dependency' wf_pk=workflow.id pk=task_dependency.id %}">
+                                        {{ task_dependency.task.name }}
+                                    </a>
                                 </div>
                             </div>
                         {% endfor %}
@@ -46,8 +48,8 @@
                 {% else %}
                     <li>No tasks registered to the workflow</li>
                 {% endif %}
-                <a href="{% url 'workflows:create_task' %}">add new task</a>
-            </div>
+            <li><a href="{% url 'workflows:create_task' %}">create new task</a></li>
+            <li><a href="{% url 'workflows:create_dependency' workflow.id %}">add new task dependency</a></li>
             <br>
             <div style="display: flex;">
                 <form method="post" style="margin: 10px;" action="delete/">
@@ -65,9 +67,17 @@
         </ul>
     </div>
 
-    <div class="ui segment">
-
+    <div id="container" class="ui segment">
     </div>
-
+    <script src="sigma.min.js"></script>
+    <script src="sigma.parsers.json.min.js"></script>
+    <script>
+        sigma.parsers.json('data.json', {
+            container: 'container',
+            settings: {
+                defaultNodeColor: '#ec5148'
+            }
+        });
+    </script>
 
 {% endblock %}
