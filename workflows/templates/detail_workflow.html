@@ -49,10 +49,9 @@
         </div>
         <br>
         <div style="display: flex;">
-            <form method="post" style="margin: 10px;" action="delete/">
-                {% csrf_token %}
-                <input type="submit" value="Delete Workflow" class="negative ui button">
-            </form>
+            <span style="margin: 10px;">
+                <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui button">Delete Workflow</a>
+            </span>
             <form method="post" style="margin: 10px;" action="run/">
                 {% csrf_token %}
                 <input type="submit" value="Run Workflow" class="ui button">
