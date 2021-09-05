@@ -45,18 +45,28 @@
                     </div>
                     {% endwith %}
                 </td>
+                <td>{{ workflow.workflowexecution_set.last.created_at }}</td>
+            {% else %}
+            <td>N/A</td>
+            <td>N/A</td>
             {% endif %}
-            <td>{{ workflow.workflowexecution_set.last.created_at }}</td>
             <td>
-                <button class="positive ui button" onclick="location.href = '{{ workflow.pk }}/run/';">
-                    <div>
-                        <i class="play circle middle aligned icon"></i></button>
-                    </div>
-                <button class="negative ui button" onclick="location.href = '{{ workflow.pk }}/delete/';">
-                    <div>
-                        <i class="trash middle aligned icon"></i>
-                    </div>
-                </button>
+                <form method="post" style="margin: 10px;" action="{{ workflow.pk }}/run/">
+                    {% csrf_token %}
+                    <button type="submit" class="positive ui button">
+                        <div>
+                            <i class="play circle middle aligned icon"></i>
+                        </div>
+                    </button>
+                </form>
+                <form method="post" style="margin: 10px;" action="{{ workflow.pk }}/delete/">
+                    {% csrf_token %}
+                    <button type="submit" class="negative ui button">
+                        <div>
+                            <i class="trash middle aligned icon"></i>
+                        </div>
+                    </button>
+                </form>
             </td>
         </tr>
         {% endfor %}
