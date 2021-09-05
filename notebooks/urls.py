@@ -1,8 +1,11 @@
 from django.urls import path
+from django.urls import re_path
 
+from . import consumers
 from . import views
 
 app_name = "notebooks"
+
 urlpatterns = [
     # notebook crud
     path("", views.NotebooksListView.as_view(), name="index"),
@@ -18,4 +21,8 @@ urlpatterns = [
     # code snippets
     path("snippets/", views.snippets_list_view, name="snippets"),
     path("snippets/<str:name>/", views.snippet_detail_view, name="snippet_detail"),
+]
+
+websocket_urlpatterns = [
+    re_path(r'ws/notebook/(?P<notebook_id>\d+)/$', consumers.NotebookConsumer.as_asgi()),
 ]
