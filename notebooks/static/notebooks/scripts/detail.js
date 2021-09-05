@@ -14,8 +14,14 @@ const EDITOR_CONFIG = {
 
 
 window.onload = function() {
-    // Initialize notebook cells with editor
-    createEditorForCellElements()
+    if(document.querySelectorAll('[id^=cell_code_]').length) {
+        // Initialize notebook cells with editor
+        createEditorForCellElements()
+    } else {
+        // Add an initial empty cell
+        addCell("")
+    }
+
 
     // Initialize Semantic dropdown
     $('.ui.dropdown').dropdown({
