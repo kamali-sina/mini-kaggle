@@ -72,35 +72,16 @@
     </div>
     <script>
         var i,
+            j,
             s,
-            N = 6,
-            E = 5,
-            g = {
+            dag = {
                 nodes: [],
                 edges: []
             };
-
-        for (i = 0; i < N; i++)
-            g.nodes.push({
-                id: 'n' + i,
-                label: 'Node ' + i,
-                x: 100 * Math.random(),
-                y: 100 * Math.random(),
-                size: 2,
-            });
-
-        for (i = 0; i < E; i++)
-            g.edges.push({
-                id: 'e' + i,
-                source: 'n' + (Math.random() * N | 0),
-                target: 'n' + (Math.random() * N | 0),
-                size: 1,
-                color: '#000000',
-                type: 'arrow'
-            });
-
+        dag.nodes = {{ nodes|safe }};
+        dag.edges = {{ edges|safe }};
         s = new sigma({
-            graph: g,
+            graph: dag,
             container: 'g-container',
             settings: {
                 defaultNodeColor: '#22ea29',

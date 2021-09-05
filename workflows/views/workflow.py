@@ -8,7 +8,6 @@ from django.template.defaulttags import register
 
 from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
-from workflows.services.workflow import generate_dag
 from workflows.services.workflow_run import trigger_workflow
 
 STATUS_CONTEXT_DICT = {
@@ -88,6 +87,36 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
     model = Workflow
     template_name = 'detail_workflow.html'
     context_object_name = 'workflow'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        workflow = context['workflow']
+        context['nodes'] = []
+        context['edges'] = []
+
+        for task_dependency in workflow.task_dependencies.all():
+            node_dict = {
+                'id': 'n' + str(task_dependency.task.id),
+                'label': task_dependency.task.name,
+                'x': 50 * task_dependency.id,
+                'y': 50 * task_dependency.parent_tasks.all().count(),
+                'size': 2,
+            }
+            context['nodes'].append(node_dict)
+            for task_dependency_parent in task_dependency.parent_tasks.all():
+                edge_dict = {
+                    'id': 'e' + str(task_dependency_parent.task.id) + 't' + str(task_dependency.task.id),
+                    'source': 'n' + str(task_dependency_parent.task.id),
+                    'target': 'n' + str(task_dependency.task.id),
+                    'size': 1,
+                    'color': '#000000',
+                    'type': 'arrow'
+                }
+                context['edges'].append(edge_dict)
+        print(context['nodes'])
+        print(context['edges'])
+
+        return context
 
 
 class WorkflowScheduleRedirectView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, View):
