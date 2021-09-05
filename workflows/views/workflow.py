@@ -8,7 +8,7 @@ from django.template.defaulttags import register
 
 from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
-from workflows.service.workflow import generate_dag
+from workflows.services.workflow import generate_dag
 
 from workflows.services.workflow_run import trigger_workflow
 

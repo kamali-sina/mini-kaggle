@@ -12,9 +12,23 @@ __pycache__/
 # C extensions
 *.so
 
+# Sigma JS
+CHANGELOG.md
+CONTRIBUTING.draft.md
+Gruntfile.js
+LICENSE.txt
+README.md
+examples/
+node_modules/
+package-lock.json
+package.json
+plugins/
+src/
+test/
+dag.json
+
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
