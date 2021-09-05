@@ -16,6 +16,6 @@ urlpatterns = [
     path("<int:notebook_pk>/cell/update/<int:cell_pk>/", views.cell_update_view, name="cell_update"),
     path("<int:notebook_pk>/cell/delete/<int:cell_pk>/", views.cell_delete_view, name="cell_delete"),
     # code snippets
-    path("snippets", views.snippets_list_view, name="snippets"),
-    path("snippets/<str:name>", views.snippet_detail_view, name="snippet_detail"),
+    path("snippets/", views.snippets_list_view, name="snippets"),
+    path("snippets/<str:name>/", views.snippet_detail_view, name="snippet_detail"),
 ]
