@@ -6,7 +6,6 @@ from notebooks.services.export import get_notebook_code
 from workflows.models import Task, Secret
 
 from workflows.models import PythonTask
-from workflows.forms import TaskForm
 
 
 class NotebookForm(ModelForm):
