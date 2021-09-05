@@ -1,0 +1,38 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+<link rel="stylesheet" type="text/css" href="{%static 'data_platform/styles/toast.css' %}">
+<script src="{%static 'data_platform/scripts/toast.js' %}"></script>
+<script>
+const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}`
+</script>
+<script src="{% static 'data_platform/scripts/typed_form.js' %}"></script>
+{% endblock %}
+
+{% block title %}Create Notification{% endblock %}
+
+{% block body %}
+
+
+<div class="ui center aligned page grid segment">
+    <form action="{% url 'notifications:create' %}" method="post" class="ui form">
+        {% csrf_token %}
+        <div class="ui grid">
+            <div class="left floated left aligned sixteen wide column">
+                {% include 'registration/basic_form.html' with form=form title='Create a notification source'%}
+            </div>
+            <div class="left floated left aligned sixteen wide column" id="typed_form">
+                {% include 'registration/base_inline_form.html' with form=typed_form %}
+            </div>
+            <input type="submit" value="Submit" class="ui button" style="margin-top: 20px;">
+        </div>
+    </form>
+</div>
+
+
+<div id="toast"></div>
+
+
+{% endblock %}

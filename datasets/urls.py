@@ -9,6 +9,9 @@ urlpatterns = [
     path("<int:pk>/", views.dataset_detail_view, name="detail"),
     path("<int:pk>/download/", views.dataset_download_view, name="download"),
     path("upload/", views.DatasetCreateView.as_view(), name="upload"),
-    path("<int:pk>/edit", views.edit_dataset_view, name="edit"),
+    path("<int:pk>/edit", views.DatasetUpdateView.as_view(), name="edit"),
     path("<int:pk>/delete", views.DatasetDeleteView.as_view(), name="delete"),
+    path("datasources/", views.DataSourceListView.as_view(), name="list_datasource"),
+    path("datasources/create", views.DataSourceCreateView.as_view(), name="create_datasource"),
+    path("datasources/<int:pk>/", views.datasource_detail_view, name="detail_datasource"),
 ]

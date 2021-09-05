@@ -1,0 +1,63 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+{% endblock %}
+
+{% block title %}Create Data Source{% endblock %}
+
+{% block body %}
+    <div class="ui center aligned page grid segment">
+        <form action="{% url 'datasets:create_datasource' %}" method="POST" class="ui form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="ui grid">
+                <div class="left floated left aligned sixteen wide column">
+                    {% include 'registration/basic_form.html' with form=form title='Create Data Source' %}
+                </div>
+                <div class="left floated left aligned six wide column {% if field.errors %} field error {% endif %}">
+                    Add Columns:
+                </div>
+                <div class="right floated left aligned twelve wide column {% if field.errors %} field error {% endif %}">
+                    {{ column_form.management_form }}
+                    {% for field in column_form.forms %}
+                        <div id="form-container" class="table">
+                            <table class="no_error">
+                                {{ field.as_table }}
+                            </table>
+                            <hr>
+                        </div>
+                    {% endfor %}
+                    <br>
+                    <input type="button" id="add-form" value="Add Column" class="ui button">
+                </div>
+                <input type="submit" value="Add Data Source" class="ui button"
+                       style="margin-bottom: 30px; margin-top: 30px;">
+            </div>
+        </form>
+    </div>
+    <script>
+        $('#add-form').click(function () {
+            cloneMore('div.table:last', 'column_set');
+        });
+
+        function cloneMore(selector, type) {
+            var newElement = $(selector).clone(true);
+            var total = $('#id_' + type + '-TOTAL_FORMS').val();
+            newElement.find(':input').each(function () {
+                var name = $(this).attr('name').replace('-' + (total - 1) + '-', '-' + total + '-');
+                var id = 'id_' + name;
+                $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+            });
+            newElement.find('label').each(function () {
+                var newFor = $(this).attr('for').replace('-' + (total - 1) + '-', '-' + total + '-');
+                $(this).attr('for', newFor);
+            });
+            total++;
+            $('#id_' + type + '-TOTAL_FORMS').val(total);
+            $(selector).after(newElement);
+        }
+    </script>
+{% endblock %}

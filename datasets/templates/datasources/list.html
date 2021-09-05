@@ -1,0 +1,38 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}{% endblock %}
+
+{% block title %}Data Sources{% endblock %}
+
+{% block body %}
+
+{% if  datasources_list  %}
+
+<h1>Data Sources</h1>
+
+<div class="ui relaxed divided list">
+    {% for datasource in datasources_list %}
+    <div class="item">
+        <i class="large database middle aligned icon"></i>
+        <div class="content">
+            <a class="header" href="{% url "datasets:detail_datasource" datasource.id%}">{{ datasource.title }}</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<br>
+
+{% include 'data_platform/pagination.html' %}
+
+{% else %}
+<h2>No data sources available.</h2>
+{% endif %}
+
+<br>
+
+<a href="{% url 'datasets:create_datasource' %}">Add a data source</a>
+
+
+{% endblock %}

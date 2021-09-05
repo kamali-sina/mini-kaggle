@@ -1,0 +1,26 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+    <style>li {
+        font-size: 17px;
+        list-style: none;
+        margin: 15px auto;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}Create Task Dependency{% endblock %}
+
+{% block body %}
+    <div class="ui center aligned page grid segment">
+        <div class="ui center aligned page grid segment">
+            <form enctype="multipart/form-data" action="" method="post" class="ui form">
+                {% csrf_token %}
+                {% include 'registration/basic_form.html' with form=form title='Create Task Dependency' submit_value='Create Task Dependency' %}
+            </form>
+        </div>
+        </form>
+    </div>
+{% endblock %}

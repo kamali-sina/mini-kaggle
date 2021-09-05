@@ -8,7 +8,16 @@
     list-style: none;
     margin: 15px auto;
 }
+
 </style>
+<link rel="stylesheet" type="text/css" href="{%static 'data_platform/styles/toast.css' %}">
+<script src="{%static 'data_platform/scripts/toast.js' %}"></script>
+<script>
+const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}`
+const typeSelectId = `id_task_type`
+
+</script>
+<script src="{% static 'data_platform/scripts/typed_form.js' %}"></script>
 {% endblock %}
 
 {% block title %}Create Task{% endblock %}
@@ -17,12 +26,22 @@
 
 
 <div class="ui center aligned page grid segment">
-    <form enctype="multipart/form-data" action="" method="post" class="ui form">
+    <form enctype="multipart/form-data" action="{% url 'workflows:create_task' %}" method="post" class="ui form">
         {% csrf_token %}
-        {% include 'registration/basic_form.html' with form=form title='Create a task' submit_value='Create Task'%}
+        <div class="ui grid">
+            <div class="left floated left aligned sixteen wide column">
+                {% include 'registration/basic_form.html' with form=form title='Create a task'%}
+            </div>
+            <div class="left floated left aligned sixteen wide column" id="typed_form">
+                {% include 'registration/base_inline_form.html' with form=typed_form %}
+            </div>
+            <input type="submit" value="Create task" class="ui button" style="margin-top: 20px;">
+        </div>
     </form>
 </div>
 
 
-{% endblock %}
+<div id="toast"></div>
 
+
+{% endblock %}

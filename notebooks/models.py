@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+CODE_SNIPPETS_DIR = './notebooks/static/notebooks/snippets'
+
 class Session(models.Model):
     class SessionStatus(models.TextChoices):
         NOTRUNNING = "NR", _("Not Running")
@@ -26,11 +28,10 @@ class Notebook(models.Model):
 
 class Cell(models.Model):
     class CellStatus(models.TextChoices):
-        PENDING = "P", _("Pending")
         RUNNING = "R", _("Running")
         DONE = "D", _("Done")
+        NONE = "N", _("None")
 
     notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE, related_name='cells', blank=True)
-    code = models.TextField()
-    result = models.TextField()
-    cell_status = models.CharField(max_length=2, choices=CellStatus.choices, default=CellStatus.PENDING)
+    code = models.TextField(null=True, blank=True)
+    cell_status = models.CharField(max_length=1, choices=CellStatus.choices, default=CellStatus.NONE)

@@ -5,16 +5,17 @@
 <link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
 {% endblock %}
 
-{% block title %}Create Email Notification{% endblock %}
+{% block title %}Edit Dataset{% endblock %}
 
 {% block body %}
 
 
 <div class="ui center aligned page grid segment">
-    <form action="{% url 'notifications:create_email_notif' %}" method="post" class="ui form">
+    <form method="post" class="ui form">
         {% csrf_token %}
-        {% include 'registration/basic_form.html' with form=form title='Create an email notification' submit_value='Submit'%}
+        {% include 'registration/basic_form.html' with form=form title='Edit Dataset' submit_value="Submit" %}
     </form>
 </div>
+
 
 {% endblock %}

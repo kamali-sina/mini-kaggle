@@ -17,7 +17,8 @@
 
     <div class="ui segment">
         <ul>
-            <li><a href="{% url 'workflows:detail_workflow' task.workflow.id %}">Back to list</a></li>
+{#        Fix this return url, go somewhere better instead of the task list#}
+            <li><a href="{% url 'workflows:list_task' %}">Back to list</a></li>
             <li><strong>Name: </strong>{{ task.name }}</li>
             {% for key,value in special_display_fields.items %}
                 <li><strong>{{ key }}: </strong>{{ value }}</li>
@@ -36,30 +37,28 @@
             </li>
             <li><strong>Creator: </strong>
                 {% if task.creator.get_full_name %}
-                {{ task.creator.get_full_name }}
+                    {{ task.creator.get_full_name }}
                 {% else %}
-                {{ task.creator.username }}
+                    {{ task.creator.username }}
                 {% endif %}
             </li>
             {% if accessible_datasets %}
-            <li><strong>Accessible datasets: </strong>
-                <ul>
-                    {% for dataset_path in accessible_datasets %}
-                    <li>
-                        <i class="right triangle icon grey"></i>
-                        {{ dataset_path }}
-                    </li>
-                    {% endfor %}
-                </ul>
-            </li>
+                <li><strong>Accessible datasets: </strong>
+                    <ul>
+                        {% for dataset_path in accessible_datasets %}
+                            <li>
+                                <i class="right triangle icon grey"></i>
+                                {{ dataset_path }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
             {% endif %}
             <div style="display: flex;">
-                <form method="post" style="
-    margin: 10px;" action="delete/">{% csrf_token %}
+                <form method="post" style="margin: 10px;" action="delete/">{% csrf_token %}
                     <input type="submit" value="Delete" class="negative ui button">
                 </form>
-                <form method="post" style="
-    margin: 10px;" action="run/">{% csrf_token %}
+                <form method="post" style="margin: 10px;" action="run/">{% csrf_token %}
                     <input type="submit" value="Run task" class="ui button">
                 </form>
             </div>
@@ -70,7 +69,9 @@
                     <div class="ui grid" id="task-excution" style="display: inline;">
                         <div class="ui button" style="display: flex;">
                             <h3 class="ui left floated 4 wide column"
-                                style="background: {{ execution.status_color }};"><a href="{% url 'workflows:detail_task_execution' execution.id %}"> {{ execution.get_status_display }}</a></h3>
+                                style="background: {{ execution.status_color }};"><a
+                                    href="{% url 'workflows:detail_task_execution' execution.id %}"> {{ execution.get_status_display }}</a>
+                            </h3>
                             {% for mark_option in mark_options %}
                                 <form method="post"
                                       style="margin: 10px;"
@@ -85,6 +86,7 @@
                     </div>
                 {% endfor %}
             {% endif %}
+
         </ul>
     </div>
 

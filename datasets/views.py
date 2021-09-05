@@ -7,23 +7,19 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.http import QueryDict
-from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Q
 from django.db.models import Count
 
-from datasets.models import Dataset, Tag
+from datasets.models import Dataset, Tag, DataSource
 from datasets.services.read_csv import read_csv_dataset
-from datasets.forms import CreateDatasetForm, EditDatasetInfoForm, AddTagForm
-from datasets.services.edit_form_handler import create_dataset_edition_forms_on_get, edition_forms_valid, \
-    create_dataset_edition_forms_on_post, \
-    submit_dataset_edition_forms
+from datasets.forms import CreateDatasetForm, UpdateDatasetForm, CreateDataSourceForm, ColumnsFormSet
 
 
 def has_permission(permission_func):
@@ -41,6 +37,61 @@ def has_permission(permission_func):
 def has_dataset_owner_perm(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
     return dataset.creator.id == request.user.id
+
+
+class DataSourceCreateView(LoginRequiredMixin, generic.CreateView):
+    """Data SOurce create view in which column objects can be dynamically added to the data source-to-be-created"""
+    model = DataSource
+    form_class = CreateDataSourceForm
+    template_name = 'datasources/create.html'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.object = None
+
+    def get(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        column_form = ColumnsFormSet()
+        return self.render_to_response(
+            self.get_context_data(form=form,
+                                  column_form=column_form))
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        column_form = ColumnsFormSet(self.request.POST)
+        if form.is_valid() and column_form.is_valid():
+            return self.form_valid(form, column_form)
+        return HttpResponse("Something went wrong!")
+
+    def form_valid(self, form, column_form):
+        datasource = form.save(self.request.user)
+        column_form.instance = datasource
+        column_form.save()
+        success_url = reverse("datasets:detail_datasource", args=(datasource.pk,))
+        messages.success(self.request, 'Data source created successfully')
+        return HttpResponseRedirect(success_url)
+
+
+class DataSourceListView(LoginRequiredMixin, generic.ListView):
+    ITEMS_PER_PAGE = 10
+    paginate_by = ITEMS_PER_PAGE
+    template_name = "datasources/list.html"
+    context_object_name = "datasources_list"
+
+    def get_queryset(self):
+        return DataSource.objects.filter(creator=self.request.user)
+
+
+@login_required
+def datasource_detail_view(request, pk):
+    if request.method == 'GET':
+        datasource = get_object_or_404(DataSource, pk=pk)
+        context = {'datasource': datasource}
+        return render(request, 'datasources/detail.html', context)
+    return HttpResponse("Bad request!", status=400)
 
 
 class DatasetListView(LoginRequiredMixin, generic.ListView):
@@ -98,6 +149,11 @@ class DatasetCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = CreateDatasetForm
     template_name = 'datasets/upload.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         candidate = form.save(self.request.user)
         success_url = reverse("datasets:detail", args=(candidate.pk,))
@@ -113,8 +169,6 @@ def dataset_detail_view(request, pk):
         context = {'csv': read_csv_dataset(str(dataset.file)),
                    'dataset': dataset}
         return render(request, 'datasets/detail.html', context)
-    if request.method == 'POST':
-        return handle_dataset_post_method(request, pk)
     if request.method == 'PATCH':
         return handle_dataset_patch_method(request, pk)
     if request.method == 'DELETE':
@@ -122,26 +176,15 @@ def dataset_detail_view(request, pk):
     return HttpResponse("Bad request!", status=400)
 
 
-def handle_dataset_post_method(request, pk):
-    user = get_object_or_404(User, pk=request.POST['creator'])
-    form = CreateDatasetForm(request.POST, request.FILES)
-    if not form.is_valid():
-        return HttpResponse("Invalid format!", status=400)
-    form.save(user, pk=pk)
-    return HttpResponse(f'Dataset {pk} created successfully', status=201)
-
-
 def handle_dataset_patch_method(request, pk):
     data = QueryDict(request.body)
     dataset = get_object_or_404(Dataset, pk=pk)
 
-    info_form = EditDatasetInfoForm(data, instance=dataset)
-    add_tag_form = AddTagForm(data, dataset=dataset)
-    if not info_form.is_valid() or not add_tag_form.is_valid():
+    form = UpdateDatasetForm(data, instance=dataset)
+    if not form.is_valid():
         return HttpResponse("Invalid format!", status=400)
 
-    info_form.save()
-    add_tag_form.submit()
+    form.save()
 
     return HttpResponse(f"Dataset {pk} edited successfully", status=200)
 
@@ -156,24 +199,24 @@ def handle_dataset_delete_method(pk):
 @has_permission(has_dataset_owner_perm)
 def dataset_download_view(request, pk):
     dataset = get_object_or_404(Dataset, pk=pk)
-    with open(dataset.file.path, 'rb') as file:
-        response = FileResponse(file)
+
+    try:
+        with open(dataset.file.path, 'r', encoding="utf-8") as file:
+            file_data = file.read()
+        response = FileResponse(file_data)
+        response['Content-Disposition'] = f'attachment; filename="{dataset.file.name}"'
         return response
+    except IOError:
+        return HttpResponseNotFound('File not exist')
 
 
-@login_required
-@has_permission(has_dataset_owner_perm)
-def edit_dataset_view(request, pk):
-    dataset = get_object_or_404(Dataset, pk=pk)
-    context = {'pk': pk}
-    if request.method == 'GET':
-        create_dataset_edition_forms_on_get(context, dataset)
-    if request.method == 'POST':
-        create_dataset_edition_forms_on_post(context, request.POST, dataset)
-        if edition_forms_valid(context):
-            submit_dataset_edition_forms(context)
-            return HttpResponseRedirect(reverse('datasets:detail', args=(pk,)))
-    return render(request, 'datasets/edit.html', context=context)
+@method_decorator(has_permission(has_dataset_owner_perm), name='dispatch')
+class DatasetUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Dataset
+    form_class = UpdateDatasetForm
+
+    def get_success_url(self):
+        return reverse('datasets:detail', args=(self.object.pk,))
 
 
 @method_decorator(login_required, name='dispatch')

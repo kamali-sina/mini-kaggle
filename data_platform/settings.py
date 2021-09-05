@@ -36,6 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # third party apps
+    'channels',
+    # apps
     'workflows',
     'datasets',
     'users',
@@ -73,6 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'data_platform.wsgi.application'
+ASGI_APPLICATION = 'data_platform.asgi.application'
 
 # Database
 if os.environ.get("IS_DOCKER"):

@@ -7,13 +7,17 @@ workflows_urls = [
     path('', views.WorkflowListView.as_view(), name='list_workflow'),
     path('create/', views.WorkflowCreateView.as_view(), name='create_workflow'),
     path('<int:pk>/', views.WorkflowDetailView.as_view(), name='detail_workflow'),
+    path('<int:pk>/dependencies/create/', views.TaskDependencyCreateView.as_view(), name='create_dependency'),
+    path('<int:wf_pk>/dependencies/<int:pk>/', views.TaskDependencyDetailView.as_view(), name='detail_dependency'),
     path('<int:pk>/delete/', views.WorkflowDeleteView.as_view(), name='delete_workflow'),
+    path('<int:pk>/run/', views.WorkflowRunView.as_view(), name='run_workflow'),
     path('<int:pk>/schedule/', views.WorkflowScheduleRedirectView.as_view(), name='schedule_workflow'),
 ]
 
 tasks_urls = [
     path('tasks/', views.TaskListView.as_view(), name='list_task'),
-    path('tasks/create/', views.TaskCreateView.as_view(), name='create_task'),
+    path('tasks/create/', views.create_task_view, name='create_task'),
+    path('tasks/create/forms/<str:task_type>', views.get_typed_task_form, name='typed_form'),
     path('tasks/<int:pk>/', views.TaskDetailView.as_view(), name='detail_task'),
     path('tasks/<int:pk>/delete/', views.TaskDeleteView.as_view(), name='delete_task'),
     path('tasks/<int:pk>/executions/<int:exec_pk>/mark/', views.task.stop_task_execution_view,
