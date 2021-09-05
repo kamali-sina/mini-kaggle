@@ -6,17 +6,14 @@ const EDITOR_CONFIG = {
 
 
 window.onload = function() {
-
     // Initialize notebook cells with editor
     createEditorForCellElements()
 
     // Initialize Semantic dropdown
     $('.ui.dropdown').dropdown({
-        values: [{  // should get this with GET
-            name: 'Read dataset',
-            value: 'read_dataset'
-        }, ],
-        placeholder: 'Select snippet ...'
+        apiSettings: {
+          url: `${window.location.origin}/notebooks/snippets/`
+        }
     })
 }
 
@@ -75,7 +72,7 @@ function handleErrors(response) {
 }
 
 
-function addCell() {
+function addCell(code) {
     /* Creates a new cell at the end of the current notebook's cells and adds it to the DOM */
 
     const initObject = {
@@ -84,9 +81,9 @@ function addCell() {
             'Content-Type': 'application/json',
             'X-CSRFToken': CSRFToken
         },
-        body: JSON.stringify({code: ""})
+        body: JSON.stringify({code: code})
     }
-    fetch(`${url}cell/create/`, initObject)
+    fetch(`${window.location.href}cell/create/`, initObject)
         .then(handleErrors)
         .then(response => response.json())
         .then(data => addCellElement(data.id, data.code))
@@ -121,7 +118,7 @@ function saveCell(cellId) {
             },
             body: JSON.stringify({code: cellEditor.getValue()})
         }
-        fetch(`${url}cell/update/${cellId}/`, initObject)
+        fetch(`${window.location.href}cell/update/${cellId}/`, initObject)
             .then(handleErrors)
             .then(r => markSaved(cellId))
             .catch(e => showToast('Failed to save the cell'))
@@ -159,7 +156,7 @@ function deleteCell(cellId) {
                 'X-CSRFToken': CSRFToken
             }
         }
-        fetch(`${url}cell/delete/${cellId}/`, initObject)
+        fetch(`${window.location.href}cell/delete/${cellId}/`, initObject)
             .then(handleErrors)
             .then(r => showToast('Cell deleted'))
             .then(() => removeCellElement(cellId))
@@ -184,7 +181,7 @@ function startSession() {
 
 
 function restartSession() {
-    /* Restarts the session for the current notebook */
+    /* Restart the session for the current notebook */
 
     console.log("Not implemented")
 }
@@ -210,8 +207,12 @@ function showCellResult(resultData, cellId) {
 
 
 function addSnippet() {
-    sample_codes = {
-        'read_dataset': 'print("I read a dataset")'
-    }
-    console.log(sample_codes[$('.ui.dropdown').dropdown('get value')])
+    /* adds the selected code snippet from the dropdown menu to the notebook cells */
+
+    fetch(`${window.origin}/notebooks/snippets/${$('.ui.dropdown').dropdown('get value')}/`)
+        .then(handleErrors)
+        .then(response => response.json())
+        .then(data => addCell(data.snippet))
+        .then(() => showToast('Snippet added successfully'))
+        .catch(e => showToast('Failed to add the snippet'))
 }

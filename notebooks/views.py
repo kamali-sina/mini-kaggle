@@ -81,8 +81,8 @@ def snippets_list_view(request):
     _, _, filenames = next(os.walk(CODE_SNIPPETS_DIR))
     values = [
         {
-            "name": os.path.splitext(name)[0],
-            "value": os.path.splitext(name)[0].replace("_", " ").capitalize(),
+            "name": os.path.splitext(name)[0].replace("_", " ").capitalize(),
+            "value": os.path.splitext(name)[0]
         }
         for name in filenames
     ]
