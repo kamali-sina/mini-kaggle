@@ -96,7 +96,7 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
 
         for task_dependency in workflow.task_dependencies.all():
             node_dict = {
-                'id': 'n' + str(task_dependency.task.id),
+                'id': str(task_dependency.id),
                 'label': task_dependency.task.name,
                 'x': 50 * task_dependency.id,
                 'y': 50 * task_dependency.parent_tasks.all().count(),
@@ -105,9 +105,9 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
             context['nodes'].append(node_dict)
             for task_dependency_parent in task_dependency.parent_tasks.all():
                 edge_dict = {
-                    'id': 'e' + str(task_dependency_parent.task.id) + 't' + str(task_dependency.task.id),
-                    'source': 'n' + str(task_dependency_parent.task.id),
-                    'target': 'n' + str(task_dependency.task.id),
+                    'id': 'e' + str(task_dependency_parent.id) + 't' + str(task_dependency.id),
+                    'source': str(task_dependency_parent.id),
+                    'target': str(task_dependency.id),
                     'size': 1,
                     'color': '#000000',
                     'type': 'arrow'

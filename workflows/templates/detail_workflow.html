@@ -82,15 +82,24 @@
         dag.edges = {{ edges|safe }};
         s = new sigma({
             graph: dag,
-            container: 'g-container',
+            renderer: {
+                container: document.getElementById('g-container'),
+                type: 'canvas'
+            },
             settings: {
                 defaultNodeColor: '#22ea29',
                 maxNodeSize: 16,
                 minNodeSize: 45,
                 minEdgeSize: 5,
                 maxEdgeSize: 5,
-                minArrowSize: 25
+                minArrowSize: 5,
             }
+        });
+
+        s.bind('clickNode rightClickNode', function (e) {
+                var url = "/workflows/{{ workflow.id }}/dependencies/" + e.data.node.id + "/";
+            console.log(url);
+            location.replace(url)
         });
     </script>
 
