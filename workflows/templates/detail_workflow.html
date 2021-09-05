@@ -7,14 +7,8 @@
         list-style: none;
         margin: 15px auto;
     }
-<<<<<<< HEAD
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-=======
-
-
-    </style>
->>>>>>> a30f8b44f3d8e0383f11df4c4e7ad32bb6d44d58
 {% endblock %}
 
 {% block title %}Workflow Details{% endblock %}
@@ -33,32 +27,20 @@
                     {{ workflow.creator.username }}
                 {% endif %}
             </li>
-<<<<<<< HEAD
-            <div>
-                <br>
-                <h3>Tasks:</h3>
-                {% if workflow.task_set.all %}
-                    <div class="ui relaxed divided list">
-                        {% for task in workflow.task_set.all %}
-=======
+
             <li>
                 <br>
                 <h3>Tasks:</h3>
                 {% if workflow.task_dependencies.all %}
                     <div class="ui relaxed divided list">
                         {% for task_dependency in workflow.task_dependencies.all %}
->>>>>>> a30f8b44f3d8e0383f11df4c4e7ad32bb6d44d58
                             <div class="item">
                                 <i class="large tasks middle aligned icon"></i>
                                 <div class="content">
                                     <a class="header"
-<<<<<<< HEAD
-                                       href="{% url 'workflows:detail_task' task.id %}">{{ task.name }}</a>
-=======
                                        href="{% url 'workflows:detail_dependency' wf_pk=workflow.id pk=task_dependency.id %}">
                                         {{ task_dependency.task.name }}
                                     </a>
->>>>>>> a30f8b44f3d8e0383f11df4c4e7ad32bb6d44d58
                                 </div>
                             </div>
                         {% endfor %}
@@ -66,23 +48,20 @@
                 {% else %}
                     <li>No tasks registered to the workflow</li>
                 {% endif %}
-<<<<<<< HEAD
-                <a href="{% url 'workflows:create_task' %}">add new task</a>
-            </div>
+            <li><a href="{% url 'workflows:create_task' %}">create new task</a></li>
+            <li><a href="{% url 'workflows:create_dependency' workflow.id %}">add new task dependency</a></li>
             <br>
             <div style="display: flex;">
-                <form method="post" style="margin: 10px;" action="delete/">
+                <span style="margin: 10px;">
+                    <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui button">Delete Workflow</a>
+                </span>
+                <form method="post" action="{% url 'workflows:run_workflow' workflow.id %}" style="margin: 10px;">
                     {% csrf_token %}
-                    <input type="submit" value="Delete Workflow" class="negative ui button">
+                    <input type="submit" value="Run workflow" class="ui button">
                 </form>
-                <form method="post" style="margin: 10px;" action="run/">
-                    {% csrf_token %}
-                    <input type="submit" value="Run Workflow" class="ui button">
-                </form>
-                <form style="margin: 10px;" action="{% url 'workflows:schedule_workflow' workflow.id %}">
-                    {% csrf_token %}
-                    <input type="submit" value="Schedule" class="ui button">
-                </form>
+                <span style="margin: 10px;">
+                <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui button">Schedule</a>
+            </span>
             </div>
         </ul>
     </div>
@@ -95,7 +74,7 @@
         var task_execution_run_time = {{ task_executions_run_time|safe }};
         var graph_labels = {{ execution_timestamps|safe }};
         datasets_list = []
-        for (let i = 1; i <= {{ tasks|length }}; i++) {
+        for (let i = 0; i < {{ tasks|length }}; i++) {
             datasets_list.push({
                 label: tasks[i],
                 backgroundColor: colors[i],
@@ -124,26 +103,4 @@
                 }
             });
     </script>
-
-
 {% endblock %}
-=======
-            <li><a href="{% url 'workflows:create_task' %}">create new task</a></li>
-            <li><a href="{% url 'workflows:create_dependency' workflow.id %}">add new task dependency</a></li>
-            <br>
-            <div style="display: flex;">
-                <span style="margin: 10px;">
-                    <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui button">Delete Workflow</a>
-                </span>
-            <form method="post" action="{% url 'workflows:run_workflow' workflow.id %}" style="margin: 10px;">
-                {% csrf_token %}
-                <input type="submit" value="Run workflow" class="ui button">
-            </form>
-            <span style="margin: 10px;">
-                <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui button">Schedule</a>
-            </span>
-            </div>
-        </ul>
-    </div>
-{% endblock %}
->>>>>>> a30f8b44f3d8e0383f11df4c4e7ad32bb6d44d58
