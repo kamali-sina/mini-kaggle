@@ -1,5 +1,5 @@
 import os
-
+import json
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.views import generic
@@ -120,9 +120,10 @@ def serialize_cell(cell):
 
 
 def get_code_from_request(request):
-    code = request.body.get('code', None)
+    data = json.loads(request.body)
+    code = data.get('code', None)
     if not code:
-        return ""
+        code = ""
     return code
 
 
