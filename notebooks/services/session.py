@@ -137,9 +137,9 @@ class SessionService:
         for line in splitted_script:
             if line.strip() != '':
                 code_lines.append(line)
-        for i in range(len(code_lines)):
-            if (code_lines[i][0] != '\t'):
-                code_lines[i] = '\n' + code_lines[i]
+        for i, line in enumerate(code_lines):
+            if line[0] != '\t':
+                code_lines[i] = '\n' + line
         script = '\n'.join(code_lines) + '\n'
         return script
 
