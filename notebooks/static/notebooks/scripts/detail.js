@@ -1,4 +1,4 @@
-const webSocket = new WebSocket(`ws://${window.location.host}/ws/notebook/1/` );
+const webSocket = new WebSocket(`ws://${window.location.host}/ws/notebook/${notebookId}/` );
 webSocket.onmessage = function(message) {
     responseData = JSON.parse(message.data)
     showCellResult(responseData.cell_id, responseData.result)
