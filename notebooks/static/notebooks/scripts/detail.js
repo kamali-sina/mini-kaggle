@@ -222,8 +222,6 @@ function restartSession() {
         .then(r => markStoppedRestarting())
         .then(() => showToast('Session restarted'))
         .catch(e => showToast('Failed to restart the session'))
-
-
 }
 
 
