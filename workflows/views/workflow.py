@@ -8,7 +8,6 @@ from django.template.defaulttags import register
 
 from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
-
 from workflows.services.workflow_run import trigger_workflow
 
 STATUS_CONTEXT_DICT = {
