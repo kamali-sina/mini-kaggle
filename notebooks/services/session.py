@@ -124,6 +124,25 @@ class SessionService:
         end = f"\n\nprint('{self.LOGEND%(self.session.uuid, self.session.run_counter)}')\n"
         return start + script + end
 
+    def _get_cleaned_script(self, script):
+        """
+        Cleans input script for python shell
+
+        script(str): users script to run
+        returns(str): updated script
+        """
+        script = self._add_uuids(script)
+        splitted_script = script.split('\n')
+        code_lines = []
+        for line in splitted_script:
+            if line.strip() != '':
+                code_lines.append(line)
+        for i in range(len(code_lines)):
+            if (code_lines[i][0] != '\t'):
+                code_lines[i] = '\n' + code_lines[i]
+        script = '\n'.join(code_lines) + '\n'
+        return script
+
     def _send_script(self, script):
         """
         Sends users script to session to run
@@ -134,7 +153,7 @@ class SessionService:
         """
         if self.session.status != Session.SessionStatus.RUNNING:
             raise SessionIsDown('Session is down.')
-        script = self._add_uuids(script)
+        script = self._get_cleaned_script(script)
         with open(self.fifo_path, 'w', encoding='UTF-8') as fifo_write:
             fifo_write.write(script)
 
