@@ -8,15 +8,15 @@ from notebooks.services.session import SessionService, make_new_session
 class NotebookConsumer(WebsocketConsumer):
     def connect(self):
         # pylint: disable=attribute-defined-outside-init
-        self.notebook_id = self.scope['url_route']['kwargs']['notebook_id']
-        self.notebook = Notebook.objects.get(pk=self.notebook_id)
+        notebook_id = self.scope['url_route']['kwargs']['notebook_id']
+        notebook = Notebook.objects.get(pk=notebook_id)
 
-        if self.notebook.session_id:
-            self.session_id = self.notebook.session_id
+        if notebook.session_id:
+            session_id = notebook.session_id
         else:
-            self.session_id = make_new_session()
+            session_id = make_new_session()
 
-        self.session_service = SessionService(self.session_id)
+        self.session_service = SessionService(session_id)
 
         self.accept()
 
