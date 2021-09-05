@@ -23,6 +23,11 @@ const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{
 
 {% block full_width_body %}
 
+<div id="page-loading">
+  <div class='uil-ring-css' style='transform:scale(0.79);'>
+    <div></div>
+  </div>
+</div>
 
 <div id="split-pane">
     <div id="side-pane">

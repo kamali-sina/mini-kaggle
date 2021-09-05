@@ -29,7 +29,9 @@ class NotebookForm(ModelForm):
 class ExportNotebookForm(TaskForm):
     def __init__(self, *args, **kwargs):
         self.notebook = kwargs.pop('notebook')
+
         super().__init__(*args, **kwargs)
+        self.fields['docker_image'].initial = "python:3.8-slim-buster"
 
     class Meta:
         model = PythonTask
