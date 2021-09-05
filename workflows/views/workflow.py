@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View, CreateView, DeleteView, DetailView, ListView, UpdateView, FormView
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
@@ -43,9 +43,7 @@ class WorkflowCreatorOnlyMixin(AccessMixin):
 
 class WorkflowDeleteView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DeleteView):
     model = Workflow
-
-    def get_success_url(self):
-        return reverse("workflows:list_workflow")
+    success_url = reverse_lazy('workflows:list_workflow')
 
 
 class WorkflowCreateView(LoginRequiredMixin, CreateView):
