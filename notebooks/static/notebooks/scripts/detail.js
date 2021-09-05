@@ -203,7 +203,33 @@ function startSession() {
 function restartSession() {
     /* Restart the session for the current notebook */
 
-    console.log("Not implemented")
+    const initObject = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRFToken
+        }
+    }
+    markRestarting()
+    fetch(`${window.location.href}restart_kernel/`, initObject)
+        .then(handleErrors)
+        .then(r => markStoppedRestarting())
+        .then(() => showToast('Session restarted'))
+        .catch(e => showToast('Failed to restart the session'))
+}
+
+
+function markRestarting() {
+    const restartSessionIcon = document.getElementById("restart-session-icon")
+    restartSessionIcon.classList.add('loading')
+    restartSessionIcon.parentNode.style.pointerEvents = 'none'
+}
+
+
+function markStoppedRestarting() {
+    const restartSessionIcon = document.getElementById("restart-session-icon")
+    restartSessionIcon.classList.remove('loading')
+    restartSessionIcon.parentNode.style.pointerEvents = 'auto'
 }
 
 
