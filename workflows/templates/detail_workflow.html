@@ -19,7 +19,7 @@
 
     <div class="ui segment">
         <ul>
-            <li><strong>Name: </strong>{{ workflow.name }}</li>
+            <li><h1>{{ workflow.name }}</h1></li>
 
             <li><strong>Creator: </strong>
                 {% if workflow.creator.get_full_name %}
@@ -38,7 +38,7 @@
                                 <i class="large tasks middle aligned icon"></i>
                                 <div class="content">
                                     <a class="header"
-                                       href="{% url 'workflows:detail_dependency' wf_pk=workflow.id pk=task_dependency.id %}">
+                                       href="">
                                         {{ task_dependency.task.name }}
                                     </a>
                                 </div>
@@ -49,20 +49,8 @@
                     <li>No tasks registered to the workflow</li>
                 {% endif %}
             <li><a href="{% url 'workflows:create_task' %}">create new task</a></li>
-            <li><a href="{% url 'workflows:create_dependency' workflow.id %}">add new task dependency</a></li>
+            <li><a href="{% url 'workflows:manage_dependencies' workflow.id %}">add new task dependency</a></li>
             <br>
-            <div style="display: flex;">
-                <span style="margin: 10px;">
-                    <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui button">Delete Workflow</a>
-                </span>
-            <form method="post" action="{% url 'workflows:run_workflow' workflow.id %}" style="margin: 10px;">
-                {% csrf_token %}
-                <input type="submit" value="Run workflow" class="ui button">
-            </form>
-            <span style="margin: 10px;">
-                <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui button">Schedule</a>
-            </span>
-            </div>
         </ul>
     </div>
 {% endblock %}

@@ -7,6 +7,9 @@ class TaskDependency(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, db_index=True)
     parent_tasks = models.ManyToManyField('self', blank=True, symmetrical=False)
 
+    def __str__(self):
+        return str(self.task.name)
+
 
 class TaskDependencyExecution(models.Model):
     workflow_execution = models.ForeignKey(WorkflowExecution, on_delete=models.CASCADE,

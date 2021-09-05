@@ -1,0 +1,26 @@
+<form enctype="multipart/form-data" action="" method="post" class="ui form">
+    {% csrf_token %}
+    <div class="ui grid">
+        <div class="left floated left aligned sixteen wide column">
+            <br><br>
+            <h2 style="text-align: center;">Add a new one</h2>
+        </div>
+        {% for field in form.visible_fields %}
+        <div class="left floated left aligned eight wide column {% if field.errors %} field error {% endif %}">
+            <strong>{{ field.label }}</strong>
+        </div>
+        {% endfor %}
+        <div class="right floated left aligned sixteen wide column" name="formset">
+            <div class="ui grid">
+                {% for field in form.visible_fields %}
+                <div class="right floated left aligned seven wide column {% if field.errors %} field error {% endif %}">
+                    {{ field }}
+                </div>
+                {% endfor %}
+                <div class="right floated left aligned two wide column">
+                    <input type="submit" value="Add" class="ui button">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
