@@ -1,3 +1,7 @@
+const webSocket = new WebSocket('ws://' + window.location.host + '/ws/notebook/1/' );
+webSocket.onmessage = (message) => showCellResult(JSON.parse(message.data).cell_id, JSON.parse(message.data).result)
+
+
 const EDITOR_CONFIG = {
     lineNumbers: true,
     mode: "python",
@@ -190,19 +194,23 @@ function restartSession() {
 function runCell(cellId) {
     /* Runs the given cell for the current notebook and renders the results in the DOM */
 
-    console.log("Not implemented")
+    const cellEditor = window[getCellEditorName(cellId)]
+    if(webSocket.readyState == 1) {
+        webSocket.send(JSON.stringify({cell_id: cellId, code: cellEditor.getValue()}))
+    } else {
+        showToast('Trying to connect to the server ...')
+    }
 }
 
 
-function showCellResult(resultData, cellId) {
+function showCellResult(cellId, result) {
     /* renders the result of running the given cell */
 
     const cellElement = document.getElementById(getCellCodeElementId(cellId)).parentNode.parentNode
     cellElement.insertAdjacentHTML('afterend', cellResultHtmlString.replace('{id_placeholder}', cellId))
 
     const resElement = document.getElementById(getCellResElementId(cellId))
-    resElement.innerHTML = resultData.result
-    resElement.classList.add(resultData.status ? 'cell-res-succeeded' : 'cell-res-failed')
+    resElement.innerText = result
 }
 
 
