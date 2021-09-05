@@ -1,6 +1,7 @@
 const webSocket = new WebSocket(`ws://${window.location.host}/ws/notebook/${notebookId}/` );
 webSocket.onmessage = function(message) {
     responseData = JSON.parse(message.data)
+    markStopped(responseData.cell_id)
     showCellResult(responseData.cell_id, responseData.result)
 }
 
@@ -68,6 +69,12 @@ function getCellResElementId(cellId) {
     return `cell_res_${cellId}`
 }
 
+
+function getCellRunElementId(cellId) {
+    /* returns the id of the cell's running elements by cell id */
+
+    return `cell_run_${cellId}`
+}
 
 function handleErrors(response) {
     /* Meant to handle response errors other than connection errors. Throws exception in case the response status is not ok' */
@@ -197,6 +204,7 @@ function restartSession() {
 function runCell(cellId) {
     /* Runs the given cell for the current notebook and renders the results in the DOM */
 
+    markRunning(cellId)
     const cellEditor = window[getCellEditorName(cellId)]
     if(webSocket.readyState == 1) {
         data = JSON.stringify({cell_id: cellId, code: cellEditor.getValue()})
@@ -204,6 +212,24 @@ function runCell(cellId) {
     } else {
         showToast('Trying to connect to the server ...')
     }
+}
+
+
+function markRunning(cellId) {
+    const runElement = document.getElementById(getCellRunElementId(cellId))
+    runElement.style.pointerEvents = 'none'
+    const iconElement = runElement.childNodes[1]
+    iconElement.classList = ""
+    iconElement.classList.add('ui', 'mini', 'active', 'inline', 'loader')
+}
+
+
+function markStopped(cellId) {
+    const runElement = document.getElementById(getCellRunElementId(cellId))
+    runElement.style.pointerEvents = 'auto'
+    const iconElement = runElement.childNodes[1]
+    iconElement.classList = ""
+    iconElement.classList.add('play', 'icon')
 }
 
 
