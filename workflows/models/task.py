@@ -45,3 +45,4 @@ class TaskExecution(models.Model):
     celery_task_id = models.CharField(max_length=50, null=True, blank=True)
     log = models.FileField(upload_to=task_execution_log_file_directory_path, null=True, blank=True)
     extracted_datasets = models.ManyToManyField(Dataset, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
