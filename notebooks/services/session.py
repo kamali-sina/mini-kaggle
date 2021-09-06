@@ -174,6 +174,23 @@ class SessionService:
         if container_state["Status"] == DOCKER_EXITED:
             raise SessionIsDown('Session container has exited.')
 
+    def _get_cleaned_logs(self, log, logstart, logend):
+        """
+        Tries its best to get the full log even during errors.
+
+        log(str): full log of the container
+        logstart(str): start id of the log
+        logend(str): end id of the log
+        returns(str): cleaned log
+        """
+        start = log.find(logstart) + len(logstart)
+        normal_log = log[start:].replace(logend, '')
+        if (normal_log.strip() != '' or self.session.run_counter == 1):
+            return normal_log
+        lastlogend = self.LOGEND%(self.session_uuid, self.session.run_counter - 1)
+        start = log.find(lastlogend) + len(lastlogend)
+        return log[start:].replace(logstart, '').replace(logend, '')
+
     def _get_logs(self):
         """
         Gets the logs of the last executed script
@@ -185,11 +202,10 @@ class SessionService:
         log = self.container.logs().decode('UTF-8')
         while log.find(logstart) == -1 or log.find(logend) == -1:
             log = self.container.logs().decode('UTF-8')
-        start = log.find(logstart) + len(logstart)
-        end = log.find(logend)
+        cleaned_log = self._get_cleaned_logs(log, logstart, logend)
         self.session.run_counter = self.session.run_counter + 1
         self.session.save()
-        return log[start:end].strip()
+        return cleaned_log
 
     def run_script(self, script):
         """
