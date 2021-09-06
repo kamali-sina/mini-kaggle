@@ -7,37 +7,38 @@
 
 {% block body %}
 
+    {% with url as url %}
+        {% include 'datasets/search_bar.html' %}
+    {% endwith %}
 
-{% include 'datasets/search_bar.html' %}
+    {% if  datasets_list %}
 
-{% if  datasets_list  %}
+        <h1>{{ visibility|title }} datasets:</h1>
+        <br>
 
-<h1>{{ visibility | title }} datasets</h1>
-<br>
-
-<div class="ui relaxed divided list">
-    {% for dataset in datasets_list %}
-    <div class="item">
-        <i class="large database middle aligned icon"></i>
-        <div class="content">
-            <a class="header" href="/datasets/{{ dataset.id }}/">{{ dataset.title }}</a>
-            <div class="description">Created at {{ dataset.date_created }}</div>
+        <div class="ui relaxed divided list">
+            {% for dataset in datasets_list %}
+                <div class="item">
+                    <i class="large database middle aligned icon"></i>
+                    <div class="content">
+                        <a class="header" href="/datasets/{{ dataset.id }}/">{{ dataset.title }}</a>
+                        <div class="description">Created at {{ dataset.date_created }}</div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    </div>
-    {% endfor %}
-</div>
 
-<br>
+        <br>
 
-{% include 'data_platform/pagination.html' %}
+        {% include 'data_platform/pagination.html' %}
 
-{% else %}
-<h2>No {{ visibility }} datasets available.</h2>
-{% endif %}
+    {% else %}
+        <h2>No {{ visibility }} datasets available.</h2>
+    {% endif %}
 
-<br>
+    <br>
 
-<a href="{% url 'datasets:upload' %}">upload a new file?</a>
+    <a href="{% url 'datasets:upload' %}">upload a new file?</a>
 
 
 {% endblock %}

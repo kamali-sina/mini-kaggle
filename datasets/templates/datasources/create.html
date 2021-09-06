@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
 {% endblock %}
 
 {% block title %}Create Data Source{% endblock %}
@@ -10,45 +10,51 @@
 {% block body %}
 
 
-<div class="ui center aligned page grid segment">
-    <form action="{% url 'datasets:create_datasource' %}" method="POST" class="ui form">
-        {% csrf_token %}
-        <div class="ui grid">
-            <div class="left floated left aligned sixteen wide column">
-                {% include 'registration/basic_form.html' with form=form title='Create Data Source' %}
-            </div>
-            <div class="left floated left aligned sixteen wide column">
-                <h2>Add Columns:</h2>
-            </div>
-            {{ column_form.management_form }}
-            {% for form in column_form.forms %}
-            {% if forloop.first %}
-            {% for field in form.visible_fields %}
-            <div class="left floated left aligned eight wide column {% if field.errors %} field error {% endif %}">
-                <strong>{{ field.label }}</strong>
-            </div>
-            {% endfor %}
-            {% endif %}
-            <div class="right floated left aligned sixteen wide column" name="formset">
-                <div class="ui grid">
-                    {% for field in form.visible_fields %}
-                    <div class="right floated left aligned eight wide column {% if field.errors %} field error {% endif %}">
-                        {{ field }}
+    <div class="ui center aligned page grid segment">
+        <form action="{% url 'datasets:create_datasource' %}" method="POST" class="ui form">
+            {% csrf_token %}
+            <div class="ui grid">
+                <div class="left floated left aligned sixteen wide column">
+                    {% include 'registration/basic_form.html' with form=form title='Create Data Source' %}
+                </div>
+                <div class="left floated left aligned sixteen wide column">
+                    <h2>Add Columns:</h2>
+                </div>
+                {{ column_form.management_form }}
+                {% for form in column_form.forms %}
+                    <div class="right floated left aligned sixteen wide column" name="formset">
+                        <div class="left floated left aligned eight wide column {% if field.errors %} field error {% endif %}">
+                            {{ form.errors }}
+                        </div>
                     </div>
-                    {% endfor %}
+                    {% if forloop.first %}
+                        {% for field in form.visible_fields %}
+                            <div class="left floated left aligned eight wide column {% if field.errors %} field error {% endif %}">
+                                <strong>{{ field.label }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="right floated left aligned sixteen wide column" name="formset">
+                        <div class="ui grid">
+                            {% for field in form.visible_fields %}
+                                <div class="right floated left aligned eight wide column {% if field.errors %} field error {% endif %}">
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="right floated right aligned sixteen wide column">
+                    <input type="button" id="add-form" value="Add Column" class="ui button">
                 </div>
             </div>
-            {% endfor %}
-
-            <div class="right floated right aligned sixteen wide column">
-                <input type="button" id="add-form" value="Add Column" class="ui button">
-            </div>
-        </div>
-        <input type="submit" value="Add Data Source" class="ui button" style="margin-bottom: 30px; margin-top: 30px;">
-</div>
-</form>
-</div>
-<script>
+            <input type="submit" value="Add Data Source" class="ui button"
+                   style="margin-bottom: 30px; margin-top: 30px;">
+    </div>
+    </form>
+    </div>
+    <script>
         $('#add-form').click(function () {
             cloneMore('[name=formset]:last', 'column_set');
         });
@@ -70,5 +76,5 @@
             $(selector).after(newElement);
         }
 
-</script>
+    </script>
 {% endblock %}

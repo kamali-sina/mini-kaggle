@@ -5,14 +5,21 @@
     </a>
 
     <h3>About this dataset</h3>
-    <h5>{{ dataset.title | title }}: {{ dataset.description }}</h5>
+    <h4>{{ dataset.title | title }}</h4>
+    <h5> {{ dataset.description }}</h5>
+{% if dataset.is_public == True %}
+    <small>Public dataset</small>
+{% else %}
+    <small>Private dataset</small>
+{% endif %}
+    <br>
     <small>
         Created by:
-                {% if dataset.creator.get_full_name %}
-                    {{ dataset.creator.get_full_name }}
-                {% else %}
-                    {{ dataset.creator.username }}
-                {% endif %}
+        {% if dataset.creator.get_full_name %}
+            {{ dataset.creator.get_full_name }}
+        {% else %}
+            {{ dataset.creator.username }}
+        {% endif %}
     </small>
     <br>
     <small>Date Created: {{ dataset.date_created }}</small><br>

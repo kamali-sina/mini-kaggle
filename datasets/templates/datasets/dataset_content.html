@@ -3,17 +3,17 @@
         <thead>
         <tr>
             {% for h in csv.header %}
-            <th>{{ h }}</th>
+                <th>{{ h }}</th>
             {% endfor %}
         </tr>
         </thead>
         <tbody>
         {% for row in csv.rows %}
-        <tr>
-            {% for item in row %}
-            <td>{{ item }}</td>
-            {% endfor %}
-        </tr>
+            <tr>
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
         {% endfor %}
         </tbody>
     </table>

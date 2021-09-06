@@ -68,7 +68,7 @@ class Dataset(models.Model):
     )
     tags = models.ManyToManyField(Tag, related_name='datasets', blank=True)
     is_public = models.BooleanField(default=False, blank=True)
-    data_source = models.ForeignKey(DataSource, on_delete=models.DO_NOTHING, blank=True, null=True)
+    data_source = models.ForeignKey(DataSource, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return str(self.title)

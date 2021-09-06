@@ -2,32 +2,38 @@
 {% load static %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{%static 'datasets/styles/detail.css' %}">
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/detail.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 {% endblock %}
 
 {% block title %}Dataset Details{% endblock %}
 
 {% block body %}
 
-{% include "datasets/dataset_info.html" %}
-{% include "datasets/dataset_content.html" %}
+    {% include "datasets/dataset_info.html" %}
+    {% include "datasets/dataset_content.html" %}
 
-<a href="{% url 'datasets:download' pk=dataset.id %}" class="ui labeled icon button">
-    <i class="download icon"></i>
-    Download
-</a>
-<a href="{% url 'datasets:delete' pk=dataset.id %}" class="ui negative button">
-    Delete
-</a>
-{% if dataset.tags.all %}
-    <div style="font-style: italic; margin-top: 20px;">
-        Tags:
-        {% for tag in dataset.tags.all %}
-        <a class="ui medium label" style="margin-top: 5px;" href="{% url 'datasets:index' %}?tag={{ tag.text }}">{{ tag.text }}</a>
-        {% endfor %}
-    </div>
-{% endif %}
+    <a href="{% url 'datasets:download' pk=dataset.id %}" class="ui labeled icon button">
+        <i class="download icon"></i>
+        Download
+    </a>
+    <a href="{% url 'datasets:delete' pk=dataset.id %}" class="ui negative button">
+        Delete
+    </a>
+    {% if dataset.tags.all %}
+        <div style="font-style: italic; margin-top: 20px;">
+            Tags:
+            {% for tag in dataset.tags.all %}
+                {% if dataset.is_public == True %}
+                    <a class="ui medium label" style="margin-top: 5px;"
+                       href="{% url 'datasets:public' %}?tag={{ tag.text }}">{{ tag.text }}</a>
+                {% else %}
+                    <a class="ui medium label" style="margin-top: 5px;"
+                       href="{% url 'datasets:index' %}?tag={{ tag.text }}">{{ tag.text }}</a>
+                {% endif %}
 
+            {% endfor %}
+        </div>
+    {% endif %}
 
 {% endblock %}
