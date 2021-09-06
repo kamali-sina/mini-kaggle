@@ -2,7 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+from datasets.models import Dataset
+
 CODE_SNIPPETS_DIR = './notebooks/static/notebooks/snippets'
+
 
 class Session(models.Model):
     class SessionStatus(models.TextChoices):
@@ -21,7 +24,8 @@ class Session(models.Model):
 class Notebook(models.Model):
     name = models.CharField(max_length=255)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
+    session = models.OneToOneField(Session, on_delete=models.CASCADE, null=True, related_name="notebook")
+    accessible_datasets = models.ManyToManyField(Dataset, blank=True)
 
     def __str__(self):
         return str(self.name)
