@@ -38,6 +38,7 @@ class SessionService:
         self.session = get_object_or_404(Session, pk=session_id)
         self.fifo_name = f'session_{self.session.id}_fifo'
         self.fifo_path = f'/tmp/{self.fifo_name}'
+        self.container = None
         if self.session.status != Session.SessionStatus.RUNNING:
             self.start()
         else:
@@ -70,7 +71,7 @@ class SessionService:
             self.start()
         self._check_fifo()
         self._update_container()
-    
+
     def _update_container(self):
         """
         Updates the self.container object
@@ -160,7 +161,7 @@ class SessionService:
         script = self._get_cleaned_script(script)
         with open(self.fifo_path, 'w', encoding='UTF-8') as fifo_write:
             fifo_write.write(script)
-    
+
     def _run_session_checks(self):
         """
         Checks if the session is up and its container is intact
@@ -170,7 +171,7 @@ class SessionService:
         if self.session.status != Session.SessionStatus.RUNNING:
             raise SessionIsDown('Session is down.')
         container_state = self.container.attrs["State"]
-        if (container_state["Status"] == DOCKER_EXITED):
+        if container_state["Status"] == DOCKER_EXITED:
             raise SessionIsDown('Session container has exited.')
 
     def _get_logs(self):
