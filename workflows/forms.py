@@ -3,6 +3,7 @@ from datetime import datetime
 from django.forms import ModelForm
 from django import forms
 from django.core.exceptions import ValidationError
+from django.shortcuts import reverse
 
 from workflows.models import Secret, Task, PythonTask, Workflow, DockerTask, WorkflowSchedule
 from workflows.models.task_dependency import TaskDependency
@@ -21,6 +22,7 @@ class TaskForm(ModelForm):
         self.fields['timeout'].help_text = 'leave empty, for no time limit'
         self.fields['secret_variables'].label = 'Add secret variable to task execution'
         self.fields['secret_variables'].queryset = Secret.objects.filter(creator=self.creator)
+        setattr(self.fields['notification_source'], 'create_link', reverse('notifications:create'))
 
     def is_valid(self):
         return super().is_valid() and self.typed_form.is_valid()
