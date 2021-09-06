@@ -8,9 +8,11 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.template.defaulttags import register
 
-from workflows.models import Workflow, WorkflowSchedule, WorkflowExecution
+from workflows.models import Workflow, WorkflowExecution, WorkflowSchedule, Task
 from workflows.forms import WorkflowForm, WorkflowScheduleForm
 from workflows.services.workflow_run import trigger_workflow
+
+RECENT_EXECUTIONS = 12
 
 STATUS_CONTEXT_DICT = {
     WorkflowExecution.StatusChoices.FAILED: {
@@ -110,14 +112,36 @@ def generate_dag_context(context, workflow: Workflow):
             context['edges'].append(edge_dict)
 
 
+def get_task_executions_context(workflow, context):
+    workflow_tasks_id = workflow.task_dependencies.values_list('task', flat=True)
+    workflow_tasks = Task.objects.filter(id__in=workflow_tasks_id)
+    for workflow_task in workflow_tasks:
+        context['workflow_task_executions'][workflow_task] = []
+        task_executions = workflow_task.taskexecution_set.filter(task__taskdependency__workflow=workflow).order_by(
+            '-created_at')[:RECENT_EXECUTIONS]
+        context['workflow_task_executions'][workflow_task] = task_executions
+
+
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
     model = Workflow
     template_name = 'detail_workflow.html'
     context_object_name = 'workflow'
 
+    @register.filter
+    def get_value(self, key):
+        return self.get(key)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         workflow = context['workflow']
+        context['workflow_executions'] = WorkflowExecution.objects.filter(workflow=workflow).order_by(
+            '-created_at__time').reverse()[:RECENT_EXECUTIONS]
+
+        context['status'] = STATUS_CONTEXT_DICT
+
+        context['workflow_task_executions'] = {}
+
+        get_task_executions_context(workflow, context)
 
         context['nodes'] = []
         context['edges'] = []
