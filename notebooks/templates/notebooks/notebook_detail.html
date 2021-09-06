@@ -44,9 +44,7 @@ const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{
         </div>
 
         {% if accessible_datasets %}
-        <br>
-        <hr>
-        <br>
+        <br><hr><br>
         <div class="ui form">
             <h4>Accessible Datasets:</h4>
                 <div class="ui divided selection list">
@@ -55,7 +53,6 @@ const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{
                         <div class="ui horizontal label">{{dataset_name}}</div>
                         <input type="text" class="copyInput" value="{{dataset_mount_path}}">
                     </a>
-
                 {% endfor %}
                 </div>
         </div>

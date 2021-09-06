@@ -10,8 +10,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 
 from datasets.views import has_permission
-from notebooks.services.datasets import get_accessible_datasets_mount_dict, get_accessible_datasets
 from workflows.models import PythonTask
+from notebooks.services.datasets import get_accessible_datasets
 from notebooks.services.notebook import get_notebook_session_service
 from notebooks.models import Cell
 from notebooks.models import Notebook
