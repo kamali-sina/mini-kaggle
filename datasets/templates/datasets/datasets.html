@@ -12,7 +12,8 @@
 
 {% if  datasets_list  %}
 
-<h1>{{ visibility }} datasets:</h1>
+<h1>{{ visibility | title }} datasets</h1>
+<br>
 
 <div class="ui relaxed divided list">
     {% for dataset in datasets_list %}
