@@ -41,7 +41,7 @@
     <tr>
         <td>
             <i class="tasks large left aligned icon"></i>
-            <a class="header" href="{{ workflow.pk }}/">{{ workflow.name }}</a>
+            <a class="header" href="{{ workflow.pk }}/" style="font-weight: bold;">{{ workflow.name }}</a>
         </td>
         <td>{{ workflow.creator.username }}</td>
         {% if workflow.workflowexecution_set.last %}

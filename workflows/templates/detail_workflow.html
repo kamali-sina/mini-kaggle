@@ -16,6 +16,7 @@
 {% block body %}
 
     <div class="ui segment">
+        <a href="{% url 'workflows:list_workflow' %}">Back to list</a>
         <ul>
             <li><h1>{{ workflow.name }}</h1></li>
             <div class="ui pointing secondary menu">
