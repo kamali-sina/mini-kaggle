@@ -7,7 +7,15 @@
     list-style: none;
     margin: 15px auto;
 }
+
 </style>
+<script>
+    const CSRFToken = `{{ csrf_token }}`
+
+</script>
+<link rel="stylesheet" type="text/css" href="{%static 'data_platform/styles/toast.css' %}">
+<script src="{% static 'data_platform/scripts/toast.js' %}"></script>
+<script src="{% static 'workflows/scripts/workflow_list.js' %}"></script>
 {% endblock %}
 
 {% block title %}Workflows{% endblock %}
@@ -16,71 +24,81 @@
 {% if  workflows %}
 <h2>Workflows:<br></h2>
 
+<br>
+
 <table class="ui very basic table">
     <thead>
-        <tr>
+    <tr>
         <th>Name</th>
-         <th>Creator</th>
+        <th>Creator</th>
         <th>Last run status</th>
         <th>Last run time</th>
         <th>Actions</th>
-        </tr>
+    </tr>
     </thead>
     <tbody>
-        {% for workflow in workflows %}
-        <tr>
-            <td>
-                <i class="tasks large left aligned icon"></i>
-                <a class="header" href="{{ workflow.pk }}/">{{ workflow.name }}</a>
-            </td>
-            <td>{{ workflow.creator.username }}</td>
-            {% if workflow.workflowexecution_set.last %}
-                <td>
-                    {% with workflow_execution_status=status|get_value:workflow.workflowexecution_set.last.status %}
-                    <div class="column"
-                        style=" margin: 5px; border-radius: 50%; width: 30px; height: 30px;
+    {% for workflow in workflows %}
+    <tr>
+        <td>
+            <i class="tasks large left aligned icon"></i>
+            <a class="header" href="{{ workflow.pk }}/">{{ workflow.name }}</a>
+        </td>
+        <td>{{ workflow.creator.username }}</td>
+        {% if workflow.workflowexecution_set.last %}
+        <td>
+            {% with workflow_execution_status=status|get_value:workflow.workflowexecution_set.last.status %}
+            <div class="column"
+                 style=" margin: 5px; border-radius: 50%; width: 30px; height: 30px;
                         border-style: solid; border-color: black; border-width: 1px;
                         background-color: {{ workflow_execution_status.color }}"
-                        title="status: {{ workflow_execution_status.text }}">
-                    </div>
-                    {% endwith %}
-                </td>
-                <td>{{ workflow.workflowexecution_set.last.created_at }}</td>
-            {% else %}
-            <td>N/A</td>
-            <td>N/A</td>
+                 title="status: {{ workflow_execution_status.text }}">
+            </div>
+            {% endwith %}
+        </td>
+        <td>{{ workflow.workflowexecution_set.last.created_at }}</td>
+        {% else %}
+        <td>N/A</td>
+        <td>N/A</td>
+        {% endif %}
+        <td style="display: flex;">
+            <form method="post" style="margin: 10px 5px;" action="{% url 'workflows:run_workflow' workflow.id %}">
+                {% csrf_token %}
+                <button type="submit" class="positive ui icon button" data-tooltip="Run workflow">
+                    <i class="play circle middle aligned icon"></i>
+                </button>
+            </form>
+            <span style="margin: 10px 2px;">
+                <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui icon button"
+                    data-tooltip="Delete workflow">
+                    <i class="trash middle aligned icon"></i>
+                </a>
+            </span>
+            <span style="margin: 10px 2px;">
+                <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui icon button"
+                    data-tooltip="Schedule workflow">
+                    <i class="clock icon"></i>
+                </a>
+            </span>
+            <span style="margin: 10px 2px;">
+                <a href="{% url 'workflows:manage_dependencies' workflow.id %}" class="ui icon button"
+                    data-tooltip="Manage task dependencies">
+                    <i class="sitemap icon"></i>
+                </a>
+            </span>
+            {% if workflow.schedule %}
+            <form method="post" style="margin: 10px 2px; display: flex; justify-content: center; align-items: center;">
+                {% csrf_token %}
+                <span class="ui toggle checkbox {% if not workflow.schedule.paused %}checked{% endif %}"
+                    style="display: flex; font-size: smaller; color: grey;">
+                    <input type="checkbox" name="pause" onchange="changePauseStatus(this, {{ workflow.id }})"
+                            checked="">
+                        {% if workflow.schedule.paused %}OFF{% else %}ON{% endif %}
+                </span>
+            </form>
             {% endif %}
-            <td style="display: flex;">
-                <form method="post" style="margin: 10px 5px;" action="{% url 'workflows:run_workflow' workflow.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="positive ui icon button" data-tooltip="Run workflow">
-                            <i class="play circle middle aligned icon"></i>
-                    </button>
-                </form>
-                <span style="margin: 10px 2px;">
-                    <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui icon button" data-tooltip="Delete workflow">
-                        <i class="trash middle aligned icon"></i>
-                    </a>
-                </span>
-                <span style="margin: 10px 2px;">
-                    <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui icon button" data-tooltip="Schedule workflow">
-                        <i class="clock icon"></i>
-                    </a>
-                </span>
-                <span style="margin: 10px 2px;">
-                    <a href="{% url 'workflows:manage_dependencies' workflow.id %}" class="ui icon button" data-tooltip="Manage task dependencies">
-                        <i class="sitemap icon"></i>
-                    </a>
-                </span>
-                <form method="post" style="margin: 10px 2px; display: flex; justify-content: center; align-items: center;" action="">
-                    {% csrf_token %}
-                    <span class="ui toggle checkbox" style="display: flex; font-size: smaller; color: grey;">
-                        <input type="checkbox" name="pause" onchange="toggleLabel(this)">
-                    </span>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
     </tbody>
 </table>
 
@@ -96,16 +114,6 @@
 <a href="{% url 'workflows:create_workflow' %}">Add new workflow</a>
 <br>
 
-<script>
-    $('.ui.checkbox').checkbox('check');
+<div id="toast"></div>
 
-    function toggleLabel(element) {
-    console.log(element.parentNode.childNodes)
-        if(element.parentNode.childNodes[3].textContent == 'ON'){
-            element.parentNode.childNodes[3].textContent = 'OFF'
-        } else {
-            element.parentNode.childNodes[3].textContent = 'ON'
-        }
-    }
-</script>
 {% endblock %}

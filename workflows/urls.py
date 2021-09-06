@@ -11,6 +11,7 @@ workflows_urls = [
     path('<int:pk>/delete/', views.WorkflowDeleteView.as_view(), name='delete_workflow'),
     path('<int:pk>/run/', views.WorkflowRunView.as_view(), name='run_workflow'),
     path('<int:pk>/schedule/', views.WorkflowScheduleRedirectView.as_view(), name='schedule_workflow'),
+    path('<int:pk>/schedule/paused/', views.workflow_schedule_paused_view, name='schedule_paused'),
 ]
 
 tasks_urls = [

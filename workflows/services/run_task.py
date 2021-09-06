@@ -42,7 +42,7 @@ def run_task(task):
     if not task.timeout or task.timeout.total_seconds() == 0:
         celery_task = run_task_in_celery.delay(task_execution.pk)
     else:
-        celery_task = run_task_in_celery.delay(task_execution.pk, time_limit=task.timeout.total_seconds())
+        celery_task = run_task_in_celery.apply_async((task_execution.pk,), time_limit=task.timeout.total_seconds())
     task_execution.celery_task_id = celery_task.id
     task_execution.save()
     return task_execution.pk
