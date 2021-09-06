@@ -118,11 +118,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Tags for managing messages
 
 MESSAGE_TAGS = {
-    messages.DEBUG: 'orange',
-    messages.INFO: 'blue',
-    messages.SUCCESS: 'green',
-    messages.WARNING: 'yellow',
-    messages.ERROR: 'red',
+    messages.DEBUG: '',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'error',
 }
 
 # Internationalization
