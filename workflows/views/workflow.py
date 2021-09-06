@@ -82,9 +82,28 @@ class WorkflowListView(LoginRequiredMixin, ListView):
         return context
 
 
-def random_color():
-    color = ["#" + ''.join([random.choice('ABCDEF0123456789') for i in range(6)])]
-    return color
+def set_chart_colors(colors, tasks):
+    # pylint: disable=unused-variable
+    for i in range(len(tasks)):
+        color = ["#" + ''.join([random.choice('ABCDEF0123456789') for i in range(6)])]
+        colors.append(color)
+
+
+def generate_chart_data(workflow, execution_timestamps, tasks, task_executions_run_time):
+    workflow_executions = workflow.workflowexecution_set.all()
+    for workflow_execution in workflow_executions:
+        execution_timestamps.append(workflow_execution.created_at.strftime("%m/%d/%Y"))
+
+    for workflow_task_dependency in workflow.task_dependencies.all():
+        task = workflow_task_dependency.task
+        tasks.append(task.name)
+        task_executions = task.taskexecution_set.all()
+        task_executions_run_time[task.name] = []
+        for task_execution in task_executions:
+            if task_execution.run_time:
+                task_executions_run_time[task.name].append(task_execution.run_time)
+            else:
+                task_executions_run_time[task.name].append(0)
 
 
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
@@ -98,29 +117,15 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
 
         # labels for xAxis
         context['execution_timestamps'] = []
-        workflow_executions = workflow.workflowexecution_set.all()
-        for workflow_execution in workflow_executions:
-            context['execution_timestamps'].append(workflow_execution.created_at.strftime("%m/%d/%Y"))
-
         # chart lines and their data
         context['tasks'] = []
         context['task_executions_run_time'] = {}
-        for workflow_task_dependency in workflow.task_dependencies.all():
-            task = workflow_task_dependency.task
-            context['tasks'].append(task.name)
-            task_executions = task.taskexecution_set.all()
-            context['task_executions_run_time'][task.name] = []
-            for task_execution in task_executions:
-                if task_execution.run_time:
-                    context['task_executions_run_time'][task.name].append(task_execution.run_time)
-                else:
-                    context['task_executions_run_time'][task.name].append(0)
-
         # chart lines colors
         context['colors'] = []
-        # pylint: disable=unused-variable
-        for i in range(len(context['tasks'])):
-            context['colors'].append(random_color())
+
+        generate_chart_data(workflow, context['execution_timestamps'], context['tasks'],
+                            context['task_executions_run_time'])
+        set_chart_colors(context['colors'], context['tasks'])
 
         return context
 
