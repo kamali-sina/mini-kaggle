@@ -18,13 +18,13 @@
         <table class="ui very basic table">
             <thead>
             <tr>
-                <th>Column Title</th>
+                <th style="color: #a6a6a6;">Column Title</th>
                 {% for column in datasource.column_set.all %}
                     <th>{{ column.title }}</th>
                 {% endfor %}
             </tr>
             <tr>
-                <th>Column Type</th>
+                <th style="color: #a6a6a6;">Column Type</th>
                 {% for column in datasource.column_set.all %}
                     <th>{{ column.type }}</th>
                 {% endfor %}
