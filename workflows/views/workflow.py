@@ -21,11 +21,11 @@ STATUS_CONTEXT_DICT = {
     },
     WorkflowExecution.StatusChoices.RUNNING: {
         "text": "running",
-        "color": "grey",
+        "color": "light blue",
     },
     WorkflowExecution.StatusChoices.PENDING: {
         "text": "pending",
-        "color": "white",
+        "color": "grey",
     }
 }
 
@@ -80,18 +80,22 @@ class WorkflowListView(LoginRequiredMixin, ListView):
         return context
 
 
-def generate_dag(nodes, edges, workflow: Workflow):
+def generate_dag_context(context, workflow: Workflow):
     for task_dependency in workflow.task_dependencies.all():
-        print(task_dependency.task.taskexecution_set.last())
+        wfe = workflow.workflowexecution_set.last()
+        try:
+            te_status = wfe.task_dependency_executions.get(task_execution__task=task_dependency.task).task_execution.status
+        except:
+            te_status = WorkflowExecution.StatusChoices.PENDING
         node_dict = {
             'id': str(task_dependency.task.id),
             'label': task_dependency.task.name,
             'x': 50 * task_dependency.id,
             'y': 50 * task_dependency.parent_tasks.all().count(),
-            'color': STATUS_CONTEXT_DICT[task_dependency.task.taskexecution_set.last().status]['color'],
+            'color': STATUS_CONTEXT_DICT[te_status]['color'],
             'size': 2,
         }
-        nodes.append(node_dict)
+        context['nodes'].append(node_dict)
         for task_dependency_parent in task_dependency.parent_tasks.all():
             edge_dict = {
                 'id': 'e' + str(task_dependency_parent.task.id) + 't' + str(task_dependency.task.id),
@@ -99,7 +103,7 @@ def generate_dag(nodes, edges, workflow: Workflow):
                 'target': str(task_dependency.task.id),
                 'size': 1,
             }
-            edges.append(edge_dict)
+            context['edges'].append(edge_dict)
 
 
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
@@ -113,7 +117,7 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
 
         context['nodes'] = []
         context['edges'] = []
-        generate_dag(context['nodes'], context['edges'], workflow)
+        generate_dag_context(context, workflow)
 
         return context
 

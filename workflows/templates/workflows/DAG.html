@@ -24,6 +24,7 @@
         settings: {
             defaultEdgeType: 'arrow',
             defaultEdgeColor: '#000000',
+            defaultNodeColor: '#349e0d',
             maxNodeSize: 16,
             minNodeSize: 45,
             minEdgeSize: 5,
@@ -34,7 +35,6 @@
 
     s.bind('clickNode rightClickNode', function (e) {
         var url = "/workflows/tasks/" + e.data.node.id + "/";
-        console.log(url);
         location.replace(url)
     });
 </script>
