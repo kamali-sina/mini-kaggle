@@ -36,7 +36,6 @@ def run_task_dependencies(workflow_execution):
 def get_executable_task_dependencies(workflow_execution):
     succeeded_parents_no_query = Q(parent_tasks__task__in=workflow_execution.task_dependency_executions.filter(
         task_execution__status=TaskExecution.StatusChoices.SUCCESS).values_list('task_execution__task', flat=True))
-
     return workflow_execution.workflow.task_dependencies.exclude(
         task__in=workflow_execution.task_dependency_executions.values_list('task_execution__task', flat=True)).annotate(
         succeeded_parents_no=Count('parent_tasks', filter=succeeded_parents_no_query),

@@ -40,8 +40,7 @@
             {% with task_execution_status=status|get_value:task.taskexecution_set.last.status %}
             <a class="header" href="executions/{{ task.taskexecution_set.last }}/">
                 <div class="column"
-                    style=" margin: 5px; border-radius: 50%; width: 30px; height: 30px;
-                            border-style: solid; border-color: black; border-width: 1px;
+                    style=" margin: 5px; border-radius: 50%; width: 20px; height: 20px;
                             background-color: {{ task_execution_status.color }}"
                     title="status: {{ task_execution_status.text }}">
                 </div>
