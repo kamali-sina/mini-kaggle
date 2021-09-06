@@ -1,3 +1,5 @@
+import json
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import View, CreateView, DeleteView, DetailView, ListView, UpdateView, FormView
 from django.urls import reverse, reverse_lazy
@@ -129,3 +131,13 @@ class WorkflowRunView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, View):
             trigger_workflow(workflow)
             return HttpResponseRedirect(reverse('workflows:detail_workflow', args=(workflow.pk,)))
         return HttpResponse(status=400)
+
+
+def workflow_schedule_paused_view(request, pk):
+    workflow = get_object_or_404(Workflow, pk=pk)
+    data = json.loads(request.body)
+    if not request.method == 'POST' or 'paused' not in data or not hasattr(workflow, 'schedule'):
+        return HttpResponse(status=400)
+    workflow.schedule.paused = data['paused']
+    workflow.schedule.save()
+    return HttpResponse(status=200)
