@@ -12,7 +12,7 @@
         {% for task_dependency in task_dependencies %}
         <div class="title" style="padding: 20px; display: flex; align-items: center;">
             <span style="font-size: 20px; font-style: italic;">{{ task_dependency.task.name }}</span>
-            <div style="width: 100%"></div>
+            <div style="flex-grow: 1;"></div>
             <i class="dropdown icon"></i>
             <span>Parents</span>
         </div>

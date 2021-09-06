@@ -9,6 +9,8 @@ li {
     list-style: none;
     margin: 15px auto;
 }
+
+
 </style>
 {% endblock %}
 
@@ -16,10 +18,17 @@ li {
 
 {% block body %}
 
-<div class="ui center aligned page grid segment">
-    {% include 'workflows/task_dependency_list.html' %}
-    {% include 'workflows/create_task_dependency_form.html' %}
+<div class="ui segment">
+    <h4><a href="{% url 'workflows:list_workflow' %}">Back to list</a></h4>
+    <ul>
+        <div class="ui center aligned page grid">
+            {% include 'workflows/task_dependency_list.html' %}
+            {% include 'workflows/create_task_dependency_form.html' %}
+
+        </div>
+    </ul>
 </div>
+
 
 <script>
 document.getElementById('id_parent_tasks').classList.add("ui", "selection", "dropdown")
@@ -32,6 +41,8 @@ $('.ui.accordion')
 $('.ui.dropdown')
   .dropdown()
 ;
+
+
 
 
 </script>

@@ -19,8 +19,7 @@ def create_notification_source(request):
             form.save()
             if 'next' in request.POST:
                 return HttpResponseRedirect(request.POST['next'])
-            else:
-                messages.success(request, "Notification source created successfully :)")
+            messages.success(request, "Notification source created successfully :)")
     else:
         form = CreateNotificationSourceForm(user=request.user)
         typed_form = NOTIFICATION_TYPED_FORM_REGISTRY[NotificationSource.DEFAULT_TYPE]()

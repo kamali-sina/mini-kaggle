@@ -1,5 +1,6 @@
 from django.core.files.base import ContentFile
 from django.forms import ModelForm
+from django.shortcuts import reverse
 
 from notebooks.models import Notebook
 from notebooks.services.export import get_notebook_code
@@ -38,6 +39,7 @@ class ExportNotebookForm(ModelForm):
         self.fields['secret_variables'].label = 'Add secret variable to task execution'
         self.fields['secret_variables'].queryset = Secret.objects.filter(creator=self.creator)
         self.fields['docker_image'].initial = "python:3.8-slim-buster"
+        setattr(self.fields['notification_source'], 'create_link', reverse('notifications:create'))
 
     class Meta:
         model = PythonTask
