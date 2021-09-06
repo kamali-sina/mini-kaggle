@@ -41,7 +41,7 @@ def get_executable_task_dependencies(workflow_execution):
         task__in=workflow_execution.task_dependency_executions.values_list('task_execution__task', flat=True)).annotate(
         succeeded_parents_no=Count('parent_tasks', filter=succeeded_parents_no_query),
         parent_tasks_no=Count('parent_tasks', filter=Q())).filter(
-        Q(parent_tasks=None) | Q(succeeded_parents_no=F('parent_tasks_no')))
+        Q(parent_tasks=None) | Q(succeeded_parents_no=F('parent_tasks_no'))).distinct()
 
 
 def update_workflow_execution_status(workflow_execution, executable_task_dependencies):
