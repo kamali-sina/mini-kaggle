@@ -20,12 +20,24 @@
          contenteditable="true" onkeyup="bindTo(event, '{{ field.id_for_label }}')">
     </div>
     {% endif %}
+    {% if field.field.create_link %}
+    <div class="right floated left aligned nine wide column {% if field.errors %} field error {% endif %}">
+        {{ field }}
+    </div>
+    <div class="right floated left aligned one wide column"
+         style="display: flex; justify-content: center; align-items: center;">
+        <a href="{{ field.field.create_link }}?next={{ request.get_full_path }}"><i
+                class="green plus icon"></i></a>
+    </div>
+    {% else %}
     <div class="right floated left aligned ten wide column {% if field.errors %} field error {% endif %}">
         {{ field }}
     </div>
+    {% endif %}
     {{ field.errors }}
     {% endfor %}
     {% if submit_value %}
     <input type="submit" value="{{ submit_value }}" class="ui button" style="margin-bottom: 30px; margin-top: 30px;">
     {% endif %}
+    <input type="hidden" name="next" value="{{ next }}">
 </div>

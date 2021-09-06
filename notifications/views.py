@@ -1,5 +1,5 @@
 from django.template.loader import render_to_string
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render
@@ -17,12 +17,18 @@ def create_notification_source(request):
         typed_form = NOTIFICATION_TYPED_FORM_REGISTRY[request.POST['type']](request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Notification source created successfully :)")
+            if 'next' in request.POST:
+                return HttpResponseRedirect(request.POST['next'])
+            else:
+                messages.success(request, "Notification source created successfully :)")
     else:
         form = CreateNotificationSourceForm(user=request.user)
         typed_form = NOTIFICATION_TYPED_FORM_REGISTRY[NotificationSource.DEFAULT_TYPE]()
+    context = {'form': form,
+               'typed_form': typed_form,
+               'next': request.GET.get('next', '')}
     return HttpResponse(
-        render(request, 'notifications/create_notification.html', context={'form': form, 'typed_form': typed_form}))
+        render(request, 'notifications/create_notification.html', context=context))
 
 
 def get_typed_notification_form(request, notification_type):
