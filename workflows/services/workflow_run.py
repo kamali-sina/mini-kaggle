@@ -28,8 +28,9 @@ def run_task_dependencies(workflow_execution):
     executable_task_dependencies = get_executable_task_dependencies(workflow_execution)
     update_workflow_execution_status(workflow_execution, executable_task_dependencies)
     for task_dependency in executable_task_dependencies:
+        task_execution = TaskExecution.objects.get(id=run_task(task_dependency.task))
         TaskDependencyExecution.objects.create(workflow_execution=workflow_execution,
-                                               task_execution__id=run_task(task_dependency.task))
+                                               task_execution=task_execution)
 
 
 def get_executable_task_dependencies(workflow_execution):
@@ -38,8 +39,9 @@ def get_executable_task_dependencies(workflow_execution):
 
     return workflow_execution.workflow.task_dependencies.exclude(
         task__in=workflow_execution.task_dependency_executions.values_list('task_execution__task', flat=True)).annotate(
-        succeeded_parents_no=Count('parent_tasks', filter=succeeded_parents_no_query)).filter(
-        Q(parent_tasks=None) | Q(succeeded_parents_no=F('parent_tasks')))
+        succeeded_parents_no=Count('parent_tasks', filter=succeeded_parents_no_query),
+        parent_tasks_no=Count('parent_tasks', filter=Q())).filter(
+        Q(parent_tasks=None) | Q(succeeded_parents_no=F('parent_tasks_no')))
 
 
 def update_workflow_execution_status(workflow_execution, executable_task_dependencies):
