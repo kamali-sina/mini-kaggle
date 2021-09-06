@@ -23,11 +23,11 @@ STATUS_CONTEXT_DICT = {
     },
     WorkflowExecution.StatusChoices.RUNNING: {
         "text": "running",
-        "color": "grey",
+        "color": "light blue",
     },
     WorkflowExecution.StatusChoices.PENDING: {
         "text": "pending",
-        "color": "white",
+        "color": "grey",
     }
 }
 
@@ -82,10 +82,48 @@ class WorkflowListView(LoginRequiredMixin, ListView):
         return context
 
 
+# pylint: disable=bare-except
+def generate_dag_context(context, workflow: Workflow):
+    for task_dependency in workflow.task_dependencies.all():
+        wfe = workflow.workflowexecution_set.last()
+        try:
+            te_status = wfe.task_dependency_executions.get(
+                task_execution__task=task_dependency.task).task_execution.status
+        except:
+            te_status = WorkflowExecution.StatusChoices.PENDING
+        node_dict = {
+            'id': str(task_dependency.task.id),
+            'label': task_dependency.task.name,
+            'x': 50 * task_dependency.id,
+            'y': 50 * task_dependency.parent_tasks.all().count(),
+            'color': STATUS_CONTEXT_DICT[te_status]['color'],
+            'size': 2,
+        }
+        context['nodes'].append(node_dict)
+        for task_dependency_parent in task_dependency.parent_tasks.all():
+            edge_dict = {
+                'id': 'e' + str(task_dependency_parent.task.id) + 't' + str(task_dependency.task.id),
+                'source': str(task_dependency_parent.task.id),
+                'target': str(task_dependency.task.id),
+                'size': 1,
+            }
+            context['edges'].append(edge_dict)
+
+
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
     model = Workflow
     template_name = 'detail_workflow.html'
     context_object_name = 'workflow'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        workflow = context['workflow']
+
+        context['nodes'] = []
+        context['edges'] = []
+        generate_dag_context(context, workflow)
+
+        return context
 
 
 class WorkflowScheduleRedirectView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, View):
