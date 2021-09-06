@@ -39,8 +39,12 @@ class CreateDatasetForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        dataset_title = cleaned_data['title']
+        is_public = cleaned_data['is_public']
         data_source = cleaned_data['data_source']
         file = cleaned_data['file']
+        if Dataset.objects.filter(is_public=is_public).filter(title=dataset_title):
+            raise ValidationError('Dataset name already used!')
         try:
             conform_dataset(file, data_source)
         except Exception as exc:
@@ -108,14 +112,19 @@ class CreateDataSourceForm(forms.ModelForm):
         datasource.save()
         return datasource
 
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data['title']
+        if DataSource.objects.filter(title=title):
+            raise ValidationError('Data source name already used!')
+
 
 TYPE_CHOICES = [
     ("int", "Integer"),
-    ("str", "String"),
+    ("object", "String"),
     ("bool", "Boolean"),
     ("float", "Floating point"),
     ("double", "Double"),
-    ("object", "Object"),
 ]
 
 

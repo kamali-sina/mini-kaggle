@@ -3,10 +3,9 @@
 
 {% block head %}{% endblock %}
 
-{% block title %}Delete Dataset{% endblock %}
+{% block title %}Delete Data Source{% endblock %}
 
 {% block body %}
-
 
     <div class="ui center aligned page grid segment">
         <div class="delete_form_container">
@@ -14,8 +13,8 @@
             <form method="post" class="ui form">
                 {% csrf_token %}
                 <br>
-                <input type="submit" value="Yes, delete it" class="negative ui button">
-                <a href="{% url 'datasets:detail' view.object.id %}" class="ui button">Cancel</a>
+                <input type="submit" value="Yes" class="negative ui button">
+                <a href="{% url 'datasets:detail_datasource' view.object.id %}" class="ui button">Cancel</a>
             </form>
         </div>
     </div>

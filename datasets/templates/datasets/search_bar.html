@@ -5,7 +5,7 @@
 </script>
 <script src="{% static 'datasets/scripts/search_bar.js' %}"></script>
 
-<form action="{% url 'datasets:index' %}?{{ request.GET.urlencode }}" method="post" id="search_bar">
+<form action="{% url 'datasets:index' %}{{ url }}?{{ request.GET.urlencode }}" method="post" id="search_bar">
     {% csrf_token %}
     <div class="ui menu">
         <div class="ui category search item">

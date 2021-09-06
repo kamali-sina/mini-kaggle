@@ -3,7 +3,7 @@ import operator
 import re
 from functools import reduce
 
-from django.views import generic
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
@@ -39,8 +39,10 @@ def has_dataset_owner_perm(request, pk):
     return dataset.creator.id == request.user.id
 
 
-class DataSourceCreateView(LoginRequiredMixin, generic.CreateView):
-    """Data SOurce create view in which column objects can be dynamically added to the data source-to-be-created"""
+class DataSourceCreateView(LoginRequiredMixin, CreateView):
+    """
+    Data Source create view in which column objects can be dynamically added to the data source-to-be-created
+    """
     model = DataSource
     form_class = CreateDataSourceForm
     template_name = 'datasources/create.html'
@@ -64,7 +66,9 @@ class DataSourceCreateView(LoginRequiredMixin, generic.CreateView):
         column_form = ColumnsFormSet(self.request.POST)
         if form.is_valid() and column_form.is_valid():
             return self.form_valid(form, column_form)
-        return HttpResponse("Something went wrong!")
+        return self.render_to_response(
+            self.get_context_data(form=form,
+                                  column_form=column_form))
 
     def form_valid(self, form, column_form):
         datasource = form.save(self.request.user)
@@ -75,14 +79,31 @@ class DataSourceCreateView(LoginRequiredMixin, generic.CreateView):
         return HttpResponseRedirect(success_url)
 
 
-class DataSourceListView(LoginRequiredMixin, generic.ListView):
+class DataSourceListView(LoginRequiredMixin, ListView):
     ITEMS_PER_PAGE = 10
     paginate_by = ITEMS_PER_PAGE
     template_name = "datasources/list.html"
     context_object_name = "datasources_list"
 
+    def post(self, request):
+        return super().get(request)
+
     def get_queryset(self):
-        return DataSource.objects.filter(creator=self.request.user)
+        return DataSource.objects.filter(self.get_title_search_words_query(), creator=self.request.user)
+
+    def get_title_search_words_query(self):
+        query_list = [Q(title__icontains=search_word) for search_word in self.get_title_search_words()]
+        return reduce(operator.or_, query_list, Q())
+
+    def get_title_search_words(self):
+        return re.split(r'\s+',
+                        self.request.POST.get('search_box', '')) if 'search_box' in self.request.POST else []
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['searched'] = self.request.POST.get('search_box', '')
+        context['url'] = 'datasources'
+        return context
 
 
 @login_required
@@ -94,7 +115,14 @@ def datasource_detail_view(request, pk):
     return HttpResponse("Bad request!", status=400)
 
 
-class DatasetListView(LoginRequiredMixin, generic.ListView):
+@method_decorator(login_required, name='dispatch')
+class DataSourceDeleteView(DeleteView):
+    model = DataSource
+    template_name = 'datasources/datasource_confirm_delete.html'
+    success_url = reverse_lazy('datasets:list_datasource')
+
+
+class DatasetListView(LoginRequiredMixin, ListView):
     """datasets list view in which datasets can be filtered by their tags and searched by their titles"""
     ITEMS_PER_PAGE = 10
     paginate_by = ITEMS_PER_PAGE
@@ -135,6 +163,8 @@ class DatasetListView(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['visibility'] = self.visibility
+        if self.visibility == 'public':
+            context['url'] = 'public'
         if self.request.user.is_authenticated:
             context['inactive_tags'] = self.request.user.tags.exclude(text__in=self.request.GET.getlist('tag'))
         else:
@@ -144,7 +174,7 @@ class DatasetListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
-class DatasetCreateView(LoginRequiredMixin, generic.CreateView):
+class DatasetCreateView(LoginRequiredMixin, CreateView):
     model = Dataset
     form_class = CreateDatasetForm
     template_name = 'datasets/upload.html'
@@ -157,7 +187,7 @@ class DatasetCreateView(LoginRequiredMixin, generic.CreateView):
     def form_valid(self, form):
         candidate = form.save(self.request.user)
         success_url = reverse("datasets:detail", args=(candidate.pk,))
-        messages.success(self.request, 'Your dataset has been created :)')
+        messages.success(self.request, 'Dataset created successfully')
         return HttpResponseRedirect(success_url)
 
 
@@ -211,7 +241,7 @@ def dataset_download_view(request, pk):
 
 
 @method_decorator(has_permission(has_dataset_owner_perm), name='dispatch')
-class DatasetUpdateView(LoginRequiredMixin, generic.UpdateView):
+class DatasetUpdateView(LoginRequiredMixin, UpdateView):
     model = Dataset
     form_class = UpdateDatasetForm
 
@@ -221,7 +251,7 @@ class DatasetUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(has_permission(has_dataset_owner_perm), name='dispatch')
-class DatasetDeleteView(generic.DeleteView):
+class DatasetDeleteView(DeleteView):
     model = Dataset
     success_url = reverse_lazy('datasets:index')
 

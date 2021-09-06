@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-<link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
 {% endblock %}
 
 {% block title %}Upload Dataset{% endblock %}
@@ -10,12 +10,12 @@
 {% block body %}
 
 
-<div class="ui center aligned page grid segment">
-    <form enctype="multipart/form-data" action="{% url 'datasets:upload' %}" method="post" class="ui form">
-        {% csrf_token %}
-        {% include 'registration/basic_form.html' with form=form title='Upload a new file' submit_value='Submit'%}
-    </form>
+    <div class="ui center aligned page grid segment">
+        <form enctype="multipart/form-data" action="{% url 'datasets:upload' %}" method="post" class="ui form">
+            {% csrf_token %}
+            {% include 'registration/basic_form.html' with form=form title='Upload a new file' submit_value='Submit' %}
+        </form>
 
-</div>
+    </div>
 
 {% endblock %}
