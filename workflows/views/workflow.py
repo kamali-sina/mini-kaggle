@@ -1,3 +1,4 @@
+import random
 import json
 
 from django.http import HttpResponse, HttpResponseRedirect
@@ -25,7 +26,7 @@ STATUS_CONTEXT_DICT = {
     },
     WorkflowExecution.StatusChoices.RUNNING: {
         "text": "running",
-        "color": "light blue",
+        "color": "blue",
     },
     WorkflowExecution.StatusChoices.PENDING: {
         "text": "pending",
@@ -82,6 +83,30 @@ class WorkflowListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['status'] = STATUS_CONTEXT_DICT
         return context
+
+
+def set_chart_colors(colors, tasks):
+    # pylint: disable=unused-variable
+    for i in range(len(tasks)):
+        color = ["#" + ''.join([random.choice('ABCDEF0123456789') for i in range(6)])]
+        colors.append(color)
+
+
+def generate_chart_context(workflow, context):
+    workflow_executions = workflow.workflowexecution_set.all()
+    for workflow_execution in workflow_executions:
+        context['execution_timestamps'].append(workflow_execution.created_at.strftime("%m/%d/%Y"))
+
+    for workflow_task_dependency in workflow.task_dependencies.all():
+        task = workflow_task_dependency.task
+        context['tasks'].append(task.name)
+        context['task_executions_run_time'][task.name] = []
+        print(task.taskexecution_set.all())
+        for task_execution in task.taskexecution_set.all():
+            if task_execution.run_time:
+                context['task_executions_run_time'][task.name].append(task_execution.run_time)
+            else:
+                context['task_executions_run_time'][task.name].append(0)
 
 
 # pylint: disable=bare-except
@@ -142,6 +167,17 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
         context['workflow_task_executions'] = {}
 
         get_task_executions_context(workflow, context)
+
+        # labels for xAxis
+        context['execution_timestamps'] = []
+        # chart lines and their data
+        context['tasks'] = []
+        context['task_executions_run_time'] = {}
+        # chart lines colors
+        context['colors'] = []
+
+        generate_chart_context(workflow, context)
+        set_chart_colors(context['colors'], context['tasks'])
 
         context['nodes'] = []
         context['edges'] = []

@@ -1,1 +1,38 @@
-Task Durations
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<canvas id="myChart" width="400" height="400"></canvas>
+
+    <script>
+        var colors = {{ colors|safe }};
+        var tasks = {{ tasks|safe }};
+        var task_execution_run_time = {{ task_executions_run_time|safe }};
+        var graph_labels = {{ execution_timestamps|safe }};
+        datasets_list = []
+        for (let i = 0; i < {{ tasks|length }}; i++) {
+            datasets_list.push({
+                label: tasks[i],
+                backgroundColor: colors[i],
+                borderColor: colors[i],
+                borderWidth: 3,
+                data: task_execution_run_time[tasks[i]],
+                fill: false,
+            });
+        }
+        new Chart("myChart",
+            {
+                type: 'line',
+                options: {
+                    legend: {display: true},
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                },
+                data: {
+                    labels: graph_labels,
+                    datasets: datasets_list,
+                }
+            });
+    </script>
