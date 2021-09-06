@@ -8,6 +8,7 @@
         margin: 15px auto;
     }
 </style>
+<link rel="stylesheet" type="text/css" href="{% static 'data_platform/styles/basic_info.css' %}">
 {% endblock %}
 
 {% block title %}Task Details{% endblock %}
@@ -16,55 +17,71 @@
 
 
 <div class="ui segment">
+    <h4><a href="{% url 'workflows:list_task' %}">Back to list</a></h4>
     <ul>
         {# Fix this return url, go somewhere better instead of the task list#}
-        <li><a href="{% url 'workflows:list_task' %}">Back to list</a></li>
+        <div class="separator medium"></div>
         <h1>{{ task.name }}</h1>
+        <div class="separator medium"></div>
+        <div class="ui grid info-grid">
         {% for key,value in special_display_fields.items %}
-        <li><strong>{{ key }}: </strong>{{ value }}</li>
+            <div class="left floated left aligned four wide column key">
+                {{ key }}:
+            </div>
+            <div class="left floated left aligned twelve wide column value">
+                {{ value }}
+            </div>
         {% endfor %}
-
-        <li><strong>Type: </strong>{{ task.get_task_type_display }}</li>
-        <li><strong>Accessible secret variables: </strong>
-            <ul>
+            <div class="left floated left aligned four wide column key">
+                Type:
+            </div>
+            <div class="left floated left aligned twelve wide column value">
+                {{ task.get_task_type_display }}
+            </div>
+            {% if task.secret_variables.all %}
+            <div class="left floated left aligned four wide column key">
+                Accessible secret variables:
+            </div>
+            <div class="left floated left aligned twelve wide column value">
+                <ul>
                 {% for secret_variable in task.secret_variables.all %}
                 <li>
                     <i class="right triangle icon grey"></i>
                     {{ secret_variable.name }}
                 <li>
                     {% endfor %}
-            </ul>
-        </li>
-        <li><strong>Creator: </strong>
-            {% if task.creator.get_full_name %}
-            {{ task.creator.get_full_name }}
-            {% else %}
-            {{ task.creator.username }}
+                </ul>
+            </div>
             {% endif %}
-        </li>
-        {% if accessible_datasets %}
-        <li><strong>Accessible datasets: </strong>
-            <ul>
-                {% for dataset_path in accessible_datasets %}
-                <li>
-                    <i class="right triangle icon grey"></i>
-                    {{ dataset_path }}
-                </li>
-                {% endfor %}
-            </ul>
-        </li>
-        {% endif %}
-        <div style="display: flex;">
-            <form method="post" style="margin: 10px;" action="delete/">{% csrf_token %}
-                <input type="submit" value="Delete" class="negative ui button">
-            </form>
-            <span style="margin: 10px 2px;">
-                <a class="positive ui icon button"
-                    data-tooltip="Include task in a workflow to run!">
-                    Run Task
-                </a>
-            </span>
+            <div class="left floated left aligned four wide column key">
+                Creator:
+            </div>
+            <div class="left floated left aligned twelve wide column value">
+                {% if task.creator.get_full_name %}
+                {{ task.creator.get_full_name }}
+                {% else %}
+                {{ task.creator.username }}
+                {% endif %}
+            </div>
+            {% if accessible_datasets %}
+            <div class="left floated left aligned four wide column key">
+                Accessible datasets:
+            </div>
+            <div class="left floated left aligned twelve wide column value">
+                <ul>
+                    {% for dataset_path in accessible_datasets %}
+                    <li>
+                        <i class="right triangle icon grey"></i>
+                        {{ dataset_path }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
         </div>
+
+
+        <div class="separator large"></div>
 
         {% if task.executions %}
         <h3>Executions:</h3>
