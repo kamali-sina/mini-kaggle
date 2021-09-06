@@ -4,6 +4,7 @@ import docker
 from django.shortcuts import get_object_or_404
 from notebooks.models import Session
 
+DOCKER_EXITED = 'exited'
 
 class SessionIsDown(Exception):
     pass
@@ -68,6 +69,12 @@ class SessionService:
         if not self.session.container_id:
             self.start()
         self._check_fifo()
+        self._update_container()
+    
+    def _update_container(self):
+        """
+        Updates the self.container object
+        """
         client = docker.from_env()
         self.container = client.containers.get(self.session.container_id)
 
@@ -138,7 +145,7 @@ class SessionService:
             if line.strip() != '':
                 code_lines.append(line)
         for i, line in enumerate(code_lines):
-            if line[0] != '\t':
+            if line[0] != '\t' and line[0] != ' ':
                 code_lines[i] = '\n' + line
         script = '\n'.join(code_lines) + '\n'
         return script
@@ -147,15 +154,24 @@ class SessionService:
         """
         Sends users script to session to run
 
-        throws: SessionIsDown exception
         script(str): users script to run
         returns: nothing
         """
-        if self.session.status != Session.SessionStatus.RUNNING:
-            raise SessionIsDown('Session is down.')
         script = self._get_cleaned_script(script)
         with open(self.fifo_path, 'w', encoding='UTF-8') as fifo_write:
             fifo_write.write(script)
+    
+    def _run_session_checks(self):
+        """
+        Checks if the session is up and its container is intact
+
+        throws: SessionIsDown exception
+        """
+        if self.session.status != Session.SessionStatus.RUNNING:
+            raise SessionIsDown('Session is down.')
+        container_state = self.container.attrs["State"]
+        if (container_state["Status"] == DOCKER_EXITED):
+            raise SessionIsDown('Session container has exited.')
 
     def _get_logs(self):
         """
@@ -178,7 +194,10 @@ class SessionService:
         """
         Runs the user's script in the session
 
+        throws: SessionIsDown exception
         returns(str): output of the script
         """
+        self._update_container()
+        self._run_session_checks()
         self._send_script(script)
         return self._get_logs()
