@@ -15,12 +15,9 @@
 
 {% block body %}
     <div class="ui center aligned page grid segment">
-        <div class="ui center aligned page grid segment">
-            <form enctype="multipart/form-data" action="" method="post" class="ui form">
-                {% csrf_token %}
-                {% include 'registration/basic_form.html' with form=form title='Create a workflow' submit_value='Create Workflow' %}
-            </form>
-        </div>
+        <form enctype="multipart/form-data" action="" method="post" class="ui form">
+            {% csrf_token %}
+            {% include 'registration/basic_form.html' with form=form title='Create a workflow' submit_value='Create Workflow' %}
         </form>
     </div>
 {% endblock %}
