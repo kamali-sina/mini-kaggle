@@ -23,6 +23,10 @@ const cellResultHtmlString = `{% include 'notebooks/cell_result.html' with id="{
 
 {% block full_width_body %}
 
+<div class="ui active dimmer" id="page-loading">
+    <div class="ui loader"></div>
+</div>
+
 
 <div id="split-pane">
     <div id="side-pane">

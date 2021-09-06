@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404
@@ -12,8 +11,8 @@ from django.http import HttpResponseRedirect, JsonResponse
 
 from datasets.views import has_permission
 from workflows.models import PythonTask
+from notebooks.services.notebook import get_notebook_session_service
 from notebooks.models import Cell
-from notebooks.services.session import make_new_session, SessionService
 from notebooks.models import Notebook
 from notebooks.models import CODE_SNIPPETS_DIR
 from notebooks.forms import ExportNotebookForm, NotebookForm
@@ -95,14 +94,7 @@ def snippet_detail_view(request, name):
 
 
 def restart_kernel_view(request, pk):
-    notebook = get_object_or_404(Notebook, pk=pk)
-
-    if notebook.session_id:
-        session_id = notebook.session_id
-    else:
-        session_id = make_new_session()
-
-    session_service = SessionService(session_id)
+    session_service=get_notebook_session_service(pk)
     session_service.restart()
     return JsonResponse({})
 

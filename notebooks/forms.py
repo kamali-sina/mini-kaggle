@@ -37,6 +37,7 @@ class ExportNotebookForm(ModelForm):
         self.fields['timeout'].help_text = 'leave empty, for no time limit'
         self.fields['secret_variables'].label = 'Add secret variable to task execution'
         self.fields['secret_variables'].queryset = Secret.objects.filter(creator=self.creator)
+        self.fields['docker_image'].initial = "python:3.8-slim-buster"
 
     class Meta:
         model = PythonTask

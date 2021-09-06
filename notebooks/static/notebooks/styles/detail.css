@@ -98,3 +98,10 @@
     border-width: 1px;
     padding: 20px;
 }
+
+#page-loading{
+    position: fixed;
+    width: 100%;
+    display: none;
+    height: 100%;
+}

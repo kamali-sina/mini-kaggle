@@ -1,23 +1,18 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
 
-from notebooks.models import Notebook, Cell
-from notebooks.services.session import SessionService, make_new_session
+from notebooks.models import Cell, Notebook
+from notebooks.services.notebook import get_notebook_session_service
+from notebooks.services.session import SessionIsDown
 
 
 class NotebookConsumer(WebsocketConsumer):
+
     def connect(self):
         # pylint: disable=attribute-defined-outside-init
-        notebook_id = self.scope['url_route']['kwargs']['notebook_id']
-        notebook = Notebook.objects.get(pk=notebook_id)
-
-        if notebook.session_id:
-            session_id = notebook.session_id
-        else:
-            session_id = make_new_session()
-
-        self.session_service = SessionService(session_id)
-
+        self.notebook_id = self.scope['url_route']['kwargs']['notebook_id']
+        if not Notebook.objects.filter(pk=self.notebook_id).exists():
+            raise Exception("Notebook not found")
         self.accept()
 
     def disconnect(self, code):
@@ -27,18 +22,24 @@ class NotebookConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         cell_id = text_data_json['cell_id']
         code = text_data_json['code']
-
         cell = Cell.objects.get(pk=cell_id)
         cell.code = code
         cell.cell_status = Cell.CellStatus.RUNNING
         cell.save()
 
-        result = self.session_service.run_script(code)
-
-        cell.cell_status = Cell.CellStatus.DONE
-        cell.save()
+        try:
+            session_service = get_notebook_session_service(self.notebook_id)
+            result = session_service.run_script(code)
+            message_type = "run_cell"
+        except SessionIsDown:
+            result = "Session is down. Please restart session"
+            message_type = "notification"
 
         self.send(text_data=json.dumps({
             'cell_id': cell_id,
             'result': result,
+            'message_type': message_type,
         }))
+
+        cell.cell_status = Cell.CellStatus.DONE
+        cell.save()
