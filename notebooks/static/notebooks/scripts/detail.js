@@ -148,6 +148,8 @@ function saveCell(cellId) {
             .then(handleErrors)
             .then(r => markSaved(cellId))
             .catch(e => showToast('Failed to save the cell'))
+    } else {
+        markSaved(cellId)
     }
 }
 
