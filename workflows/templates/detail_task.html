@@ -58,9 +58,12 @@
                 <form method="post" style="margin: 10px;" action="delete/">{% csrf_token %}
                     <input type="submit" value="Delete" class="negative ui button">
                 </form>
-                <form method="post" style="margin: 10px;" action="run/">{% csrf_token %}
-                    <input type="submit" value="Run task" class="ui button">
-                </form>
+                <span style="margin: 10px 2px;">
+                    <a class="positive ui icon button"
+                        data-tooltip="Include task in a workflow to run!">
+                        Run Task
+                    </a>
+                </span>
             </div>
 
             {% if task.executions %}
