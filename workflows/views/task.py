@@ -7,9 +7,11 @@ from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.template.defaulttags import register
 
 from workflows.models import Task, TaskExecution
 from workflows.forms import TaskForm, TASK_TYPED_FORM_REGISTRY
+from workflows.views.workflow import STATUS_CONTEXT_DICT
 from workflows.services.docker import task_status_color, get_special_display_fields, get_task_type, DockerTaskService, \
     MarkTaskExecutionStatusOptions, read_task_execution_log_file
 from workflows.services.runner import get_service_runner
@@ -112,6 +114,14 @@ class TaskListView(LoginRequiredMixin, ListView):
 
         return tasks
 
+    @register.filter
+    def get_value(self, key):
+        return self.get(key)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status'] = STATUS_CONTEXT_DICT
+        return context
 
 def run_task_view(request, pk):
     task = get_object_or_404(Task, pk=pk)
