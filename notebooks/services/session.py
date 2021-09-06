@@ -187,7 +187,7 @@ class SessionService:
         normal_log = log[start:].replace(logend, '')
         if normal_log.strip() != '' or self.session.run_counter == 1:
             return normal_log
-        lastlogend = self.LOGEND%(self.session_uuid, self.session.run_counter - 1)
+        lastlogend = self.LOGEND%(self.session.uuid, self.session.run_counter - 1)
         start = log.find(lastlogend) + len(lastlogend)
         return log[start:].replace(logstart, '').replace(logend, '')
 
