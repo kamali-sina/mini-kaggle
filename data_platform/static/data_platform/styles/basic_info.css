@@ -1,0 +1,17 @@
+.key {
+    font-size: larger;
+    font-weight: bold;
+    margin-bottom: -10px;
+}
+
+.value {
+    margin-bottom: -10px;
+}
+
+.separator.large{
+    margin-top: 100px;
+}
+
+.separator.medium{
+    margin-top: 50px;
+}
