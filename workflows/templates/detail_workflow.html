@@ -19,15 +19,15 @@
         <ul>
             <li><h1>{{ workflow.name }}</h1></li>
             <div class="ui pointing secondary menu">
-                <a class="item active" data-tab="EXECUTIONS">Executions History</a>
-                <a class="item" data-tab="DAG">Task Dependencies DAG</a>
+                <a class="item active" data-tab="DAG">Task Dependencies DAG</a>
+                <a class="item" data-tab="EXECUTIONS">Executions History</a>
                 <a class="item" data-tab="DURATION">Tasks Duration</a>
-            </div>
-            <div class="ui tab" data-tab="EXECUTIONS">
-                {% include 'workflows/workflow_executions_history.html' %}
             </div>
             <div class="ui tab active" data-tab="DAG">
                 {% include 'workflows/DAG.html' %}
+            </div>
+            <div class="ui tab" data-tab="EXECUTIONS">
+                {% include 'workflows/workflow_executions_history.html' %}
             </div>
             <div class="ui tab" data-tab="DURATION">
                 {% include 'workflows/task_duration.html' %}
