@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, JsonResponse
 
 from datasets.views import has_permission
+from notebooks.services.datasets import get_accessible_datasets_mount_dict, get_accessible_datasets
 from workflows.models import PythonTask
 from notebooks.services.notebook import get_notebook_session_service
 from notebooks.models import Cell
@@ -37,6 +38,11 @@ class NotebooksListView(LoginRequiredMixin, generic.ListView):
 
 class NotebookDetailView(LoginRequiredMixin, generic.DetailView):
     model = Notebook
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["accessible_datasets"] = get_accessible_datasets(context["object"])
+        return context
 
 
 class NotebookDeleteView(LoginRequiredMixin, NotebookCreatorOnlyMixin, generic.DeleteView):
@@ -94,7 +100,7 @@ def snippet_detail_view(request, name):
 
 
 def restart_kernel_view(request, pk):
-    session_service=get_notebook_session_service(pk)
+    session_service = get_notebook_session_service(pk)
     session_service.restart()
     return JsonResponse({})
 

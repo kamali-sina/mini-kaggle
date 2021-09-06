@@ -3,6 +3,7 @@ from uuid import uuid4
 import docker
 from django.shortcuts import get_object_or_404
 from notebooks.models import Session
+from notebooks.services.datasets import get_accessible_datasets_mount_dict
 
 DOCKER_EXITED = 'exited'
 
@@ -89,13 +90,19 @@ class SessionService:
             return
         self._make_fifo()
         client = docker.from_env()
+
+        volumes = {}
+        if self.session.notebook:
+            volumes.update(get_accessible_datasets_mount_dict(self.session.notebook))
+        volumes.update({self.fifo_path: {"bind": f"/{self.fifo_name}"}})
+
         self.container = client.containers.run(
-                        "m.docker-registry.ir/python:3.8-slim-buster",
-                        ["sh", "-c", f"python -i -u <>/{self.fifo_name}"],
-                        stdin_open=True,
-                        detach=True,
-                        volumes={self.fifo_path: {"bind": f"/{self.fifo_name}"}}
-                    )
+            "m.docker-registry.ir/python:3.8-slim-buster",
+            ["sh", "-c", f"python -i -u <>/{self.fifo_name}"],
+            stdin_open=True,
+            detach=True,
+            volumes=volumes
+        )
         self.session.container_id = str(self.container.id)
         self.session.status = Session.SessionStatus.RUNNING
         self.session.save()

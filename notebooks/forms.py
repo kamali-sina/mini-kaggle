@@ -13,16 +13,19 @@ class NotebookForm(ModelForm):
     def __init__(self, *args, **kwargs):
         self.creator = kwargs.pop('user')
         super().__init__(*args, **kwargs)
+        self.fields['accessible_datasets'].label = 'Select the datasets this task will make use of'
+        self.fields['accessible_datasets'].queryset = self.creator.datasets
 
     class Meta:
         model = Notebook
-        fields = ['name']
+        fields = ['name', 'accessible_datasets']
 
     def save(self, commit=True):
         notebook = super().save(commit=False)
         notebook.creator = self.creator
         if commit:
             notebook.save()
+            self.save_m2m()
         return notebook
 
 
