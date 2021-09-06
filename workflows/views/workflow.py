@@ -80,11 +80,13 @@ class WorkflowListView(LoginRequiredMixin, ListView):
         return context
 
 
+# pylint: disable=bare-except
 def generate_dag_context(context, workflow: Workflow):
     for task_dependency in workflow.task_dependencies.all():
         wfe = workflow.workflowexecution_set.last()
         try:
-            te_status = wfe.task_dependency_executions.get(task_execution__task=task_dependency.task).task_execution.status
+            te_status = wfe.task_dependency_executions.get(
+                task_execution__task=task_dependency.task).task_execution.status
         except:
             te_status = WorkflowExecution.StatusChoices.PENDING
         node_dict = {
