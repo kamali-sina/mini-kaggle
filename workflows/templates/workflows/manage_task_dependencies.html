@@ -1,0 +1,38 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
+<style>
+li {
+    font-size: 17px;
+    list-style: none;
+    margin: 15px auto;
+}
+</style>
+{% endblock %}
+
+{% block title %}Manage Task Dependencies{% endblock %}
+
+{% block body %}
+
+<div class="ui center aligned page grid segment">
+    {% include 'workflows/task_dependency_list.html' %}
+    {% include 'workflows/create_task_dependency_form.html' %}
+</div>
+
+<script>
+document.getElementById('id_parent_tasks').classList.add("ui", "selection", "dropdown")
+document.getElementById('id_parent_tasks').setAttribute('multiple', "")
+
+
+$('.ui.accordion')
+  .accordion()
+;
+$('.ui.dropdown')
+  .dropdown()
+;
+
+
+</script>
+{% endblock %}

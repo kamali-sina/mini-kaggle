@@ -84,7 +84,7 @@ def generate_dag(nodes, edges, workflow: Workflow):
     for task_dependency in workflow.task_dependencies.all():
         print(task_dependency.task.taskexecution_set.last())
         node_dict = {
-            'id': str(task_dependency.id),
+            'id': str(task_dependency.task.id),
             'label': task_dependency.task.name,
             'x': 50 * task_dependency.id,
             'y': 50 * task_dependency.parent_tasks.all().count(),
@@ -94,9 +94,9 @@ def generate_dag(nodes, edges, workflow: Workflow):
         nodes.append(node_dict)
         for task_dependency_parent in task_dependency.parent_tasks.all():
             edge_dict = {
-                'id': 'e' + str(task_dependency_parent.id) + 't' + str(task_dependency.id),
-                'source': str(task_dependency_parent.id),
-                'target': str(task_dependency.id),
+                'id': 'e' + str(task_dependency_parent.task.id) + 't' + str(task_dependency.task.id),
+                'source': str(task_dependency_parent.task.id),
+                'target': str(task_dependency.task.id),
                 'size': 1,
             }
             edges.append(edge_dict)
