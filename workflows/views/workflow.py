@@ -109,12 +109,12 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
             task = workflow_task_dependency.task
             context['tasks'].append(task.name)
             task_executions = task.taskexecution_set.all()
-            context['task_executions_run_time'][task.id] = []
+            context['task_executions_run_time'][task.name] = []
             for task_execution in task_executions:
                 if task_execution.run_time:
-                    context['task_executions_run_time'][task.id].append(task_execution.run_time)
+                    context['task_executions_run_time'][task.name].append(task_execution.run_time)
                 else:
-                    context['task_executions_run_time'][task.id].append(0)
+                    context['task_executions_run_time'][task.name].append(0)
 
         # chart lines colors
         context['colors'] = []
