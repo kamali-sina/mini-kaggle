@@ -14,9 +14,9 @@
 <div class="ui relaxed divided list">
     {% for datasource in datasources_list %}
     <div class="item">
-        <i class="large database middle aligned icon"></i>
+        <i class="large columns middle aligned icon"></i>
         <div class="content">
-            <a class="header" href="{% url "datasets:detail_datasource" datasource.id%}">{{ datasource.title }}</a>
+            <a class="header" href="{% url 'datasets:detail_datasource' datasource.id %}">{{ datasource.title }}</a>
         </div>
     </div>
     {% endfor %}

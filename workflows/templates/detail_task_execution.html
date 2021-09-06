@@ -18,10 +18,10 @@
         <ul>
             <li><a href="{% url 'workflows:detail_task' task_execution.task.id %}">Back to task</a></li>
             <hr>
-            <li>Task Name: {{ task_execution.task.name }}</li>
-            <li>status: {{ task_execution.get_status_display }}</li>
+            <li><strong>Task Name: </strong>{{ task_execution.task.name }}</li>
+            <li><strong>Status: </strong>{{ task_execution.get_status_display }}</li>
 
-            <li>log:</li>
+            <li><strong>Log:</strong></li>
             <li>
                 {% if task_execution_have_log %}
                     <div class="ui visible message">
