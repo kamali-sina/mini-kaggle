@@ -80,6 +80,28 @@ class WorkflowListView(LoginRequiredMixin, ListView):
         return context
 
 
+def generate_dag(nodes, edges, workflow: Workflow):
+    for task_dependency in workflow.task_dependencies.all():
+        print(task_dependency.task.taskexecution_set.last())
+        node_dict = {
+            'id': str(task_dependency.id),
+            'label': task_dependency.task.name,
+            'x': 50 * task_dependency.id,
+            'y': 50 * task_dependency.parent_tasks.all().count(),
+            'color': STATUS_CONTEXT_DICT[task_dependency.task.taskexecution_set.last().status]['color'],
+            'size': 2,
+        }
+        nodes.append(node_dict)
+        for task_dependency_parent in task_dependency.parent_tasks.all():
+            edge_dict = {
+                'id': 'e' + str(task_dependency_parent.id) + 't' + str(task_dependency.id),
+                'source': str(task_dependency_parent.id),
+                'target': str(task_dependency.id),
+                'size': 1,
+            }
+            edges.append(edge_dict)
+
+
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
     model = Workflow
     template_name = 'detail_workflow.html'
@@ -88,30 +110,10 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         workflow = context['workflow']
+
         context['nodes'] = []
         context['edges'] = []
-
-        for task_dependency in workflow.task_dependencies.all():
-            node_dict = {
-                'id': str(task_dependency.id),
-                'label': task_dependency.task.name,
-                'x': 50 * task_dependency.id,
-                'y': 50 * task_dependency.parent_tasks.all().count(),
-                'size': 2,
-            }
-            context['nodes'].append(node_dict)
-            for task_dependency_parent in task_dependency.parent_tasks.all():
-                edge_dict = {
-                    'id': 'e' + str(task_dependency_parent.id) + 't' + str(task_dependency.id),
-                    'source': str(task_dependency_parent.id),
-                    'target': str(task_dependency.id),
-                    'size': 1,
-                    'color': '#000000',
-                    'type': 'arrow'
-                }
-                context['edges'].append(edge_dict)
-        print(context['nodes'])
-        print(context['edges'])
+        generate_dag(context['nodes'], context['edges'], workflow)
 
         return context
 

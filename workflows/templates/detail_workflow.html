@@ -86,7 +86,8 @@
                 type: 'canvas'
             },
             settings: {
-                defaultNodeColor: '#22ea29',
+                defaultEdgeType: 'arrow',
+                defaultEdgeColor: '#000000',
                 maxNodeSize: 16,
                 minNodeSize: 45,
                 minEdgeSize: 5,
@@ -96,7 +97,7 @@
         });
 
         s.bind('clickNode rightClickNode', function (e) {
-                var url = "/workflows/{{ workflow.id }}/dependencies/" + e.data.node.id + "/";
+                var url = "dependencies/" + e.data.node.id + "/";
             console.log(url);
             location.replace(url)
         });

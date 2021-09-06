@@ -15,7 +15,7 @@
 {% block body %}
     <div class="ui segment">
         <ul>
-            <li><a href="{% url 'workflows:detail_workflow' task_dependency.workflow.id %}">Back to list</a></li>
+            <li><a href="{% url 'workflows:detail_workflow' task_dependency.workflow.id %}">Back to workflow</a></li>
             <li>
                 <strong>Task: </strong>
                 <a href="{% url 'workflows:detail_task' task_dependency.task.id %}">{{ task_dependency.task.name }}</a>
