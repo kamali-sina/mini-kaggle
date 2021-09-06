@@ -24,6 +24,8 @@
 {% if  workflows %}
 <h2>Workflows:<br></h2>
 
+<br>
+
 <table class="ui very basic table">
     <thead>
     <tr>
@@ -66,32 +68,32 @@
                 </button>
             </form>
             <span style="margin: 10px 2px;">
-                    <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui icon button"
-                       data-tooltip="Delete workflow">
-                        <i class="trash middle aligned icon"></i>
-                    </a>
-                </span>
+                <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui icon button"
+                    data-tooltip="Delete workflow">
+                    <i class="trash middle aligned icon"></i>
+                </a>
+            </span>
             <span style="margin: 10px 2px;">
-                    <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui icon button"
-                       data-tooltip="Schedule workflow">
-                        <i class="clock icon"></i>
-                    </a>
-                </span>
+                <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui icon button"
+                    data-tooltip="Schedule workflow">
+                    <i class="clock icon"></i>
+                </a>
+            </span>
             <span style="margin: 10px 2px;">
-                    <a href="{% url 'workflows:manage_dependencies' workflow.id %}" class="ui icon button"
-                       data-tooltip="Manage task dependencies">
-                        <i class="sitemap icon"></i>
-                    </a>
-                </span>
+                <a href="{% url 'workflows:manage_dependencies' workflow.id %}" class="ui icon button"
+                    data-tooltip="Manage task dependencies">
+                    <i class="sitemap icon"></i>
+                </a>
+            </span>
             {% if workflow.schedule %}
             <form method="post" style="margin: 10px 2px; display: flex; justify-content: center; align-items: center;">
                 {% csrf_token %}
                 <span class="ui toggle checkbox {% if not workflow.schedule.paused %}checked{% endif %}"
-                      style="display: flex; font-size: smaller; color: grey;">
-                        <input type="checkbox" name="pause" onchange="changePauseStatus(this, {{ workflow.id }})"
-                               checked="">
-                            {% if workflow.schedule.paused %}OFF{% else %}ON{% endif %}
-                    </span>
+                    style="display: flex; font-size: smaller; color: grey;">
+                    <input type="checkbox" name="pause" onchange="changePauseStatus(this, {{ workflow.id }})"
+                            checked="">
+                        {% if workflow.schedule.paused %}OFF{% else %}ON{% endif %}
+                </span>
             </form>
             {% endif %}
         </td>

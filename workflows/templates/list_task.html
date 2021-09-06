@@ -15,18 +15,53 @@
 
 {% block body %}
 {% if  tasks %}
+<h2>Tasks:<br></h2>
 
-<div class="ui relaxed divided list">
+<br>
+
+<table class="ui very basic table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Last Execution</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for task in tasks %}
-    <div class="item">
-        <i class="large tasks middle aligned icon"></i>
-        <div class="content">
+    <tr>
+        <td>
+            <i class="clipboard outline large left aligned icon"></i>
             <a class="header" href="{{ task.pk }}/">{{ task.name }}</a>
-            <div class="description">(Type: {{ task.get_task_type_display }})</div>
-        </div>
-    </div>
+        </td>
+        <td>{{ task.get_task_type_display }}</td>
+        {% if task.taskexecution_set.last %}
+        <td>
+            {% with task_execution_status=status|get_value:task.taskexecution_set.last.status %}
+            <a class="header" href="executions/{{ task.taskexecution_set.last }}/">
+                <div class="column"
+                    style=" margin: 5px; border-radius: 50%; width: 30px; height: 30px;
+                            border-style: solid; border-color: black; border-width: 1px;
+                            background-color: {{ task_execution_status.color }}"
+                    title="status: {{ task_execution_status.text }}">
+                </div>
+            </a>
+            {% endwith %}
+        {% else %}
+        <td>N/A</td>
+        {% endif %}
+        <td>
+            <span style="margin: 10px 2px;">
+                <a href="{% url 'workflows:delete_task' task.id %}" class="negative ui icon button"
+                    data-tooltip="Delete Task">
+                    <i class="trash middle aligned icon"></i>
+                </a>
+            </span>
+        </td>
     {% endfor %}
-</div>
+    </tbody>
+</table>
 
 <br>
 
