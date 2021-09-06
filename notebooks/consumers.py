@@ -1,7 +1,7 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
 
-from notebooks.models import Cell
+from notebooks.models import Cell, Notebook
 from notebooks.services.notebook import get_notebook_session_service
 from notebooks.services.session import SessionIsDown
 
@@ -11,7 +11,8 @@ class NotebookConsumer(WebsocketConsumer):
     def connect(self):
         # pylint: disable=attribute-defined-outside-init
         self.notebook_id = self.scope['url_route']['kwargs']['notebook_id']
-
+        if not Notebook.objects.filter(pk=self.notebook_id).exists():
+            raise Exception("Notebook not found")
         self.accept()
 
     def disconnect(self, code):
