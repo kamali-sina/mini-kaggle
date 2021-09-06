@@ -20,7 +20,7 @@
     <thead>
         <tr>
         <th>Name</th>
-        <th>Creator</th>
+         <th>Creator</th>
         <th>Last run status</th>
         <th>Last run time</th>
         <th>Actions</th>
@@ -30,7 +30,7 @@
         {% for workflow in workflows %}
         <tr>
             <td>
-                <i class="list alternate large middle aligned icon"></i>
+                <i class="tasks large left aligned icon"></i>
                 <a class="header" href="{{ workflow.pk }}/">{{ workflow.name }}</a>
             </td>
             <td>{{ workflow.creator.username }}</td>
@@ -50,20 +50,34 @@
             <td>N/A</td>
             <td>N/A</td>
             {% endif %}
-            <td>
-                <form method="post" style="margin: 10px;" action="{% url 'workflows:run_workflow' workflow.id %}">
+            <td style="display: flex;">
+                <form method="post" style="margin: 10px 5px;" action="{% url 'workflows:run_workflow' workflow.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="positive ui button">
-                        <div>
+                    <button type="submit" class="positive ui icon button" data-tooltip="Run workflow">
                             <i class="play circle middle aligned icon"></i>
-                        </div>
                     </button>
                 </form>
-                <span style="margin: 10px;">
-                    <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui button">
+                <span style="margin: 10px 2px;">
+                    <a href="{% url 'workflows:delete_workflow' workflow.id %}" class="negative ui icon button" data-tooltip="Delete workflow">
                         <i class="trash middle aligned icon"></i>
                     </a>
                 </span>
+                <span style="margin: 10px 2px;">
+                    <a href="{% url 'workflows:schedule_workflow' workflow.id %}" class="ui icon button" data-tooltip="Schedule workflow">
+                        <i class="clock icon"></i>
+                    </a>
+                </span>
+                <span style="margin: 10px 2px;">
+                    <a href="{% url 'workflows:manage_dependencies' workflow.id %}" class="ui icon button" data-tooltip="Manage task dependencies">
+                        <i class="sitemap icon"></i>
+                    </a>
+                </span>
+                <form method="post" style="margin: 10px 2px; display: flex; justify-content: center; align-items: center;" action="">
+                    {% csrf_token %}
+                    <span class="ui toggle checkbox" style="display: flex; font-size: smaller; color: grey;">
+                        <input type="checkbox" name="pause" onchange="toggleLabel(this)">
+                    </span>
+                </form>
             </td>
         </tr>
         {% endfor %}
@@ -82,5 +96,16 @@
 <a href="{% url 'workflows:create_workflow' %}">Add new workflow</a>
 <br>
 
+<script>
+    $('.ui.checkbox').checkbox('check');
 
+    function toggleLabel(element) {
+    console.log(element.parentNode.childNodes)
+        if(element.parentNode.childNodes[3].textContent == 'ON'){
+            element.parentNode.childNodes[3].textContent = 'OFF'
+        } else {
+            element.parentNode.childNodes[3].textContent = 'ON'
+        }
+    }
+</script>
 {% endblock %}
