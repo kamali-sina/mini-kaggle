@@ -2,35 +2,35 @@
 {% load static %}
 
 {% block head %}
-    <link rel="stylesheet" type="text/css" href="{% static 'datasets/styles/detail.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'data_platform/styles/basic_info.css' %}">
 {% endblock %}
 
 {% block title %}DataSource Details{% endblock %}
 
 {% block body %}
-    <div class="ui segment">
-        <h4><a href="{% url 'datasets:list_datasource' %}">Back to list</a></h4>
-        <hr>
-        <div style="font-style: italic; margin-top: 20px;">
-            <h3>{{ datasource.title }}</h3>
-        </div>
-        <br>
+<div class="ui segment">
+    <h4><a href="{% url 'datasets:list_datasource' %}">Back to list</a></h4>
+    <ul>
+        <div class="separator medium"></div>
+        <h1 class="title">{{ datasource.title }}</h1>
+        <div class="separator medium"></div>
         <table class="ui very basic table">
             <thead>
             <tr>
-                <th>Column Title</th>
+                <th style="color: #a6a6a6;">Column Title</th>
                 {% for column in datasource.column_set.all %}
-                    <th>{{ column.title }}</th>
+                <th>{{ column.title }}</th>
                 {% endfor %}
             </tr>
             <tr>
-                <th>Column Type</th>
+                <th style="color: #a6a6a6;">Column Type</th>
                 {% for column in datasource.column_set.all %}
-                    <th>{{ column.type }}</th>
+                <th>{{ column.type }}</th>
                 {% endfor %}
             </tr>
             </thead>
         </table>
-    </div>
+    </ul>
+</div>
 
 {% endblock %}

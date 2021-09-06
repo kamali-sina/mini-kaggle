@@ -1,0 +1,23 @@
+{% extends 'data_platform/basic.html' %}
+{% load static %}
+
+{% block head %}{% endblock %}
+
+{% block title %}Delete Task{% endblock %}
+
+{% block body %}
+
+
+<div class="ui center aligned page grid segment">
+    <div class="delete_form_container">
+        <h4>Are you sure you want to delete "{{ object }}"?</h4>
+        <form method="post" class="ui form">
+            {% csrf_token %}
+            <br>
+            <input type="submit" value="Yes, delete it" class="negative ui button">
+            <a href="{% url 'workflows:detail_task' view.object.id %}" class="ui button">Cancel</a>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

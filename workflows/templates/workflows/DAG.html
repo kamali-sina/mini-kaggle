@@ -1,0 +1,40 @@
+{% load static %}
+
+<script src="{% static 'data_platform/scripts/sigma.min.js' %}"></script>
+<script src="{% static 'data_platform/scripts/plugins/sigma.parsers.json.min.js' %}"></script>
+<div id="container" class="ui segment">
+    <div id="g-container" style="position: relative; width: 100%; height: 100%;"></div>
+</div>
+<script>
+    var i,
+        j,
+        s,
+        dag = {
+            nodes: [],
+            edges: []
+        };
+    dag.nodes = {{ nodes|safe }};
+    dag.edges = {{ edges|safe }};
+    s = new sigma({
+        graph: dag,
+        renderer: {
+            container: document.getElementById('g-container'),
+            type: 'canvas'
+        },
+        settings: {
+            defaultEdgeType: 'arrow',
+            defaultEdgeColor: '#000000',
+            defaultNodeColor: '#349e0d',
+            maxNodeSize: 16,
+            minNodeSize: 45,
+            minEdgeSize: 5,
+            maxEdgeSize: 5,
+            minArrowSize: 5,
+        }
+    });
+
+    s.bind('clickNode rightClickNode', function (e) {
+        var url = "/workflows/tasks/" + e.data.node.id + "/";
+        location.replace(url)
+    });
+</script>

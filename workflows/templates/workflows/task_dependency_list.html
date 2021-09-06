@@ -1,0 +1,27 @@
+<div class="left floated left aligned sixteen wide column">
+    <h1 style="text-align: center;">Task Dependencies</h1>
+</div>
+
+{% if not task_dependencies %}
+<div class="left floated left aligned sixteen wide column">
+    <h3 style="text-align: center; color: #d1d1d1;">Nothing yet</h3>
+</div>
+{% else %}
+<div class="left floated left aligned sixteen wide column">
+    <div class="ui styled accordion" style="width: 100%;">
+        {% for task_dependency in task_dependencies %}
+        <div class="title" style="padding: 20px; display: flex; align-items: center;">
+            <span style="font-size: 20px; font-style: italic;">{{ task_dependency.task.name }}</span>
+            <div style="width: 100%"></div>
+            <i class="dropdown icon"></i>
+            <span>Parents</span>
+        </div>
+        <div class="content">
+            {% for parent in task_dependency.parent_tasks.all %}
+            <p style="text-align: right; padding-right: 10px;">{{ parent.task.name }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

@@ -16,11 +16,12 @@
                 <a href="{% url 'users:login' %}" class="menu-item">Login</a>
                 <a href="{% url 'users:signup' %}" class="menu-item">Sign up</a>
             {% else %}
-                <a href="{% url 'datasets:index' %}" class="menu-item">Your datasets</a>
-                <a href="{% url 'datasets:list_datasource' %}" class="menu-item">Your data sources</a>
-                <a href="{% url 'workflows:list_workflow' %}" class="menu-item">Your workflows</a>
-                <a href="{% url 'workflows:list_secret' %}" class="menu-item">Your Secrets</a>
-                <a href="{% url 'notebooks:index' %}" class="menu-item">Your Notebooks</a>
+                <a href="{% url 'datasets:index' %}" class="menu-item">Datasets</a>
+                <a href="{% url 'datasets:list_datasource' %}" class="menu-item">Data Sources</a>
+                <a href="{% url 'workflows:list_workflow' %}" class="menu-item">Workflows</a>
+                <a href="{% url 'workflows:list_task' %}" class="menu-item">Tasks</a>
+                <a href="{% url 'workflows:list_secret' %}" class="menu-item">Secrets</a>
+                <a href="{% url 'notebooks:index' %}" class="menu-item">Notebooks</a>
                 <a href="{% url 'users:logout' %}" class="menu-item">Sign out</a>
                 <span style="font-style: italic">
                     <i class="user circle outline icon"></i>
