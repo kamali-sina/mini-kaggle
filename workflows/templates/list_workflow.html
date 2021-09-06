@@ -20,6 +20,7 @@
     <thead>
         <tr>
         <th>Name</th>
+         <th>Creator</th>
         <th>Last run status</th>
         <th>Last run time</th>
         <th>Actions</th>
@@ -29,9 +30,10 @@
         {% for workflow in workflows %}
         <tr>
             <td>
-                <i class="list alternate large middle aligned icon"></i>
+                <i class="tasks large left aligned icon"></i>
                 <a class="header" href="{{ workflow.pk }}/">{{ workflow.name }}</a>
             </td>
+            <td>{{ workflow.creator.username }}</td>
             {% if workflow.workflowexecution_set.last %}
                 <td>
                     {% with workflow_execution_status=status|get_value:workflow.workflowexecution_set.last.status %}
