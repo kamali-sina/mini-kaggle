@@ -1,1 +1,50 @@
-Workflow Executions History
+<table class="ui collapsing table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        {% for workflow_execution in workflow_executions %}
+            {% ifchanged %}
+            <th>{{ workflow_execution.created_at.time }}</th>
+            {% else %}
+            <th>--></th>
+            {% endifchanged %}
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><strong>{{ workflow.name }}</strong></td>
+        {% for workflow_execution in workflow_executions %}
+            {% with workflow_execution_status=status|get_value:workflow_execution.status %}
+                <td>
+                    <div style="background-color: {{ workflow_execution_status.color }};
+                            border-radius: 50%; width: 30px; height: 30px; border-style: solid; border-color: black; border-width: 1px"
+                         onclick="location.href='{% url 'workflows:detail_workflow' workflow.id %}';"
+                         title="status: {{ workflow_execution_status.text }}"></div>
+                </td>
+            {% endwith %}
+        {% endfor %}
+    </tr>
+    {% for task,task_executions in workflow_task_executions.items %}
+        <tr>
+            <td>{{ task.name }}</td>
+            {% for task_execution in task_executions reversed %}
+                {% with task_execution_status=status|get_value:task_execution.status %}
+                    <td>
+                        <div style="background-color: {{ task_execution_status.color }};
+                                width: 30px; height: 30px; border-style: solid; border-color: black; border-width: 1px"
+                             onclick="location.href='{% url 'workflows:detail_task' task.id %}';"
+                             title="status: {{ task_execution_status.text }}"></div>
+                    </td>
+                {% endwith %}
+                {% empty %}
+                <td>NA</td>
+            {% endfor %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td>No task available</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

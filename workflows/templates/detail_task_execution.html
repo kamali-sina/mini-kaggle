@@ -2,53 +2,68 @@
 {% load static %}
 
 {% block head %}
-    <style>li {
+<style>li {
         font-size: 17px;
         list-style: none;
         margin: 15px auto;
     }
-    </style>
+
+
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'data_platform/styles/basic_info.css' %}">
 {% endblock %}
 
 {% block title %}Task Execution Details{% endblock %}
 
 {% block body %}
 
-    <div class="ui segment">
-        <ul>
-            <li><a href="{% url 'workflows:detail_task' task_execution.task.id %}">Back to task</a></li>
-            <hr>
-            <li><strong>Task Name: </strong>{{ task_execution.task.name }}</li>
-            <li><strong>Status: </strong>{{ task_execution.get_status_display }}</li>
-
-            <li><strong>Log:</strong></li>
-            <li>
+<div class="ui segment">
+    <h4><a href="{% url 'workflows:detail_task' task_execution.task.id %}">Back to list</a></h4>
+    <div class="separator medium"></div>
+    <ul>
+        <div class="ui grid info-grid">
+            <div class="left floated left aligned four wide column key">
+                Task Name:
+            </div>
+            <div class="left floated left aligned twelve wide column value">
+                {{ task_execution.task.name }}
+            </div>
+            <div class="left floated left aligned four wide column key">
+                Status:
+            </div>
+            <div class="left floated left aligned twelve wide column value">
+                {{ task_execution.get_status_display }}
+            </div>
+            <div class="left floated left aligned sixteen wide column key">
+                Log:
+            </div>
+            <div class="left floated left aligned sixteen wide column value">
                 {% if task_execution_have_log %}
-                    <div class="ui visible message">
-                        <p>{{ task_execution_log }}</p>
-                    </div>
-                {% else %}
-                    <div class="ui visible message red">
-                        <p>log not found</p>
-                    </div>
-                    <p style="white-space: pre-line;">{{ task_execution_log }}</p>
+                <div class="ui visible message">
+                    <p>{{ task_execution_log }}</p>
                 </div>
-            {% else %}
-                <div class="ui visible message red">
+                {% else %}
+                <div class="ui visible message">
                     <p>log not found</p>
                 </div>
-            {% endif %}
-
-            </li>
-
-            <li><strong>Extracted datasets: </strong>
+                {% endif %}
+            </div>
+            {% if extracted_datasets %}
+            <div class="left floated left aligned four wide column key">
+                Extracted datasets:
+            </div>
+            <div class="left floated left aligned twelve wide column value">
                 <ul>
                     {% for dataset in extracted_datasets %}
-                        <li><a href="{% url 'datasets:detail' dataset.id %}">{{ dataset }}</a>
-                    {% endfor %}
+                    <li><a href="{% url 'datasets:detail' dataset.id %}">{{ dataset }}</a>
+                        {% endfor %}
                 </ul>
-            </li>
-        </ul>
-    </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="separator medium"></div>
+    </ul>
+</div>
+
 
 {% endblock %}

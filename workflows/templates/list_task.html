@@ -32,7 +32,7 @@
     {% for task in tasks %}
     <tr>
         <td>
-            <i class="clipboard outline large left aligned icon"></i>
+            <i class="check left aligned icon"></i>
             <a class="header" href="{{ task.pk }}/">{{ task.name }}</a>
         </td>
         <td>{{ task.get_task_type_display }}</td>
@@ -78,3 +78,4 @@
 
 
 {% endblock %}
+
