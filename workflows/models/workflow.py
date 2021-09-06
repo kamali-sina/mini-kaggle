@@ -17,8 +17,11 @@ class Workflow(models.Model):
         return str(self.name)
 
     def exceeds_active_execution_limit(self):
-        active_executions_count = self.workflowexecution_set.all().count()
+        active_executions_count = self.get_active_executions_count()
         return active_executions_count >= self.max_active_executions_count
+
+    def get_active_executions_count(self):
+        return self.workflowexecution_set.filter(status=WorkflowExecution.StatusChoices.RUNNING).count()
 
 
 class WorkflowExecution(models.Model):

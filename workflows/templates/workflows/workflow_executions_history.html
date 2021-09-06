@@ -1,7 +1,7 @@
-<table class="ui collapsing table">
+<table class="ui collapsing table" style="width: 100%;">
     <thead>
     <tr>
-        <th>Name</th>
+        <th></th>
         {% for workflow_execution in workflow_executions %}
             {% ifchanged %}
             <th>{{ workflow_execution.created_at.time }}</th>
@@ -18,7 +18,7 @@
             {% with workflow_execution_status=status|get_value:workflow_execution.status %}
                 <td>
                     <div style="background-color: {{ workflow_execution_status.color }};
-                            border-radius: 50%; width: 30px; height: 30px; border-style: solid; border-color: black; border-width: 1px"
+                            border-radius: 50%; width: 20px; height: 20px;"
                          onclick="location.href='{% url 'workflows:detail_workflow' workflow.id %}';"
                          title="status: {{ workflow_execution_status.text }}"></div>
                 </td>
@@ -28,15 +28,20 @@
     {% for task,task_executions in workflow_task_executions.items %}
         <tr>
             <td>{{ task.name }}</td>
-            {% for task_execution in task_executions reversed %}
+            {% for task_execution in task_executions %}
+                {% if task_execution %}
                 {% with task_execution_status=status|get_value:task_execution.status %}
                     <td>
-                        <div style="background-color: {{ task_execution_status.color }};
-                                width: 30px; height: 30px; border-style: solid; border-color: black; border-width: 1px"
+                        <div style="background-color: {{ task_execution_status.color }}; width: 20px; height: 20px;"
                              onclick="location.href='{% url 'workflows:detail_task' task.id %}';"
                              title="status: {{ task_execution_status.text }}"></div>
                     </td>
                 {% endwith %}
+                {% else %}
+                    <td>
+                        <div style="background-color: transparent;width: 20px; height: 20px;"></div>
+                    </td>
+                {% endif %}
                 {% empty %}
                 <td>NA</td>
             {% endfor %}

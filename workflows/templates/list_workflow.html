@@ -32,6 +32,7 @@
         <th>Creator</th>
         <th>Last run status</th>
         <th>Last run time</th>
+        <th>Active runs</th>
         <th>Actions</th>
     </tr>
     </thead>
@@ -47,8 +48,7 @@
         <td>
             {% with workflow_execution_status=status|get_value:workflow.workflowexecution_set.last.status %}
             <div class="column"
-                 style=" margin: 5px; border-radius: 50%; width: 30px; height: 30px;
-                        border-style: solid; border-color: black; border-width: 1px;
+                 style=" margin: 5px; border-radius: 50%; width: 20px; height: 20px;
                         background-color: {{ workflow_execution_status.color }}"
                  title="status: {{ workflow_execution_status.text }}">
             </div>
@@ -59,6 +59,7 @@
         <td>N/A</td>
         <td>N/A</td>
         {% endif %}
+        <td>{{ workflow.get_active_executions_count }}</td>
         <td style="display: flex;">
             <form method="post" style="margin: 10px 5px;" action="{% url 'workflows:run_workflow' workflow.id %}">
                 {% csrf_token %}
@@ -87,10 +88,10 @@
             {% if workflow.schedule %}
             <form method="post" style="margin: 10px 2px; display: flex; justify-content: center; align-items: center;">
                 {% csrf_token %}
-                <span class="ui toggle checkbox {% if not workflow.schedule.paused %}checked{% endif %}"
+                <span class="ui toggle checkbox"
                     style="display: flex; font-size: smaller; color: grey;">
                     <input type="checkbox" name="pause" onchange="changePauseStatus(this, {{ workflow.id }})"
-                            checked="">
+                            {% if not workflow.schedule.paused %}checked=""{% endif %}>
                         {% if workflow.schedule.paused %}OFF{% else %}ON{% endif %}
                 </span>
             </form>

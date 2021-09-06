@@ -18,15 +18,15 @@ RECENT_EXECUTIONS = 12
 STATUS_CONTEXT_DICT = {
     WorkflowExecution.StatusChoices.FAILED: {
         "text": "failed",
-        "color": "red",
+        "color": "#ff4242",
     },
     WorkflowExecution.StatusChoices.SUCCESS: {
         "text": "success",
-        "color": "green",
+        "color": "#68f26f",
     },
     WorkflowExecution.StatusChoices.RUNNING: {
         "text": "running",
-        "color": "blue",
+        "color": "#53848c",
     },
     WorkflowExecution.StatusChoices.PENDING: {
         "text": "pending",
@@ -101,7 +101,6 @@ def generate_chart_context(workflow, context):
         task = workflow_task_dependency.task
         context['tasks'].append(task.name)
         context['task_executions_run_time'][task.name] = []
-        print(task.taskexecution_set.all())
         for task_execution in task.taskexecution_set.all():
             if task_execution.run_time:
                 context['task_executions_run_time'][task.name].append(task_execution.run_time)
@@ -138,13 +137,17 @@ def generate_dag_context(context, workflow: Workflow):
 
 
 def get_task_executions_context(workflow, context):
-    workflow_tasks_id = workflow.task_dependencies.values_list('task', flat=True)
-    workflow_tasks = Task.objects.filter(id__in=workflow_tasks_id)
+    workflow_executions = workflow.workflowexecution_set.all().order_by('-created_at')[:RECENT_EXECUTIONS]
+    workflow_tasks_ids = workflow.task_dependencies.values_list('task', flat=True)
+    workflow_tasks = Task.objects.filter(id__in=workflow_tasks_ids)
     for workflow_task in workflow_tasks:
         context['workflow_task_executions'][workflow_task] = []
-        task_executions = workflow_task.taskexecution_set.filter(task__taskdependency__workflow=workflow).order_by(
-            '-created_at')[:RECENT_EXECUTIONS]
-        context['workflow_task_executions'][workflow_task] = task_executions
+        for workflow_execution in workflow_executions:
+            try:
+                task_execution = workflow_execution.task_dependency_executions.get(task_execution__task=workflow_task).task_execution
+            except:
+                task_execution = {}
+            context['workflow_task_executions'][workflow_task].append(task_execution)
 
 
 class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailView):
@@ -160,7 +163,7 @@ class WorkflowDetailView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, DetailVie
         context = super().get_context_data(**kwargs)
         workflow = context['workflow']
         context['workflow_executions'] = WorkflowExecution.objects.filter(workflow=workflow).order_by(
-            '-created_at__time').reverse()[:RECENT_EXECUTIONS]
+            '-created_at__time')[:RECENT_EXECUTIONS]
 
         context['status'] = STATUS_CONTEXT_DICT
 
