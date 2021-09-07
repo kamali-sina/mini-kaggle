@@ -3,7 +3,7 @@ from channels.generic.websocket import WebsocketConsumer
 
 from notebooks.models import Cell, Notebook
 from notebooks.services.notebook import get_notebook_session_service
-from notebooks.services.session import SessionIsDown
+from notebooks.services.session import SessionIsDown, FifoIsNotAvailable
 
 
 class NotebookConsumer(WebsocketConsumer):
@@ -32,7 +32,10 @@ class NotebookConsumer(WebsocketConsumer):
             result = session_service.run_script(code)
             message_type = "run_cell"
         except SessionIsDown:
-            result = "Session is down. Please restart session"
+            result = "Your session is down. Please restart session"
+            message_type = "notification"
+        except FifoIsNotAvailable:
+            result = "Your session is die. Please restart session"
             message_type = "notification"
 
         self.send(text_data=json.dumps({
