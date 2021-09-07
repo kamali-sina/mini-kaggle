@@ -24,8 +24,8 @@ const EDITOR_CONFIG = {
 }
 
 
-window.onload = function() {
-    if(document.querySelectorAll('[id^=cell_code_]').length) {
+window.onload = function () {
+    if (document.querySelectorAll('[id^=cell_code_]').length) {
         // Initialize notebook cells with editor
         createEditorForCellElements()
     } else {
@@ -37,7 +37,7 @@ window.onload = function() {
     // Initialize Semantic dropdown
     $('.ui.dropdown').dropdown({
         apiSettings: {
-          url: `${window.location.origin}/notebooks/snippets/`
+            url: `${window.location.origin}/notebooks/snippets/`
         }
     })
 }
@@ -198,6 +198,14 @@ function deleteCell(cellId) {
 }
 
 
+function clearResults() {
+    /* Clear all results after success restart session */
+    const resultElements = document.getElementsByClassName("cell-res")
+    while(resultElements.length > 0){
+        resultElements[0].parentNode.parentNode.remove();
+    }
+}
+
 function removeCellElement(cellId) {
     /* Removes the given cell's entire elements from the DOM */
 
@@ -208,7 +216,7 @@ function removeCellElement(cellId) {
 
 function restartSession() {
     /* Restart the session for the current notebook */
-    document.getElementById("page-loading").style.display="block"
+    document.getElementById("page-loading").style.display = "block"
     const initObject = {
         method: 'POST',
         headers: {
@@ -220,10 +228,13 @@ function restartSession() {
     fetch(`${window.location.href}restart_kernel/`, initObject)
         .then(handleErrors)
         .then(() => showToast('Session restarted'))
-        .catch(function(e)  {showToast('Failed to restart the session');})
+        .then(() => clearResults())
+        .catch(function (e) {
+            showToast('Failed to restart the session');
+        })
         .finally(() => {
-    markStoppedRestarting()
-  });
+            markStoppedRestarting()
+        });
 }
 
 
@@ -231,7 +242,7 @@ function markRestarting() {
     const restartSessionIcon = document.getElementById("restart-session-icon")
     restartSessionIcon.classList.add('loading')
     restartSessionIcon.parentNode.style.pointerEvents = 'none'
-    document.getElementById("page-loading").style.display="block"
+    document.getElementById("page-loading").style.display = "block"
 }
 
 
@@ -239,7 +250,7 @@ function markStoppedRestarting() {
     const restartSessionIcon = document.getElementById("restart-session-icon")
     restartSessionIcon.classList.remove('loading')
     restartSessionIcon.parentNode.style.pointerEvents = 'auto'
-    document.getElementById("page-loading").style.display="none"
+    document.getElementById("page-loading").style.display = "none"
 }
 
 
@@ -248,11 +259,12 @@ function runCell(cellId) {
 
     markRunning(cellId)
     const cellEditor = window[getCellEditorName(cellId)]
-    if(webSocket.readyState == 1) {
+    if (webSocket.readyState == 1) {
         data = JSON.stringify({cell_id: cellId, code: cellEditor.getValue()})
         webSocket.send(data)
     } else {
-        showToast('Trying to connect to the server ...')
+        showToast('The connection has been lost. Please Wait...');
+        markStopped(cellId);
     }
 }
 
@@ -298,7 +310,7 @@ function addSnippet() {
         .catch(e => showToast('Failed to add the snippet'))
 }
 
-$(document).bind('keydown', function(e) {
+$(document).bind('keydown', function (e) {
     if (e.shiftKey && e.which === 78) {
         addCell('')
         return false;
