@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <script src="{% static 'data_platform/scripts/jquery.js' %}"></script>
     {% block head %}
     <!--style, link and other head tags go here-->
     {% endblock %}
@@ -26,7 +27,6 @@
     <meta name="keywords" content="dataset, workflow, task, data">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link type="text/css" rel="stylesheet" href="{% static 'data_platform/styles/semantic.css' %}">
-    <script src="{% static 'data_platform/scripts/jquery.js' %}"></script>
     <script src="{% static 'data_platform/scripts/semantic.js' %}"></script>
     <title>{% block title %}<!--page title goes here-->{% endblock %}</title>
 </head>

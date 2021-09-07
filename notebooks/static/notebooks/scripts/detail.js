@@ -17,7 +17,7 @@ const EDITOR_CONFIG = {
     mode: "python",
     viewportMargin: Infinity,
     extraKeys: {
-        "Ctrl-Enter": function (cm) {
+        "Shift-Enter": function (cm) {
             cm.getWrapperElement().closest(".cell").querySelector(".cell-run").click()
         }
     }
@@ -297,3 +297,10 @@ function addSnippet() {
         .then(() => showToast('Snippet added successfully'))
         .catch(e => showToast('Failed to add the snippet'))
 }
+
+$(document).bind('keydown', function(e) {
+    if (e.shiftKey && e.which === 78) {
+        addCell('')
+        return false;
+    }
+});
