@@ -35,7 +35,7 @@ class NotebookConsumer(WebsocketConsumer):
             result = "Your session is down. Please restart session"
             message_type = "notification"
         except FifoIsNotAvailable:
-            result = "Your session is die. Please restart session"
+            result = "Your session is dead. Please restart session"
             message_type = "notification"
 
         self.send(text_data=json.dumps({
