@@ -19,7 +19,8 @@
     <div class="right floated left aligned ten wide column {% if field.errors %} field error {% endif %} interactive_input"
          contenteditable="true" onkeyup="bindTo(event, '{{ field.id_for_label }}')">
     </div>
-    {% endif %}
+    {{ field }}
+    {% else %}
     {% if field.field.create_link %}
     <div class="right floated left aligned nine wide column {% if field.errors %} field error {% endif %}">
         {{ field }}
@@ -33,6 +34,7 @@
     <div class="right floated left aligned ten wide column {% if field.errors %} field error {% endif %}">
         {{ field }}
     </div>
+    {% endif %}
     {% endif %}
     {{ field.errors }}
     {% endfor %}

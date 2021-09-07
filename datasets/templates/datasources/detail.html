@@ -2,38 +2,40 @@
 {% load static %}
 
 {% block head %}
-    <link rel="stylesheet" type="text/css" href="{% static 'data_platform/styles/basic_info.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'data_platform/styles/basic_info.css' %}">
 {% endblock %}
 
 {% block title %}DataSource Details{% endblock %}
 
 {% block body %}
-    <div class="ui segment">
-        <h4><a href="{% url 'datasets:list_datasource' %}">Back to list</a></h4>
-        <ul>
-            <div class="separator medium"></div>
-            <h1 class="title">{{ datasource.title }}</h1>
-            <div class="separator medium"></div>
-            <table class="ui very basic table">
-                <thead>
-                <tr>
-                    <th style="color: #a6a6a6;">Column Title</th>
-                    {% for column in datasource.column_set.all %}
-                        <th>{{ column.title }}</th>
-                    {% endfor %}
-                </tr>
-                <tr>
-                    <th style="color: #a6a6a6;">Column Type</th>
-                    {% for column in datasource.column_set.all %}
-                        <th>{{ column.type }}</th>
-                    {% endfor %}
-                </tr>
-                </thead>
-            </table>
-        </ul>
-    </div>
-    <a href="{% url 'datasets:delete_datasource' pk=datasource.id %}" class="ui negative button">
-        Delete
-    </a>
+<div class="ui segment">
+    <h4><a href="{% url 'datasets:list_datasource' %}">Back to list</a></h4>
+    <ul>
+        <div class="separator medium"></div>
+        <h1 class="title">{{ datasource.title }}</h1>
+        <div class="separator medium"></div>
+        <table class="ui very basic table">
+            <thead>
+            <tr>
+                <th style="color: #a6a6a6;">Column Title</th>
+                {% for column in datasource.column_set.all %}
+                <th>{{ column.title }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th style="color: #a6a6a6;">Column Type</th>
+                {% for column in datasource.column_set.all %}
+                <th>{{ column.type }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+        </table>
+
+        <div class="separator medium"></div>
+        <a href="{% url 'datasets:delete_datasource' pk=datasource.id %}" class="ui negative button">
+            Delete
+        </a>
+    </ul>
+</div>
 
 {% endblock %}
