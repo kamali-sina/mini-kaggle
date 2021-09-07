@@ -44,7 +44,9 @@ def get_executable_task_dependencies(workflow_execution):
 
 
 def update_workflow_execution_status(workflow_execution, executable_task_dependencies):
-    if executable_task_dependencies:
+    if executable_task_dependencies or workflow_execution.task_dependency_executions.filter(
+            task_execution__status__in=[TaskExecution.StatusChoices.RUNNING,
+                                        TaskExecution.StatusChoices.PENDING]).exists():
         workflow_execution.status = WorkflowExecution.StatusChoices.RUNNING
     elif workflow_execution.task_dependency_executions.filter(
             task_execution__status=TaskExecution.StatusChoices.FAILED).exists():
