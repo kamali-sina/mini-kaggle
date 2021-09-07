@@ -15,7 +15,12 @@ webSocket.onmessage = function (message) {
 const EDITOR_CONFIG = {
     lineNumbers: true,
     mode: "python",
-    viewportMargin: Infinity
+    viewportMargin: Infinity,
+    extraKeys: {
+        "Ctrl-Enter": function (cm) {
+            cm.getWrapperElement().closest(".cell").querySelector(".cell-run").click()
+        }
+    }
 }
 
 
