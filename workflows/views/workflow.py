@@ -121,7 +121,7 @@ def generate_dag_context(context, workflow: Workflow):
             'id': str(task_dependency.task.id),
             'label': task_dependency.task.name,
             'x': 50 * task_dependency.id,
-            'y': 50 * task_dependency.parent_tasks.all().count(),
+            'y': random.randint(40, 50) * task_dependency.parent_tasks.all().count(),
             'color': STATUS_CONTEXT_DICT[te_status]['color'],
             'size': 2,
         }
