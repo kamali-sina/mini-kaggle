@@ -105,6 +105,7 @@ class SessionService:
         )
         self.session.container_id = str(self.container.id)
         self.session.status = Session.SessionStatus.RUNNING
+        self.session.run_counter = 1
         self.session.save()
 
     def stop(self):
