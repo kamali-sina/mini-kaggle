@@ -90,9 +90,7 @@
                 <span class="ui toggle checkbox" id="schedule_{{ workflow.id }}"
                     style="display: flex; font-size: smaller; color: grey;">
                     <input type="checkbox" name="pause" onchange="changePauseStatus(this, {{ workflow.id }})"
-                            {% if not workflow.schedule.paused %}checked=""{% endif %}>
-                        {% if workflow.schedule.paused %}OFF{% else %}ON{% endif %}
-                </span>
+                            {% if not workflow.schedule.paused %}checked=""{% endif %}>{% if workflow.schedule.paused %}OFF{% else %}ON{% endif %}</span>
             </form>
             {% endif %}
         </td>
