@@ -15,7 +15,7 @@
             {% csrf_token %}
             <br>
             <input type="submit" value="Yes, delete it" class="negative ui button">
-            <a href="{% url 'workflows:detail_workflow' view.object.id %}" class="ui button">Cancel</a>
+            <a href="{% url 'workflows:list_workflow' %}" class="ui button">Cancel</a>
         </form>
     </div>
 </div>
