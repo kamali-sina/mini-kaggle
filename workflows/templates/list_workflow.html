@@ -11,7 +11,6 @@
 </style>
 <script>
     const CSRFToken = `{{ csrf_token }}`
-
 </script>
 <link rel="stylesheet" type="text/css" href="{%static 'data_platform/styles/toast.css' %}">
 <script src="{% static 'data_platform/scripts/toast.js' %}"></script>
@@ -88,7 +87,7 @@
             {% if workflow.schedule %}
             <form method="post" style="margin: 10px 2px; display: flex; justify-content: center; align-items: center;">
                 {% csrf_token %}
-                <span class="ui toggle checkbox"
+                <span class="ui toggle checkbox" id="schedule_{{ workflow.id }}"
                     style="display: flex; font-size: smaller; color: grey;">
                     <input type="checkbox" name="pause" onchange="changePauseStatus(this, {{ workflow.id }})"
                             {% if not workflow.schedule.paused %}checked=""{% endif %}>
