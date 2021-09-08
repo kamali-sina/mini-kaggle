@@ -1,13 +1,12 @@
 window.onload = () => {
     $('.ui.checkbox').checkbox();
-
 }
 
 
 function changePauseStatus(element, workflowId) {
     /* Requests to change the workflows schedule ON/OFF status on the checkbox value changed */
 
-    isChecked = $('.ui.checkbox').checkbox('is checked');
+    isChecked = $(`.ui.checkbox#schedule_${workflowId}`).checkbox('is checked');
     element.parentNode.style.pointerEvents = 'none'
 
     const initObject = {
