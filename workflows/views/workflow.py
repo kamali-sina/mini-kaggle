@@ -61,7 +61,7 @@ class WorkflowCreateView(LoginRequiredMixin, CreateView):
         workflow.creator = self.request.user
         workflow.save()
         messages.success(self.request, 'Workflow created successfully.')
-        success_url = reverse("workflows:detail_workflow", args=(workflow.pk,))
+        success_url = reverse("workflows:list_workflow")
         return HttpResponseRedirect(success_url)
 
 
@@ -144,7 +144,8 @@ def get_task_executions_context(workflow, context):
         context['workflow_task_executions'][workflow_task] = []
         for workflow_execution in workflow_executions:
             try:
-                task_execution = workflow_execution.task_dependency_executions.get(task_execution__task=workflow_task).task_execution
+                task_execution = workflow_execution.task_dependency_executions.get(
+                    task_execution__task=workflow_task).task_execution
             except:
                 task_execution = {}
             context['workflow_task_executions'][workflow_task].append(task_execution)
@@ -200,9 +201,7 @@ class WorkflowScheduleRedirectView(LoginRequiredMixin, WorkflowCreatorOnlyMixin,
 class WorkflowScheduleFormView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, FormView):
     model = WorkflowSchedule
     form_class = WorkflowScheduleForm
-
-    def get_success_url(self):
-        return reverse("workflows:detail_workflow", args=(self.kwargs['pk'],))
+    success_url = reverse_lazy("workflows:list_workflow")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -216,7 +215,7 @@ class WorkflowScheduleCreateView(WorkflowScheduleFormView, CreateView):
         workflow_schedule = form.save(commit=False)
         workflow_schedule.workflow = workflow
         workflow_schedule.save()
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(self.success_url)
 
 
 class WorkflowScheduleUpdateView(WorkflowScheduleFormView, UpdateView):
@@ -230,7 +229,7 @@ class WorkflowRunView(LoginRequiredMixin, WorkflowCreatorOnlyMixin, View):
         if request.method == 'POST':
             workflow = get_object_or_404(Workflow, pk=kwargs['pk'])
             trigger_workflow(workflow)
-            return HttpResponseRedirect(reverse('workflows:detail_workflow', args=(workflow.pk,)))
+            return HttpResponseRedirect(reverse('workflows:list_workflow'))
         return HttpResponse(status=400)
 
 
