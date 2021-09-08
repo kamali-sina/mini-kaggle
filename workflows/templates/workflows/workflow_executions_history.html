@@ -4,7 +4,7 @@
         <th></th>
         {% for workflow_execution in workflow_executions %}
             {% ifchanged %}
-            <th>{{ workflow_execution.created_at.time }}</th>
+            <th>{{ workflow_execution.created_at|time }}</th>
             {% else %}
             <th>--></th>
             {% endifchanged %}
