@@ -47,7 +47,7 @@ limit-inference-results=100
 # usually to register additional checkers.
 load-plugins=pylint_django,
 
-django-settings-module=data_platform.settings
+django-settings-module=mini_kaggle.settings
 
 # Pickle collected data for later comparisons.
 persistent=yes
