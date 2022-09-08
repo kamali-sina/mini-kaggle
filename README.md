@@ -22,3 +22,7 @@ Then to run the project, simply run:
     ./manage.py runserver
 
 Keep in mind that the first line has to be run only once.
+
+## Licence
+
+All rights are reserved by the developers. For more information you can read [LICENCE](https://github.com/kamali-sina/mini-kaggle/blob/main/LICENCE).
