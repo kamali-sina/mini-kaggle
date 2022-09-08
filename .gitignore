@@ -16,8 +16,6 @@ __pycache__/
 CHANGELOG.md
 CONTRIBUTING.draft.md
 Gruntfile.js
-LICENSE.txt
-README.md
 examples/
 node_modules/
 package-lock.json
