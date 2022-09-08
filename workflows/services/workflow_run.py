@@ -1,6 +1,6 @@
 from django.db.models import F, Count, Q
 
-from data_platform.celery import app
+from mini_kaggle.celery import app
 
 from workflows.models import TaskExecution, WorkflowExecution
 from workflows.models.task_dependency import TaskDependencyExecution

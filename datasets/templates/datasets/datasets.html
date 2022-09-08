@@ -1,4 +1,4 @@
-{% extends 'data_platform/basic.html' %}
+{% extends 'mini_kaggle/basic.html' %}
 {% load static %}
 
 {% block head %}{% endblock %}
@@ -30,7 +30,7 @@
 
         <br>
 
-        {% include 'data_platform/pagination.html' %}
+        {% include 'mini_kaggle/pagination.html' %}
 
     {% else %}
         <h2>No {{ visibility }} datasets available.</h2>

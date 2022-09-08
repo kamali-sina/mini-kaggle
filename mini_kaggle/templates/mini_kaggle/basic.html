@@ -1,0 +1,49 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <script src="{% static 'mini_kaggle/scripts/jquery.js' %}"></script>
+    {% block head %}
+    <!--style, link and other head tags go here-->
+    {% endblock %}
+    <style>
+        body {
+            font-family: Garamond, sans-serif;
+            overflow-x: hidden;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        html {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'mini_kaggle/styles/basic.css' %}">
+    <meta charset="utf-8">
+    <meta name="author" content="SummerCamp_Bakend_Team3">
+    <meta name="keywords" content="dataset, workflow, task, data">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="{% static 'mini_kaggle/styles/semantic.css' %}">
+    <script src="{% static 'mini_kaggle/scripts/semantic.js' %}"></script>
+    <title>{% block title %}<!--page title goes here-->{% endblock %}</title>
+</head>
+
+<body>
+{% include 'mini_kaggle/nav_bar.html' %}
+<div style="padding: 30px;" class="ui container">
+    {% include "mini_kaggle/messages.html" %}
+    {% block body %}
+    <!--body goes here-->
+    {% endblock %}
+</div>
+<div style="margin: 0px 50px 0px 50px">
+    {% block full_width_body %}
+    <!--used for non-centralized body-->
+    {% endblock %}
+</div>
+</body>
+
+</html>

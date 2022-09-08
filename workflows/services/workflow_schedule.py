@@ -3,7 +3,7 @@ import logging
 from django.db import transaction
 from django.utils import timezone
 
-from data_platform.celery import app
+from mini_kaggle.celery import app
 
 from workflows.models import WorkflowSchedule
 from workflows.services.workflow_run import trigger_workflow

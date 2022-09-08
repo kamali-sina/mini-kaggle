@@ -1,14 +1,14 @@
-{% extends 'data_platform/basic.html' %}
+{% extends 'mini_kaggle/basic.html' %}
 {% load static %}
 
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{% static 'users/styles/basic_form.css' %}">
-<link rel="stylesheet" type="text/css" href="{%static 'data_platform/styles/toast.css' %}">
-<script src="{%static 'data_platform/scripts/toast.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{%static 'mini_kaggle/styles/toast.css' %}">
+<script src="{%static 'mini_kaggle/scripts/toast.js' %}"></script>
 <script>
 const url = `{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{ request.path }}`
 </script>
-<script src="{% static 'data_platform/scripts/typed_form.js' %}"></script>
+<script src="{% static 'mini_kaggle/scripts/typed_form.js' %}"></script>
 {% endblock %}
 
 {% block title %}Create Notification{% endblock %}
