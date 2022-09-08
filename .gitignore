@@ -26,7 +26,7 @@ plugins/
 src/
 test/
 workflows/templates/dag.json
-!data_platform/static/data_platform/scripts/plugins
+!mini_kaggle/static/mini_kaggle/scripts/plugins
 
 # Distribution / packaging
 .Python
@@ -157,3 +157,4 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+.DS_Store
