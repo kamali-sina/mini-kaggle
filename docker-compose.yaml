@@ -37,7 +37,7 @@ services:
     restart: always
     build:
       context: .
-    command: celery -A data_platform worker -l INFO
+    command: celery -A mini_kaggle worker -l INFO
     volumes:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock:z
