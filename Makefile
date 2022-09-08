@@ -41,7 +41,7 @@ restart_broker:
 	docker start broker
 
 start_celery:
-	celery -A data_platform worker -l INFO --detach
+	celery -A mini_kaggle worker -l INFO --detach
 
 start_celerybeat:
-	celery -A data_platform beat
+	celery -A mini_kaggle beat
